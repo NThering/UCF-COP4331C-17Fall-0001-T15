@@ -5,6 +5,7 @@
  */
 package articlemanagerserver;
 import am_utils.CUtils;
+import database.Public;
 
 public class ArticleManagerServer {
 
@@ -13,7 +14,7 @@ public class ArticleManagerServer {
      */
     public static void main(String[] args) {
         // Logic for starting the server.
-        CUtils.PrintOutCategories();
+        CUtils.printOutCategories();
     }
     
 }

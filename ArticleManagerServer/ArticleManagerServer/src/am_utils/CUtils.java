@@ -20,34 +20,34 @@ public final class CUtils
     }
     
     /** Prints a standard message to the console. */
-    public static void Msg( String msg ) 
+    public static void msg( String msg ) 
     {
         System.out.println( msg );
     }
     
     /** Prints a standard message to the console only if debug mode is on. */
-    public static void DebugMsg( String msg ) 
+    public static void debugMsg( String msg ) 
     {
         if ( DEBUGMODE )
             System.out.println( "[DEBUG] " + msg );
     }
     
     /** Prints a warning to the console. Should only be used to reflect something going wrong. */
-    public static void Warning( String warningString ) 
+    public static void warning( String warningString ) 
     {
         System.out.println( "[WARNING] " + warningString );
     }
     
     
     /** Print out a nice list of all categories and subcategories.*/
-    public static void PrintOutCategories()
+    public static void printOutCategories()
     {
-        CUtils.Msg("Printing categories!\n");
+        CUtils.msg("Printing categories!\n");
         for( CategoryEnums.MainCategory mainCat: CategoryEnums.MainCategory.values() )
         {
-            CUtils.Msg(mainCat.PrintName());
-            for( CategoryEnums.SubCategory subCat: mainCat.Children() )
-                CUtils.Msg( "\t" + subCat.PrintName() );
+            CUtils.msg(mainCat.printName());
+            for( CategoryEnums.SubCategory subCat: mainCat.children() )
+                CUtils.msg( "\t" + subCat.printName() );
         }
     }
 }

@@ -15,47 +15,48 @@ import java.util.Date;
  */
 public class ArticleInfo {
     /** The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable. */
-    int ArticleID; 
+    private int articleID; 
         
     /** DOI number of the article, if any. */
-    public String DOINumber; 
+    public String doiNumber; 
         
     /**The name that the article is displayed under, can be the same as other articles.*/
-    public String PrintName; 
+    public String printName; 
         
     /** Category the article is assigned to */
-    public MainCategory MainCategory; 
+    public MainCategory mainCategory; 
         
     /** Sub-Category the article is assigned to */
-    public SubCategory SubCategory; 
+    public SubCategory subCategory; 
         
     /** Authors of the article */
-    public String Author;
+    public String author;
         
     /** Account who uploaded the article */
-    public String Owner; 
+    public String owner; 
         
     /** Text of the abstract section of the document, limited to 5000 characters.  "..." will replace the last 3 characters if the 5000 limit is exceeded.*/
-    public String Abstract; 
+    public String abstractText; 
         
     /** Time the article was uploaded or last updated. */
-    public Date UploadTime; 
+    public Date uploadTime; 
         
-    /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed. */
+    /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
+     * @param articleID */
     public ArticleInfo( int articleID )
     {
-        ArticleID = articleID;
+        this.articleID = articleID;
     }
         
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed. */
-    void SetArticleID( int articleID ) 
+    void setArticleID( int articleID ) 
     { 
         if ( articleID == 0 ) // We can't overwrite the article ID of an article that already has an ID!
-            ArticleID = articleID; 
+            this.articleID = articleID; 
         else
-            CUtils.Warning( "Tried to assign ArticleID to article that's already been assigned one!" );
+            CUtils.warning( "Tried to assign articleID to article that's already been assigned one!" );
     }
         
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
-    int GetArticleID() { return ArticleID; }
+    int getArticleID() { return articleID; }
 }

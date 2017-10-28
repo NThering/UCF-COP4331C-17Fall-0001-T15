@@ -1,7 +1,5 @@
 package am_utils;
 
-import java.util.ArrayList;
-
 public final class CategoryEnums {
 
     public enum SubCategory
@@ -22,7 +20,7 @@ public final class CategoryEnums {
             this.printName = printName;
         }
 
-        public String PrintName()
+        public String printName()
         {
             return printName;
         }
@@ -46,12 +44,12 @@ public final class CategoryEnums {
             this.children = children;
         }
 
-        public String PrintName()
+        public String printName()
         {
             return printName;
         }
 
-        public SubCategory[] Children()
+        public SubCategory[] children()
         {
             return children;
         }
