@@ -21,6 +21,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,14 +30,14 @@ public class MainActivity extends AppCompatActivity {
 
         String root = Environment.getExternalStorageDirectory().toString();
 
-        File pdffile = convertToPDF(createNewFile("helloworld.html"));
+        File pdffile = convertToPDF(createNewFile("helloworld2.txt"));
         convertFromPDF(pdffile,3);
 
-           Toast.makeText(getApplicationContext(),pdffile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+        //   Toast.makeText(getApplicationContext(),pdffile.getAbsolutePath(), Toast.LENGTH_LONG).show();
 //  TextView output=(TextView) findViewById(R.id.myTextbox);
         // Assuming that 'output' is the id of your TextView
 
-
+        listFiles();
         //  output.setText(result);
 
     }
@@ -54,9 +55,24 @@ public class MainActivity extends AppCompatActivity {
         //}
 
 
+       CategoryEnums.MainCategory categoryMain = new CategoryEnums.MainCategory("Animals");
+        categoryMain.addNewSubcategory("Dogs");
+        categoryMain.addNewSubcategory("Cats");
+        categoryMain.addNewSubcategory("Birds");
 
+        CategoryEnums.SubCategory[] children = categoryMain.children();
+        toast(categoryMain.printName() + "");           // prints Animals
+
+        for(int q = 0; q < categoryMain.size(); q++){
+            toast(children[q].printName());
+            // prints Dogs, Cats, Birds
+        }
 
     }
+    public void toast(String s){
+        Toast.makeText(getApplicationContext(), s , Toast.LENGTH_LONG).show();
+    }
+
     public File convertToPDF(File inputFile ){
 
         if(!inputFile.exists()){
@@ -227,6 +243,10 @@ public class MainActivity extends AppCompatActivity {
             Canvas canvas = page.getCanvas();
             Paint paint = new Paint();
 
+            // look up how to use default fonts in paint and make sure font sizes look good
+            paint.setLetterSpacing((float)0.1);
+            paint.setTextSize((float)3.0);
+            paint.getFontMetrics();
             canvas.drawText(data, 10, 10, paint);
 
 
