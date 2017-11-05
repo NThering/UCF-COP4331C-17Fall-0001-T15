@@ -96,6 +96,60 @@ public class FileConverter extends AppCompatActivity {
         return result;
     }
 
+
+
+    public String getDoiFromText(String text) {
+
+
+        // first search for 10. and then skip the first / and substring on the following space
+        if (text.contains("10.")) {
+            text = text.substring(text.indexOf("10."));
+
+
+            if (text.contains("/")) {
+
+               // text = text.substring(0, text.indexOf((char)0x0A));
+
+                try{
+                  //  text = text.substring(0, text.indexOf((char)0x20));
+                }
+                catch (Exception e){
+
+                }
+                try{
+                    text = text.substring(0, text.indexOf((char)0x0A));
+                }
+                catch (Exception e){
+
+                }
+
+
+            }
+
+
+        }
+        return text;
+
+    }
+
+
+    public String getAbstractFromText(String text) {
+
+
+        // first search for 10. and then skip the first / and substring on the following space
+        if (text.contains("abstract")) {
+            text = text.substring(text.indexOf("abstract", 5000));
+
+        }
+        else{
+            if(text.length() > 5000){
+
+                text = text.substring(0, 5000);
+            }
+        }
+        return text;
+
+    }
     public String setPath(String filepath){
         String correctedPath = "";
         if(!filepath.contains("Article Manager")){
