@@ -1,7 +1,5 @@
 package com.remaclek.kelcamer.academicarticlemanager;
 
-import android.os.Environment;
-
 import java.io.File;
 
 /**
@@ -21,6 +19,7 @@ public class DefaultCategories {
              "Mailing",
             "Artificial Intelligence",
             "Machine Learning",
+             "USPS",
             "Visible Light Communication",
             "Infrared",
              "People",
@@ -48,52 +47,16 @@ public class DefaultCategories {
             mainCat[x] = new MainCategory(mainCategories[x]);
             index++;
         }
+
+
         categorize();
 
 
 
     }
 
-        public void categorize(){
+        public void categorize(File file){
 
-            if(mainCat == null) return;
-            if(mainCat[0] == null)  return;
-            if(mainCat[0].equals(""))  return;
-
-            FileConverter convert = new FileConverter();
-
-            String root = Environment.getExternalStorageDirectory().toString() + "/Article Manager/";
-            File directory = new File(root);
-
-            File[] allFiles = directory.listFiles();
-
-            // loop for all files in the Article Manager directory
-            for(int y = 0; y < allFiles.length; y++){
-
-                String name = allFiles[y].getName();
-                File convertedText = convert.convertFromPDF(allFiles[y], 1);
-                
-                String result = convert.readFile(convertedText.getName());
-
-                // loop through string array of categories and assign an id index
-                for(int z = 0; z < mainCategories.length; z++){
-                    test = result;
-                    if(result.contains(mainCategories[z])){
-
-                        mainCat[y].setID(z);
-                        mainCat[y].setName(mainCategories[z]);
-
-
-                    }
-
-
-
-
-                }
-
-
-
-            }
 
 
 
