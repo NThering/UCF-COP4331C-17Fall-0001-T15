@@ -1,4 +1,4 @@
-package com.remaclek.kelcamer.academicarticlemanager;
+package am_utils;
 
 import java.io.File;
 
@@ -49,7 +49,7 @@ public class DefaultCategories {
         }
 
 
-        categorize();
+        categorize(null);
 
 
 

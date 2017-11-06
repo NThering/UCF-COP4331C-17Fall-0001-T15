@@ -14,7 +14,7 @@ public class ArticleManagerServer {
      */
     public static void main(String[] args) {
         // Logic for starting the server.
-        CUtils.printOutCategories();
+        //CUtils.printOutCategories();
     }
     
 }

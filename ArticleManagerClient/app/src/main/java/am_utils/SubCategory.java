@@ -1,4 +1,4 @@
-package com.remaclek.kelcamer.academicarticlemanager;
+package am_utils;
 
 /**
  * Created by Kelsey on 10/31/17.

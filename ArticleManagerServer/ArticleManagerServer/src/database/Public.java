@@ -7,8 +7,8 @@ package database;
 import am_utils.ArticleInfo;
 import java.io.File;
 import java.util.ArrayList;
-import am_utils.CategoryEnums.MainCategory;
-import am_utils.CategoryEnums.SubCategory;
+import am_utils.MainCategory;
+import am_utils.SubCategory;
 /**
  *
  * @author NThering

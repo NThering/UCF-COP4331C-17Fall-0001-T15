@@ -35,6 +35,8 @@ public final class CUtils
 
 
     /** Print out a nice list of all categories and subcategories.*/
+    // Invalidated, Kelsey will have to fix.
+    /*
     public static void printOutCategories()
     {
         CUtils.msg("Printing categories!\n");
@@ -44,5 +46,5 @@ public final class CUtils
             for( CategoryEnums.SubCategory subCat: mainCat.children() )
                 CUtils.msg( "\t" + subCat.printName() );
         }
-    }
+    }*/
 }
