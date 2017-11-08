@@ -1,0 +1,19 @@
+Tentative client-server communication model:
+Communications will follow the space-delimited pattern of OPTYPE ACTION (ACTION), where:
+	OPTYPE gives the general type of action the client would like the server to take and
+	ACTION gives further information, I.E. username for login, password for login, article ID to retrieve.
+
+Additionally, the client will be required to give the server a heartbeat ping every second to acknowledge that it is still connected.
+	The purpose of this is to allow the server to identify client connections which have been dropped unceremoniously for cleanup.
+		This will in turn allow us to avoid memory/resource leaks due to 'zombie' connections.
+	The server listen timeout will be set to two seconds, and will count the number of consecutive timeouts and failed communication attempts.
+		If this number passes an arbitrary threshold, the connection will be terminated.
+		Any successful communication will reset the consecutive failure count to 0, so intermittent failures will not add up to a client termination.
+		
+A tentative mapping of the API codes is listed below:
+* denotes a command that requires user permissions to be executed.
+OPTYPE			ACTION		(ACTION)		PURPOSE
+0				(none)		(none)			(heartbeat) Notifies server that connection is still live. Has no function otherwise and is simply discarded by parser
+1				"username"	"Password"		logs in to the server. The majority of other commands will not be accessible until a valid login occurs.
+2*				"search string"				Search catalogue?
+10				(none)		(none)			Close connection
