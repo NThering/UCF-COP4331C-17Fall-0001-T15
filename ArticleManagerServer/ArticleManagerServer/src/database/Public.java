@@ -9,12 +9,42 @@ import java.io.File;
 import java.util.ArrayList;
 import am_utils.MainCategory;
 import am_utils.SubCategory;
+import java.sql.*;
 /**
  *
  * @author NThering
+ * @author MAllen
  */
 public class Public {
-
+	static Connection DBConnection;
+	
+	/** Returns 0 if the database connection is successful, nonzero otherwise */
+	/** MUST BE RUN BEFORE ANY OTHER FUNCTIONS IN THIS CLASS CAN BE RUN*/
+	public static int startDBCon(String DBInfo, String DBUsername, String DBPass)
+	{
+		try
+		{
+			Class.forName("com.mysql.Driver");
+			DBConnection = DriverManager.getConnection(DBInfo, DBUsername, DBPass);
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+			return 1;
+		}
+		return 0;
+	}
+	
+	public static int login(String username, String password) throws SQLException
+	{
+		Statement stmt = DBConnection.createStatement();
+		stmt.execute("select * from users where name=\"" + username + "\" and password=\"" + password + "\";");
+		ResultSet rs = stmt.getResultSet();
+		if(!rs.first())
+		{
+			return -1; // Return notification of invalid login.
+		}
+		return 0;
+	}
     /** Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server. */
     public static ArrayList<ArticleInfo> getArticlesFromCategory( MainCategory articleCategory, SubCategory subCategory )
     {
