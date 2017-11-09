@@ -1,0 +1,189 @@
+Format:
+
+Major Category
+	Minor Category
+	Minor Category
+Major Category
+	Minor Category
+etc
+
+-------------------------------------------------------------
+
+
+Physics*
+	Acoustics
+	Agrophysics 
+	Astrophysics 
+	Astronony
+	Mechanics
+	Nuclear physics
+	Particle physics 
+	Quantum physics 
+	Statics 
+	Theoretical physics
+Chemistry*
+	Physical Chemistry
+	Ocean Chemistry
+	Organic Chemistry
+	Inorganic Chemistry
+	Nuclear Chemistry 
+	Analytical Chemistry
+Ecology
+	Animal ecology
+	Insect ecology
+	Microbial ecology
+	Paleoecology
+	Plant ecology
+Geology*
+	Geochemistry
+	Mineralogy
+	Paleontology
+	Volcanology
+	Stratigraphy
+	Geomorphology
+	Geophysics
+	Marine Geology
+Meteorology
+	Microscale meteorology
+	Mesoscale meteorology 
+	Synoptic scale meteorology 
+Biology*
+	Anatomy
+	Biomechanics
+	Biochemistry 
+	Biogeography 
+	Biophysics 
+	Biotechnology
+	Chronobiology
+	Cryobiology 
+	Ecology 
+	Genetics 
+	Microbiology 
+	Physiology 
+	Marine Biology
+Zoology*
+	Anthrozoology 
+	Entomology 
+	Ethology 
+	Herpetology
+	Ichthyology 
+	Mammalogy 
+	Neuroethology 
+	Ornithology
+	Parasitology 
+	Protozoology
+	Endocrinology 
+	Nematology 
+Botany*
+	Agronomy
+	Bryology 
+	Dendrology 
+	Ethnobotany
+	Lichenology 
+	Mycology 
+	Palynology 
+	Phycology 
+	Phytosociology
+	Pteridology 
+Mathematics*
+	Arithmetic
+	Geometry	
+	Number theory
+	Trigonometry
+	Topology
+	Calculus
+	Differential Equations
+	Analysis
+	Category theory
+	Set theory
+	Type theory
+	Combinatorics
+	Cryptography
+Engineering
+	Computer Engineering
+	Chemical Engineering
+	Civil Engineering
+	Electrical Engineering
+	Photonics Engineering
+	Mechanical Engineering
+	Systems Engineering
+Medicine*
+	Angiology
+	Cardiology
+	Endocrinology
+	Gastroenterology
+	Geriatrics
+	Hematology
+	Hepatology
+	Infectious disease
+	Nephrology
+	Neurology
+	Oncology
+	Pediatrics
+	Pulmonology
+	Rheumatology
+	Sports Medicine
+Computer Science*
+	Data structures and algorithms
+	Theory of computation
+	Information and coding theory
+	Programming language theory
+	Formal methods
+	Computer architecture
+	Computer performance analysis
+	Concurrent, parallel and distributed systems
+	Computer networks
+	Computer security and cryptography
+	Databases
+	Computer graphics and visualization
+	Human-computer interaction
+	Scientific computing
+	Artificial intelligence
+Anthropology*
+	Archaeology 
+	Ethnobiology 
+	Ethnobotany 
+	Ethnology
+	Zooarchaeology
+	Anthrozoology 
+Business Studies
+	Accountancy 
+	Finance 
+	Management 
+	Marketing 
+Economics
+	Macroeconomics 
+	Microeconomics 
+	Bioeconomics 
+	Public finance 
+	Socioeconomics
+	Public finance 
+	Neuroeconomics 
+Linguistics 
+	Cognitive linguistics 
+	Dialectology 
+	Etymology 
+	Geolinguistics 
+	Morphology
+	Neurolinguistics
+	Phonetics
+	Pragmatics 
+	Semantics 
+Political Science 
+	Game theory 
+	Geopolitics
+	Ideology
+	Psephology 
+	Public administration 
+Psychology*
+	Psychometrics 
+	Clinical psychology 
+	Neuropsychology
+	Psychophysics 
+Health
+	Nutrition
+	Excersise
+
+
+
+* Essential Major Category
