@@ -1,4 +1,4 @@
-package am_utils;
+package com.remaclek.kelcamer.academicarticlemanager;
 
 /**
  * Created by Kelsey on 10/31/17.
@@ -65,6 +65,24 @@ public class MainCategory {
         if(index == arrayMax) {
             return;
         }
+    }
+
+    public void addNewSubcategory(SubCategory[] sub) {
+
+
+        for(int z = 0; z < sub.length && z < arrayMax; z++){
+            children[z] = sub[z];
+            index++;
+        }
+
+    }
+    public void addNewSubcategory(String[] sub) {
+
+        for(int z = 0; z < sub.length && z < arrayMax; z++){
+            children[z] = new SubCategory(sub[z]);
+            index++;
+        }
+
     }
     public void setID(int num){
         this.categoryID = num;
