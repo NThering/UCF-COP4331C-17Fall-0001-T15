@@ -1,7 +1,4 @@
-package am_utils;
-import am_utils.MainCategory;
-import am_utils.SubCategory;
-import java.util.Date;
+package com.remaclek.kelcamer.academicarticlemanager;
 
 
 /**
@@ -55,22 +52,61 @@ public class ArticleInfo {
     /** Time the article was uploaded or last updated.
      * Used for record keeping/article info display.
      */
-    public Date uploadTime;
+  //  public Date uploadTime;
 
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
-     * @param articleID */
-    public ArticleInfo( int articleID )
+    */
+    public ArticleInfo( int id )
     {
-        this.articleID = articleID;
+        articleID = id;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+    }
+    public ArticleInfo( int id, String auth, String own, String abstr, String doi)
+    {
+        articleID = id;
+        author = auth;
+        owner = own;
+        abstractText = abstr;
+        doiNumber = doi;
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+    }
+
+    public ArticleInfo(){
+        articleID = -1;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+
+
+
     }
 
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed. */
     void setArticleID( int articleID )
     {
-        if ( articleID == 0 ) // We can't overwrite the article ID of an article that already has an ID!
+        if ( articleID == 0 ) {
             this.articleID = articleID;
-        else
-            CUtils.warning( "Tried to assign articleID to article that's already been assigned one!" );
+        }
+
+        else{
+
+        }
+           // CUtils.warning( "Tried to assign articleID to article that's already been assigned one!" );
+    }
+
+    // author of article
+    public void setAuthor(String author){
+
+        this.author = author;
     }
 
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
