@@ -1,7 +1,5 @@
 package com.remaclek.kelcamer.academicarticlemanager;
 
-import android.os.Environment;
-
 import java.io.File;
 
 /**
@@ -16,27 +14,28 @@ public class DefaultCategories {
      private String mainCategories[] = {
 
              "Biology",
-            "Food",
-             "Mailing",
-            "Artificial Intelligence",
-            "Machine Learning",
-            "Visible Light Communication",
-            "Infrared",
+             "Food",
              "People",
-             "hello",
-            "Blockchain",
-            "Object Detection",
-            "Transistors",
-            "Nanotechnology",
-            "Quadcopters",
+             "Technology",
+             "Animals",
+             "Social",
+             "Travel",
+             "Life",
+             "Other",
+
+
+             // Under technology
+
 
 
 
     };
 
+
     DefaultCategories(){
         index = -1;
         mainCat = new MainCategory[50];
+
         createCategories();
 
     }
@@ -47,50 +46,126 @@ public class DefaultCategories {
             mainCat[x] = new MainCategory(mainCategories[x]);
             index++;
         }
-        categorize();
+
+        // Biology
+        String[] biologyList = {
+                "Biodiversity",
+                "Molecular",
+                "Human",
+                "Chemical",
+                "Cell"
+
+        };
+        mainCat[0].addNewSubcategory(biologyList);
 
 
+        // food list
+       String[] foodList = {"Meat", "Turkey",
+                "Chicken",
+                "Seafood",
+                "Eggs",
+                "Milk", "Cheese", "Dairy",
+                "Fruits", "Vegetables"};
+        mainCat[1].addNewSubcategory(foodList);
+
+
+        // People
+        String[] peopleList = {
+
+                "White",
+                "Hispanic",
+                "Black and African Americans",
+                "Asian Americans",
+                "Native Americans and Alaska Natives",
+
+
+        };
+        mainCat[2].addNewSubcategory(peopleList);
+
+        // technology
+        String[] technologyList = {
+                   "Artificial Intelligence",
+                   "Machine Learning",
+                  "Visible Light Communication",
+                   "Infrared",
+                   "Blockchain",
+                   "Object Detection",
+                    "Transistors",
+                    "Nanotechnology",
+                    "Quadcopters",
+                   "Programming",
+
+        };
+        mainCat[3].addNewSubcategory(technologyList);
+
+
+        // Animals
+        String[] animalList = {
+                "Dogs",
+                "Cats",
+                "Bears",
+                "Lions",
+                "Tigers",
+                "Octopus",
+                "Pig",
+                "Cow",
+                "Chicken"
+
+
+        };
+        mainCat[4].addNewSubcategory(animalList);
+
+
+        // Social
+
+        String[] socialList = {
+
+                "Facebook",
+                "Twitter",
+                "Snapchat",
+                "Instagram",
+                "Skype",
+                "MySpace"
+        };
+        mainCat[5].addNewSubcategory(socialList);
+
+
+        // Travel
+
+        String[] travelList={
+            "Airplane",
+                "Bike",
+                "Segway",
+                "Hoverboard",
+                "Skateboard",
+                "Car",
+                "Helicopter"
+
+        };
+        mainCat[6].addNewSubcategory(travelList);
+
+
+        // Life
+
+        String[] lifeList = {
+                "Tools",
+                "Kitchen",
+                "Living",
+                "School",
+                "Work",
+                "Philosophy"
+
+        };
+        mainCat[7].addNewSubcategory(lifeList);
+
+
+
+        // Other has no subcategories and will be defined separately
 
     }
 
-        public void categorize(){
+        public void categorize(File uploadedFile){
 
-            if(mainCat == null) return;
-            if(mainCat[0] == null)  return;
-            if(mainCat[0].equals(""))  return;
-
-            FileConverter convert = new FileConverter();
-
-            String root = Environment.getExternalStorageDirectory().toString() + "/Article Manager/";
-            File directory = new File(root);
-
-            File[] allFiles = directory.listFiles();
-
-            // loop for all files in the Article Manager directory
-            for(int y = 0; y < allFiles.length; y++){
-
-                String name = allFiles[y].getName();
-                String result = convert.readFile(allFiles[y].getName());
-
-                // loop through string array of categories and assign an id index
-                for(int z = 0; z < mainCategories.length; z++){
-
-                    if(result.contains(mainCategories[z])){
-
-                        mainCat[y].setID(z);
-                        mainCat[y].setName(mainCategories[z]);
-
-
-                    }
-
-
-
-
-                }
-
-
-
-            }
 
 
 
