@@ -1,4 +1,4 @@
-package com.remaclek.kelcamer.academicarticlemanager;
+package am_utils;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -97,7 +97,14 @@ public class FileConverter extends AppCompatActivity {
     }
 
 
+    public String getAuthorFromText(String text){
 
+        String author = "Undefined";
+
+
+
+        return author;
+    }
     public String getDoiFromText(String text) {
 
 

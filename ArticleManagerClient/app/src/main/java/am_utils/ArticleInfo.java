@@ -1,4 +1,4 @@
-package com.remaclek.kelcamer.academicarticlemanager;
+package am_utils;
 
 
 /**
@@ -106,9 +106,9 @@ public class ArticleInfo {
     }
 
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed. */
-    void setArticleID( int articleID )
+    void setMainCategoryIndex( int articleID )
     {
-        if ( articleID == 0 ) {
+        if ( articleID == -1 ) {
             this.mainCategoryIndex = articleID;
         }
 
@@ -117,15 +117,33 @@ public class ArticleInfo {
         }
 
     }
+    void setSubCategoryIndex( int articleID )
+    {
+        if ( articleID == -1 ) {
+            this.mainCategoryIndex = articleID;
+        }
 
+        else{
+
+        }
+
+    }
     // author of article
     public void setAuthor(String author){
-
         this.author = author;
     }
 
+    public void setDoiNumber(String doi){
+        this.doiNumber = doi;
+    }
+    public void setAbstractText(String abs){
+        this.abstractText = abs;
+    }
+    public void setOwner(String owner){
+        this.owner = owner;
+    }
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
     int getMainArticleID() { return mainCategoryIndex; }
-    int getSubArticleID() { return mainCategoryIndex; }
+    int getSubArticleID() { return subCategoryIndex; }
 
 }

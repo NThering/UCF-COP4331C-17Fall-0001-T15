@@ -1,7 +1,6 @@
-package com.remaclek.kelcamer.academicarticlemanager;
+package am_utils;
 
 import java.io.File;
-
 /**
  * Created by Kelsey on 10/31/17.
  */
@@ -10,8 +9,7 @@ public class DefaultCategories {
 
      private MainCategory[] mainCat;
      private int index;
-     String id;
-
+     String test = "";
      private String mainCategories[] = {
 
              "Physics",             // 0
@@ -341,7 +339,9 @@ public class DefaultCategories {
 
     }
 
-        public String categorize(File uploadedFile){
+        public ArticleInfo categorize(File uploadedFile){
+
+             ArticleInfo filledArticle = new ArticleInfo();
 
             FileConverter convert = new FileConverter();
             File pdfFile = convert.convertToPDF(uploadedFile);
@@ -354,15 +354,18 @@ public class DefaultCategories {
             for(int x = 0; x < this.index; x++){
                if(data.contains(mainCat[x].printName()) || uploadedFile.getName().contains(mainCat[x].printName())) {
                    SubCategory[] children = mainCat[x].children();
-                   id = mainCat[x].printName();
+                   filledArticle.setMainCategoryIndex(x);
 
                    for (int y = 0; y < mainCat[x].size(); y++) {
                        if (data.contains(children[y].printName())
                                || uploadedFile.getName().contains(children[y].printName())
                                || data.contains(checkModifiedWord(children[y].printName()))) {
 
-                           id = mainCat[x].printName() + " " + children[y].printName();
-                           return id;
+                           test = mainCat[x].printName() + " " + children[y].printName();
+                           filledArticle.setSubCategoryIndex(y);
+
+                           filledArticle = addExtraData(filledArticle, data);
+                           return filledArticle;
 
                        }
 
@@ -378,8 +381,17 @@ public class DefaultCategories {
 
 
 
-            return id;
+            return filledArticle;
         }
+        private ArticleInfo addExtraData(ArticleInfo article, String data){
+
+            FileConverter convert = new FileConverter();
+            article.setDoiNumber(convert.getDoiFromText(data));
+            article.setAbstractText(convert.getAbstractFromText(data));
+            article.setAuthor(convert.getAuthorFromText(data));
+            return article;
+        }
+
         public int size(){
             return index;
         }

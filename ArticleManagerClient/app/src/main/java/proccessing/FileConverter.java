@@ -1,4 +1,4 @@
-package com.remaclek.kelcamer.academicarticlemanager;
+package proccessing;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -26,7 +26,7 @@ public class FileConverter extends AppCompatActivity {
     String toast = "";
 
 
-    FileConverter(){
+    public FileConverter(){
 
 
     }
