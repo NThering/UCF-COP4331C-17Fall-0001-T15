@@ -412,6 +412,9 @@ public class DefaultCategories {
                 word = word.substring(0, word.indexOf("aphy"));
                 word += "aphical";
             }
+            if(word.contains(" ")){
+                word.replace(" ", "");
+            }
             return word;
 
         }
