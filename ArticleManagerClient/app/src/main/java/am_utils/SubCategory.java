@@ -10,10 +10,12 @@ public class SubCategory
     private String printName;
     private int categoryID;
     private int index;
+    private MainCategory parent;
 
     private ArticleInfo[] listOfArticles;
     SubCategory( String printName )
     {
+        this.parent = null;
         this.printName = printName;
         categoryID = 0;
         listOfArticles = new ArticleInfo[50];
@@ -21,7 +23,7 @@ public class SubCategory
     }
 
     SubCategory(){
-
+        this.parent = null;
         this.printName = "";
         categoryID = 0;
         listOfArticles = new ArticleInfo[50];
@@ -46,5 +48,11 @@ public class SubCategory
         listOfArticles[index] = article;
         index++;
 
+    }
+    public int size(){
+        return index;
+    }
+    public void setParent(MainCategory par){
+        this.parent = par;
     }
 }

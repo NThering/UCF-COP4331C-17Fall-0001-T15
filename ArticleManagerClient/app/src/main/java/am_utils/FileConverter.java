@@ -72,7 +72,7 @@ public class FileConverter extends AppCompatActivity {
     default converts to .txt
     NOTE: CURRENTLY ONLY READS FROM ONE PAGE!
      */
-    public String extractTextFromPDF(String filename, int filetype, int pageNumber){
+    public String extractTextFromPDF(String filename, int pageNumber){
         String result = "";
 
         filename = setPath(filename);
@@ -152,6 +152,9 @@ public class FileConverter extends AppCompatActivity {
     }
     public String setPath(String filepath){
         String correctedPath = "";
+
+
+
         if(!filepath.contains("Article Manager")){
             correctedPath = Environment.getExternalStorageDirectory() + "/Article Manager/" + filepath;
         }
@@ -162,7 +165,7 @@ public class FileConverter extends AppCompatActivity {
 
     }
     public void convertFromPDF(String filename, int filetype) {
-        String result = extractTextFromPDF(filename, filetype, 1);
+        String result = extractTextFromPDF(filename, 1);
 
         switch (filetype) {
             case 1:

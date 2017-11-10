@@ -10,7 +10,8 @@ public class ArticleInfo {
     /** The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable.
      * Used in identifying the article for all critical article functions.
      */
-    private int articleID;
+    private int mainCategoryIndex;
+    private int subCategoryIndex;
 
     /** DOI number of the article, if any.
      * Assigned a value of null if no DOI number exists.
@@ -58,7 +59,7 @@ public class ArticleInfo {
     */
     public ArticleInfo( int id )
     {
-        articleID = id;
+        mainCategoryIndex = id;
         author = "";
         owner = "";
         abstractText = "";
@@ -66,9 +67,22 @@ public class ArticleInfo {
         mainCategory = new MainCategory();
         subCategory = new SubCategory();
     }
-    public ArticleInfo( int id, String auth, String own, String abstr, String doi)
+    public ArticleInfo( int id, int sub)
     {
-        articleID = id;
+        mainCategoryIndex = id;
+        subCategoryIndex = sub;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+    }
+
+    public ArticleInfo( int id, int sub, String auth, String own, String abstr, String doi)
+    {
+        mainCategoryIndex = id;
+        subCategoryIndex = sub;
         author = auth;
         owner = own;
         abstractText = abstr;
@@ -78,7 +92,8 @@ public class ArticleInfo {
     }
 
     public ArticleInfo(){
-        articleID = -1;
+        mainCategoryIndex = -1;
+        subCategoryIndex = -1;
         author = "";
         owner = "";
         abstractText = "";
@@ -94,13 +109,13 @@ public class ArticleInfo {
     void setArticleID( int articleID )
     {
         if ( articleID == 0 ) {
-            this.articleID = articleID;
+            this.mainCategoryIndex = articleID;
         }
 
         else{
 
         }
-           // CUtils.warning( "Tried to assign articleID to article that's already been assigned one!" );
+
     }
 
     // author of article
@@ -110,5 +125,7 @@ public class ArticleInfo {
     }
 
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
-    int getArticleID() { return articleID; }
+    int getMainArticleID() { return mainCategoryIndex; }
+    int getSubArticleID() { return mainCategoryIndex; }
+
 }

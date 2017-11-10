@@ -61,6 +61,8 @@ public class MainCategory {
 
     public void addNewSubcategory(SubCategory sub) {
         children[index] = sub;
+        children[index].setParent(this);
+
         index++;
         if(index == arrayMax) {
             return;
@@ -72,6 +74,8 @@ public class MainCategory {
 
         for(int z = 0; z < sub.length && z < arrayMax; z++){
             children[z] = sub[z];
+            children[z].setParent(this);
+
             index++;
         }
 
@@ -80,8 +84,10 @@ public class MainCategory {
 
         for(int z = 0; z < sub.length && z < arrayMax; z++){
             children[z] = new SubCategory(sub[z]);
+            children[z].setParent(this);
             index++;
         }
+
 
     }
     public void setID(int num){

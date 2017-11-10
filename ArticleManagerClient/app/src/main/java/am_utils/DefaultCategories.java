@@ -10,7 +10,8 @@ public class DefaultCategories {
 
      private MainCategory[] mainCat;
      private int index;
-     String test;
+     String id;
+
      private String mainCategories[] = {
 
              "Physics",             // 0
@@ -26,11 +27,12 @@ public class DefaultCategories {
              "Computer Science",    // 10
              "Anthropology",        // 11
              "Business",            // 12
-             "Linguistics",         // 13
-             "Political Science",   // 14
-             "Psychology",          // 15
-             "Health",              // 16
-             "Other",               // 17
+             "Economics",           // 13
+             "Linguistics",         // 14
+             "Political Science",   // 15
+             "Psychology",          // 16
+             "Health",              // 17
+             "Other",               // 18
 
     };
 
@@ -50,19 +52,19 @@ public class DefaultCategories {
             index++;
         }
 
-        // Biology
+
         String[] physicsList = {
 
                 "Acoustics",
                 "Agrophysics",
                 "Astrophysics",
-                "Astronony",
+                "Astronomy",
                 "Mechanics",
-                "Nuclear physics",
-                "Particle physics",
-                "Quantum physics",
+                "Nuclear",
+                "Particle",
+                "Quantum",
                 "Statics",
-                "Theoretical physics",
+                "Theoretical",
 
         };
         mainCat[0].addNewSubcategory(physicsList);
@@ -70,18 +72,18 @@ public class DefaultCategories {
 
         // food list
        String[] chemList = {
-               "Physical Chemistry",
-               "Ocean Chemistry",
-               "Organic Chemistry",
-               "Inorganic Chemistry",
-               "Nuclear Chemistry",
-               "Analytical Chemistry",
+               "Physical",
+               "Ocean",
+               "Organic",
+               "Inorganic",
+               "Nuclear",
+               "Analytical",
        };
 
         mainCat[1].addNewSubcategory(chemList);
 
 
-        // People
+
         String[] ecologyList = {
                 "Animals",
                 "Insects",
@@ -92,7 +94,7 @@ public class DefaultCategories {
         };
         mainCat[2].addNewSubcategory(ecologyList);
 
-        // technology
+
         String[] geologyList = {
                 "Geochemistry",
                 "Mineralogy",
@@ -107,22 +109,23 @@ public class DefaultCategories {
         mainCat[3].addNewSubcategory(geologyList);
 
 
-        // Animals
+
         String[] metList = {
-                "Microscale meteorology",
-                "Mesoscale meteorology",
-                "Synoptic scale meteorology",
+                "Microscale",
+                "Mesoscale",
+                "Synoptic",
 
         };
         mainCat[4].addNewSubcategory(metList);
 
 
-        // Social
+
 
         String[] bioList = {
 
                 "Anatomy",
                 "Biomechanics",
+                "Biodiversity",
                 "Biochemistry",
                 "Biogeography",
                 "Biophysics",
@@ -138,7 +141,6 @@ public class DefaultCategories {
         mainCat[5].addNewSubcategory(bioList);
 
 
-        // Travel
 
         String[] botanyList={
 
@@ -180,13 +182,13 @@ public class DefaultCategories {
 
 
         String[] engList = {
-                "Computer Engineering",
-                "Chemical Engineering",
-                "Civil Engineering",
-                "Electrical Engineering",
-                "Photonics Engineering",
-                "Mechanical Engineering",
-                "Systems Engineering",
+                "Computer",
+                "Chemical",
+                "Civil",
+                "Electrical",
+                "Photonics",
+                "Mechanical",
+                "Systems",
 
         };
         mainCat[8].addNewSubcategory(engList);
@@ -229,7 +231,7 @@ public class DefaultCategories {
                 "Graphics",
                 "Human-computer interaction",
                 "Scientific computing",
-                "Artificial intelligence",
+                "Artificial Intelligence",
         };
         mainCat[10].addNewSubcategory(csList);
 
@@ -262,9 +264,9 @@ public class DefaultCategories {
 
         String[] economList={
 
-                "Macroeconomics",
-                "Microeconomics",
-                "Bioeconomics",
+                "Macro",
+                "Micro",
+                "Bio",
                 "Public Finance",
                 "Socioeconomics",
                 "Neuroeconomics",
@@ -295,7 +297,7 @@ public class DefaultCategories {
                 "Geopolitics",
                 "Ideology",
                 "Psephology",
-                "Public administration",
+                "Public Administration",
 
         };
         mainCat[15].addNewSubcategory(politList);
@@ -319,33 +321,88 @@ public class DefaultCategories {
 
         };
         mainCat[17].addNewSubcategory(healthList);
+
         // Other has no subcategories and will be defined separately
-        String other = "Other";
-        mainCat[8].addNewSubcategory(other);
 
 
+        String[] otherList={
+                "Other",
 
+        };
+        mainCat[18].addNewSubcategory(otherList);
 
 
 
         // Always Update
-        index = 8;
+        index = 18;
 
 
 
 
     }
 
-        public void categorize(File uploadedFile){
+        public String categorize(File uploadedFile){
+
+            FileConverter convert = new FileConverter();
+            File pdfFile = convert.convertToPDF(uploadedFile);
+
+
+            for(int z = 1; z < 5; z++){
+            String data = convert.extractTextFromPDF(pdfFile.getName(), z);
+
+
+            for(int x = 0; x < this.index; x++){
+               if(data.contains(mainCat[x].printName()) || uploadedFile.getName().contains(mainCat[x].printName())) {
+                   SubCategory[] children = mainCat[x].children();
+                   id = mainCat[x].printName();
+
+                   for (int y = 0; y < mainCat[x].size(); y++) {
+                       if (data.contains(children[y].printName())
+                               || uploadedFile.getName().contains(children[y].printName())
+                               || data.contains(checkModifiedWord(children[y].printName()))) {
+
+                           id = mainCat[x].printName() + " " + children[y].printName();
+                           return id;
+
+                       }
+
+
+                   }
+
+
+               }
+                }
+
+
+            }
 
 
 
-
+            return id;
         }
         public int size(){
             return index;
         }
+        private String checkModifiedWord(String word){
+            if(word.contains("ology")){
+                word = word.substring(0, word.indexOf("ology"));
+                word += "ological";
 
+            }
+
+
+            if(word.contains("s")){
+                word = word.substring(0, word.lastIndexOf("s"));
+            }
+
+
+            if(word.contains("aphy")){
+                word = word.substring(0, word.indexOf("aphy"));
+                word += "aphical";
+            }
+            return word;
+
+        }
     public MainCategory[] getDefaultCategories(){
         return mainCat;
     }
