@@ -49,10 +49,10 @@ public class Public {
         input = new DataInputStream(clientSocket.getInputStream());
         output = new DataOutputStream(clientSocket.getOutputStream());
     }
-    catch (UnkownHostException e){
+    catch (UnkownHostException e) {
         System.err.println("Unknown host: " + HOSTNAME);
     }
-    catch (IOException e){
+    catch (IOException e) {
         System.err.println("I/O connection failed");
     }
 
