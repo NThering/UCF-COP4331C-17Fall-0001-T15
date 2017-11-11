@@ -1,12 +1,15 @@
 package networking;
 
-import java.io.File;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
 import am_utils.ArticleInfo;
 import am_utils.CategoryEnums.MainCategory;
 import am_utils.CategoryEnums.SubCategory;
 import java.sql.*;
-import com.mysql.jdbc.Driver;
+import static java.util.concurrent.TimeUnit.*;
 
 public class Public {
     /*    General Responsibilities:
@@ -16,27 +19,41 @@ public class Public {
 
     // All calls to networking should probably be done in a seperate thread to prevent hangups!
 
-    private String driver = "com.mysql.jdbc.Driver";
-    private String URL = "jdbc:mysql://localhost:8080/ArticleManager";
-    private String USER = "root";
-    private String PASS = "";
+    //socket to send/receive data
+    private Socket clientSocket = null;
+    private DataInputStream input = null;
+    private DataOutputStream output = null;
 
-    public static Connection conn = null;
+    //from ArticleServer/networking
+    Connection conn = null;
 
-    private SessionManager session = new SessionManager(context);
+    //keep connection established (2 to 5 secs)
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    public void setHeartbeat() {
+        final Runnable heartbeat = new Runnable() {
+            public void run() {
+                clientSocket.write("h");
+            };
+        }
+        final scheduledFuture<?> beatHandler = scheduler.scheduleAtFixedRate(heartbeat, 3, 3, SECONDS);
+        scheduler.schedule(new Runnable() {
+            public void run() {
+                beatHandler.cancel(true);
+            }
+        }, 3600, SECONDS);
+    }
 
     try {
-        //load jdbc driver
-        Class.forName(driver);
-
-        //establish connection to database
-        conn = DriverManager.getConnection(URL, USER, PASS);
-
-        serverSocket = new ServerSocket(8080);
+        clientSocket = new Socket(HOSTNAME, 'port');
+        input = new DataInputStream(clientSocket.getInputStream());
+        output = new DataOutputStream(clientSocket.getOutputStream());
     }
-    catch (SQLException e) {
-        System.out.println("Error occured: ");
-        System.out.println(e.printStackTrace());
+    catch (UnkownHostException e){
+        System.err.println("Unknown host: " + HOSTNAME);
+    }
+    catch (IOException e){
+        System.err.println("I/O connection failed");
     }
 
     /** Relays user info to the login system on the server, returning 0 on the client if the login
@@ -50,7 +67,7 @@ public class Public {
      * and an int corresponding to the type of error if it was not. */
     public static int logout( )
     {
-        return 1;
+        return 0;
     }
 
     /** Relays user info to the login system on the server, returning 0 on the client if the
