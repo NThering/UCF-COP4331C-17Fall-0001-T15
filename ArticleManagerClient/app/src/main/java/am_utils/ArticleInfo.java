@@ -1,7 +1,4 @@
 package am_utils;
-import am_utils.MainCategory;
-import am_utils.SubCategory;
-import java.util.Date;
 
 
 /**
@@ -13,7 +10,8 @@ public class ArticleInfo {
     /** The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable.
      * Used in identifying the article for all critical article functions.
      */
-    private int articleID;
+    private int mainCategoryIndex;
+    private int subCategoryIndex;
 
     /** DOI number of the article, if any.
      * Assigned a value of null if no DOI number exists.
@@ -55,24 +53,97 @@ public class ArticleInfo {
     /** Time the article was uploaded or last updated.
      * Used for record keeping/article info display.
      */
-    public Date uploadTime;
+  //  public Date uploadTime;
 
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
-     * @param articleID */
-    public ArticleInfo( int articleID )
+    */
+    public ArticleInfo( int id )
     {
-        this.articleID = articleID;
+        mainCategoryIndex = id;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+    }
+    public ArticleInfo( int id, int sub)
+    {
+        mainCategoryIndex = id;
+        subCategoryIndex = sub;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+    }
+
+    public ArticleInfo( int id, int sub, String auth, String own, String abstr, String doi)
+    {
+        mainCategoryIndex = id;
+        subCategoryIndex = sub;
+        author = auth;
+        owner = own;
+        abstractText = abstr;
+        doiNumber = doi;
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+    }
+
+    public ArticleInfo(){
+        mainCategoryIndex = -1;
+        subCategoryIndex = -1;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+        mainCategory = new MainCategory();
+        subCategory = new SubCategory();
+
+
+
     }
 
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed. */
-    void setArticleID( int articleID )
+    void setMainCategoryIndex( int articleID )
     {
-        if ( articleID == 0 ) // We can't overwrite the article ID of an article that already has an ID!
-            this.articleID = articleID;
-        else
-            CUtils.warning( "Tried to assign articleID to article that's already been assigned one!" );
+        if ( articleID == -1 ) {
+            this.mainCategoryIndex = articleID;
+        }
+
+        else{
+
+        }
+
+    }
+    void setSubCategoryIndex( int articleID )
+    {
+        if ( articleID == -1 ) {
+            this.mainCategoryIndex = articleID;
+        }
+
+        else{
+
+        }
+
+    }
+    // author of article
+    public void setAuthor(String author){
+        this.author = author;
     }
 
+    public void setDoiNumber(String doi){
+        this.doiNumber = doi;
+    }
+    public void setAbstractText(String abs){
+        this.abstractText = abs;
+    }
+    public void setOwner(String owner){
+        this.owner = owner;
+    }
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
-    int getArticleID() { return articleID; }
+    int getMainArticleID() { return mainCategoryIndex; }
+    int getSubArticleID() { return subCategoryIndex; }
+
 }
