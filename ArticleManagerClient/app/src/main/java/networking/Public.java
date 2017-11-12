@@ -21,19 +21,23 @@ public class Public {
 
     //socket to send/receive data
     private Socket clientSocket = null;
-    private DataInputStream input = null;
-    private DataOutputStream output = null;
+    private ObjectInputStream inputObject = null;
+    private ObjectOutputStream outputObject = null;
 
-    //from ArticleServer/networking
-    Connection conn = null;
+    private final HOSTNAME = "odroid.now-dns.net";
+    private final PORT = 1906;
 
     //keep connection established (2 to 5 secs)
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    //bufferedReader for getting data
+
+    //need printWriter object
+
     public void setHeartbeat() {
         final Runnable heartbeat = new Runnable() {
             public void run() {
-                clientSocket.write("h");
+                clientSocket.getOutputStream("0");
             };
         }
         final scheduledFuture<?> beatHandler = scheduler.scheduleAtFixedRate(heartbeat, 3, 3, SECONDS);
@@ -45,9 +49,9 @@ public class Public {
     }
 
     try {
-        clientSocket = new Socket(HOSTNAME, 'port');
-        input = new DataInputStream(clientSocket.getInputStream());
-        output = new DataOutputStream(clientSocket.getOutputStream());
+        clientSocket = new Socket(HOSTNAME, PORT);
+        inputObject = new ObjectInputStream(clientSocket.getInputStream());
+        outputObject = new ObjectOutputStream(clientSocket.getOutputStream());
     }
     catch (UnkownHostException e) {
         System.err.println("Unknown host: " + HOSTNAME);
