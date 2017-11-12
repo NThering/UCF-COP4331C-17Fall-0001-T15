@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package am_utils;
-import am_utils.MainCategory;
-import am_utils.SubCategory;
 import java.util.Date;
 
 
@@ -15,58 +8,102 @@ import java.util.Date;
  */
 
 public class ArticleInfo {
-    /** The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable.
+    /** 
+     * The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable.
      * Used in identifying the article for all critical article functions.
      */
     private int articleID; 
         
-    /** DOI number of the article, if any. 
+    /** 
+     * DOI number of the article, if any. 
      * Assigned a value of null if no DOI number exists.
      * Used for future proofing the application
      */
     public String doiNumber; 
         
-    /**The name that the article is displayed under, can be the same as other articles.
+    /**
+     * The name that the article is displayed under, can be the same as other articles.
      * Used for display in the article lists, along with display in the article info and text files.
      */
     public String printName;
     
-    /** Category the article is assigned to.
+    /** 
+     * Category the article is assigned to.
      * Critical for category display and storage.
      */
-    public MainCategory mainCategory; 
+    public int mainCategoryID; 
         
-    /** Sub-Category the article is assigned to
+    /** 
+     * Sub-Category the article is assigned to
      * Critical for category display and storage.
      */
-    public SubCategory subCategory; 
+    public int subCategoryID; 
         
-    /** Authors of the article 
+    /** 
+     * Authors of the article 
      * Used primarily to display the more specific details of an article when it's selected, but
      * is also used to make that one text file the assignment specs want us to have.
      */
     public String author;
         
-    /** Account who uploaded the article
+    /** 
+     * Account who uploaded the article
     * Used for permissions tracking in the database and display of the article's information.
     */
     public String owner; 
         
-    /** Text of the abstract section of the document, limited to 5000 characters.  "..." will replace the last 3 characters if the 5000 limit is exceeded.
+    /** 
+     * Text of the abstract section of the document, limited to 5000 characters.  "..." will replace the last 3 characters if the 5000 limit is exceeded.
      * Used for the display of an article's properties along with making the -other- pointless text file required by the assignment.
      */
     public String abstractText; 
         
-    /** Time the article was uploaded or last updated. 
+    /** 
+     * Time the article was uploaded or last updated. 
      * Used for record keeping/article info display.
      */
     public Date uploadTime; 
         
-    /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
-     * @param articleID */
+    /** 
+     * Basic constructor that assumes all relevant values will be manually set after it is called.
+     * articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
+     * @param articleID Unique ID of the article 
+     */
     public ArticleInfo( int articleID )
     {
         this.articleID = articleID;
+        this.doiNumber = null;
+        this.printName = null;
+        this.mainCategoryID = -1;
+        this.subCategoryID = -1;
+        this.author = null;
+        this.owner = null;
+        this.abstractText = null;
+        this.uploadTime = null;
+    }
+    
+    
+    /** Constructor that builds an ArticleInfo with all the data that Article Processing needs to fill out.
+     * articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
+     * @param articleID Unique ID of the article, set by the server and used internally.
+     * @param doiNumber Object Identification number of the article, if there is one.
+     * @param printName Name the article is displayed under, typically the title.
+     * @param mainCategoryID ID of the main category the article is under.
+     * @param subCategoryID ID of the sub category the article is under.
+     * @param author Authors of the article
+     * @param abstractText Abstract of the article
+     */
+    public ArticleInfo( int articleID, String doiNumber, String printName, int mainCategoryID, int subCategoryID, String author, String abstractText)
+    {
+        this.articleID = articleID;
+        this.doiNumber = null;
+        this.printName = null;
+        this.mainCategoryID = -1;
+        this.subCategoryID = -1;
+        this.author = null;
+        this.owner = null;
+        this.abstractText = null;
+        this.uploadTime = null;
     }
         
     /** articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed. */

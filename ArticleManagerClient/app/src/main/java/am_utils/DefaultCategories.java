@@ -341,7 +341,7 @@ public class DefaultCategories {
 
         public ArticleInfo categorize(File uploadedFile){
 
-             ArticleInfo filledArticle = new ArticleInfo();
+             ArticleInfo filledArticle = new ArticleInfo(0);
 
             FileConverter convert = new FileConverter();
             File pdfFile = convert.convertToPDF(uploadedFile);
@@ -354,7 +354,7 @@ public class DefaultCategories {
             for(int x = 0; x < this.index; x++){
                if(data.contains(mainCat[x].printName()) || uploadedFile.getName().contains(mainCat[x].printName())) {
                    SubCategory[] children = mainCat[x].children();
-                   filledArticle.setMainCategoryIndex(x);
+                   filledArticle.mainCategoryID = x;
 
                    for (int y = 0; y < mainCat[x].size(); y++) {
                        if (data.contains(children[y].printName())
@@ -362,7 +362,7 @@ public class DefaultCategories {
                                || data.contains(checkModifiedWord(children[y].printName()))) {
 
                            test = mainCat[x].printName() + " " + children[y].printName();
-                           filledArticle.setSubCategoryIndex(y);
+                           filledArticle.subCategoryID = y;
 
                            filledArticle = addExtraData(filledArticle, data);
                            return filledArticle;
@@ -386,9 +386,9 @@ public class DefaultCategories {
         private ArticleInfo addExtraData(ArticleInfo article, String data){
 
             FileConverter convert = new FileConverter();
-            article.setDoiNumber(convert.getDoiFromText(data));
-            article.setAbstractText(convert.getAbstractFromText(data));
-            article.setAuthor(convert.getAuthorFromText(data));
+            article.doiNumber = convert.getDoiFromText(data);
+            article.abstractText = convert.getAbstractFromText(data);
+            article.author = convert.getAuthorFromText(data);
             return article;
         }
 

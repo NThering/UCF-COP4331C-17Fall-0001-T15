@@ -83,8 +83,8 @@ public class Public {
 
     /** Returns a list to the client of all ArticleInfos in a given category/sub-category.  If
      * IncludeAbstracts is false, abstracts are left blank to save bandwidth.*/
-    public static ArrayList<ArticleInfo> getArticlesFromCategory( MainCategory articleCategory,
-          SubCategory subCategory, boolean IncludeAbstracts )
+    public static ArrayList<ArticleInfo> getArticlesFromCategory( int mainCategoryID,
+          int subCategoryID, boolean IncludeAbstracts )
     {
         return null;
     }

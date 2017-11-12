@@ -47,7 +47,7 @@ public class Public {
 	
     /** Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server. 
      * @throws ParseException */
-    public static ArrayList<ArticleInfo> getArticlesFromCategory( MainCategory articleCategory, SubCategory subCategory )
+    public static ArrayList<ArticleInfo> getArticlesFromCategory( int mainCategoryID, int subCategoryID )
     {	
     	Connection con = getDBConnection();
     	Statement queryStatement;
