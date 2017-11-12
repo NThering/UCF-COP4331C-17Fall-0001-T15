@@ -7,9 +7,7 @@ public class ArticleManagerServer {
 	public static void main(String[] args)
 	{
 		boolean running = true;
-		
-		database.Public.getDBConnection();
-		
+				
 		ConnectionHandler serverConnectionHandler = new ConnectionHandler(10);
 		
 		while(running)

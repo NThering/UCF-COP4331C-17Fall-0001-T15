@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import am_utils.MainCategory;
 import am_utils.SubCategory;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
 import org.mariadb.jdbc.Driver;
+
 /**
  *
  * @author NThering
@@ -20,7 +23,7 @@ public class Public {
 	static Connection DBConnection;
 	
 	
-	// Returns null object if the cration of the connection fails.
+	// Returns null object if the creation of the connection fails.
 	public static Connection getDBConnection()
 	{
 		Connection dbCon = null;
@@ -42,9 +45,51 @@ public class Public {
     	return dbCon;
 	}
 	
-    /** Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server. */
+    /** Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server. 
+     * @throws ParseException */
     public static ArrayList<ArticleInfo> getArticlesFromCategory( MainCategory articleCategory, SubCategory subCategory )
     {	
+    	Connection con = getDBConnection();
+    	Statement queryStatement;
+    	ResultSet rs;
+    	ResultSet srs;
+    	DateFormat dateConverter = DateFormat.getDateInstance();
+    	ArrayList<ArticleInfo> articles = new ArrayList<ArticleInfo>();
+    	ArticleInfo newArt = null;
+		try {
+			queryStatement = con.createStatement();
+			rs = queryStatement.executeQuery("select * from article inner join article_subcat on article.id = article_subcat.id");
+			
+			
+			while(rs.next())
+			{
+				if(rs.getString("mainCategory") == articleCategory.getName() && rs.getString("subcatName") == subCategory.printName())
+				newArt = new ArticleInfo(rs.getInt("id"));
+				newArt.doiNumber = rs.getString("doiNumber");
+				newArt.printName = rs.getString("printName");
+				newArt.mainCategory.setName(rs.getString("mainCategory"));
+				newArt.mainCategory.setID(rs.getInt("mainID"));
+				newArt.author = rs.getString("author");
+				newArt.owner = rs.getString("owner");
+				newArt.abstractText = rs.getString("abstractText");
+				newArt.uploadTime = dateConverter.parse(rs.getString("uploadDate"));
+				srs = queryStatement.executeQuery("select * from article_subcat where id=" + rs.getInt("id"));
+				
+				while(srs.next())
+				{
+					newArt.mainCategory.addNewSubcategory(srs.getString("subcatName"));
+				}
+				
+				articles.add(newArt);
+			}
+			return articles;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(0);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
         return null;
     }
         
