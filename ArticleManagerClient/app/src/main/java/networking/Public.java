@@ -11,7 +11,7 @@ import am_utils.CategoryEnums.SubCategory;
 import java.sql.*;
 import static java.util.concurrent.TimeUnit.*;
 
-public class Public {
+public class Public extends Thread {
     /*    General Responsibilities:
     *     Keep track of logged in users and their permissions so they don't need to re-authenticate
     *     for every action.
@@ -24,34 +24,42 @@ public class Public {
     private ObjectInputStream inputObject = null;
     private ObjectOutputStream outputObject = null;
 
-    private final HOSTNAME = "odroid.now-dns.net";
-    private final PORT = 1906;
+    private final String HOSTNAME = "odroid.now-dns.net";
+    private final int PORT = 1906;
 
     //keep connection established (2 to 5 secs)
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    //bufferedReader for getting data
+    //BufferedReader for retrieving data
+    private static BufferedReader reader = null;
 
-    //need printWriter object
+    //PrintWriter for sending data
+    private static Printwriter writer = null;
 
     public void setHeartbeat() {
         final Runnable heartbeat = new Runnable() {
             public void run() {
                 clientSocket.getOutputStream("0");
-            };
-        }
-        final scheduledFuture<?> beatHandler = scheduler.scheduleAtFixedRate(heartbeat, 3, 3, SECONDS);
+            }
+        };
+        final ScheduledFuture beatHandler =
+                scheduler.scheduleAtFixedRate(heartbeat, 3, 3, TimeUnit.SECONDS);
+
         scheduler.schedule(new Runnable() {
             public void run() {
                 beatHandler.cancel(true);
             }
-        }, 3600, SECONDS);
+        }, 3600, TimeUnit.SECONDS);
     }
 
     try {
         clientSocket = new Socket(HOSTNAME, PORT);
         inputObject = new ObjectInputStream(clientSocket.getInputStream());
         outputObject = new ObjectOutputStream(clientSocket.getOutputStream());
+
+        writer = new PrintWriter(outputObject, true);
+
+        System.out.println("Connection successful");
     }
     catch (UnkownHostException e) {
         System.err.println("Unknown host: " + HOSTNAME);
@@ -78,7 +86,10 @@ public class Public {
      * registration was successful and an int corresponding to the type of error if it was not. */
     public static int register( String username, String password )
     {
-        return 1;
+        writer.println(username);
+        writer.println(password);
+
+        return (reader.readLine().equals("ok")) ? 0 : 1;
     }
 
     /** Returns a list to the client of all ArticleInfos in a given category/sub-category.  If
@@ -119,6 +130,6 @@ public class Public {
      * whatever transfers were taking place in case the user hits the back button or something. */
     public static void abortActiveConnections()
     {
-        return;
+        //return;
     }
 }
