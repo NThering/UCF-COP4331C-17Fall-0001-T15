@@ -8,13 +8,16 @@
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
+    <import file="buildOptions.xml"/>
     <path id="ArticleManagerServer.classpath">
         <pathelement location="bin"/>
+        <pathelement location="src/dbConnector/mariadb-java-client-2.2.0.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -37,12 +40,5 @@
         <java classname="articleManagerServer.ArticleManagerServer" failonerror="true" fork="yes">
             <classpath refid="ArticleManagerServer.classpath"/>
         </java>
-    </target>
-    <target depends="build-project" description="create JAR file of compiled classes." name="build-jar">
-    	<jar basedir="bin" destfile="build/${ant.project.name}.jar">
-    		<manifest>
-    			<attribute name="Main-Class" value="articleManagerServer.ArticleManagerServer"/>
-    		</manifest>
-    	</jar>
     </target>
 </project>

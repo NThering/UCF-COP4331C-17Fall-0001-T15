@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse.ant.import?>
+
+<project basedir="." default="build" name="ArticleManagerServer">
+
+<target depends="build-project" description="create JAR file of compiled classes." name="build-jar">
+		<manifestclasspath property="jar.classpath" jarfile="build/${ant.project.name}.jar">
+			<classpath refid="ArticleManagerServer.classpath"/>
+		</manifestclasspath>
+    	<jar basedir="bin" destfile="build/${ant.project.name}.jar">
+    		<manifest>
+    			<attribute name="Main-Class" value="articleManagerServer.ArticleManagerServer"/>
+    			<attribute name="Class-Path" value="${jar.classpath}"/>
+    		</manifest>
+    	</jar>
+</target>
+</project>

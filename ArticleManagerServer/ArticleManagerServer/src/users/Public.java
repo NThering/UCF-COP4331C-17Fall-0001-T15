@@ -6,7 +6,8 @@
 package users;
 import java.util.*;
 import java.sql.*;
-import com.mysql.jdbc.Driver;
+import org.mariadb.jdbc.Driver;
+//import com.mysql.jdbc.Driver;
 /**
  *
  * @author NThering

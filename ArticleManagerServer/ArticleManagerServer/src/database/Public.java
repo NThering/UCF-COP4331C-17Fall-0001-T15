@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import am_utils.MainCategory;
 import am_utils.SubCategory;
 import java.sql.*;
+import org.mariadb.jdbc.Driver;
 /**
  *
  * @author NThering
@@ -18,36 +19,32 @@ import java.sql.*;
 public class Public {
 	static Connection DBConnection;
 	
-	/** Returns 0 if the database connection is successful, nonzero otherwise */
-	/** MUST BE RUN BEFORE ANY OTHER FUNCTIONS IN THIS CLASS CAN BE RUN*/
-	public static int startDBCon(String DBInfo, String DBUsername, String DBPass)
+	
+	// Returns null object if the cration of the connection fails.
+	public static Connection getDBConnection()
 	{
-		try
-		{
-			Class.forName("com.mysql.Driver");
-			DBConnection = DriverManager.getConnection(DBInfo, DBUsername, DBPass);
-		} catch(Exception e)
-		{
+		Connection dbCon = null;
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			System.err.println("Failed to create database driver.");
 			e.printStackTrace();
-			return 1;
+			return dbCon;
 		}
-		return 0;
+    	
+    	try {
+			dbCon = DriverManager.getConnection("jdbc:mariadb://localhost/article_manager", "root", "cop4331");
+		} catch (SQLException e) {
+			System.err.println("Failed to connect to database.");
+			e.printStackTrace();
+			return dbCon;
+		}
+    	return dbCon;
 	}
 	
-	public static int login(String username, String password) throws SQLException
-	{
-		Statement stmt = DBConnection.createStatement();
-		stmt.execute("select * from users where name=\"" + username + "\" and password=\"" + password + "\";");
-		ResultSet rs = stmt.getResultSet();
-		if(!rs.first())
-		{
-			return -1; // Return notification of invalid login.
-		}
-		return 0;
-	}
     /** Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server. */
     public static ArrayList<ArticleInfo> getArticlesFromCategory( MainCategory articleCategory, SubCategory subCategory )
-    {
+    {	
         return null;
     }
         
