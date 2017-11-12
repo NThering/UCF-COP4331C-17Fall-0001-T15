@@ -1,12 +1,8 @@
 package networking;
 
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.Context;
-import android.content.Intent;
-import java.util.HashMap;
+import java.util.*;
 
-public class SessionManager {
+public class SessionManager extends Context implements SharedPreferences{
 
     private static final String SHARED_PREF_ID = "shared_pref";
     private static final String LOGGED_IN = "is_logged_in";
@@ -24,7 +20,6 @@ public class SessionManager {
         instance = contxt.getSharedPreferences(SHARED_PREF_ID, PRIVATE_MODE);
         editor = instance.edit();
     }
-
 
     public void createSession(String username, String password)
     {
