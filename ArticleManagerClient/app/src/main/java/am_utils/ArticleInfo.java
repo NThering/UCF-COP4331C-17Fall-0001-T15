@@ -81,6 +81,12 @@ public class ArticleInfo {
         this.abstractText = null;
         this.uploadTime = null;
     }
+    
+    /*
+        Allows you to create a new Article Info object that has a default category and subcategory,
+        and allows you to set the categories.  
+        
+    */
     public ArticleInfo(int id, int sub, int articleID)
     {
         mainCategoryIndex = id;
@@ -89,6 +95,7 @@ public class ArticleInfo {
         owner = "";
         abstractText = "";
         doiNumber = "";
+        articleID = 0;
     }
 
     /** Constructor that builds an ArticleInfo with all the data that Article Processing needs to fill out.
