@@ -35,12 +35,11 @@ public class DefaultCategories {
     };
 
 
-    DefaultCategories(){
+    public DefaultCategories(){
         index = -1;
         mainCat = new MainCategory[50];
 
         createCategories();
-
     }
     private void createCategories() {
 
