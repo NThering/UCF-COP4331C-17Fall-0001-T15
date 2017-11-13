@@ -89,8 +89,8 @@ public class ArticleInfo {
     */
     public ArticleInfo(int id, int sub, int articleID)
     {
-        mainCategoryIndex = id;
-        subCategoryIndex = sub;
+        mainCategoryID = id;
+        subCategoryID = sub;
         author = "";
         owner = "";
         abstractText = "";
