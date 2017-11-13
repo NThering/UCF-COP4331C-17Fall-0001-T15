@@ -7,8 +7,6 @@ package database;
 import am_utils.ArticleInfo;
 import java.io.File;
 import java.util.ArrayList;
-import am_utils.MainCategory;
-import am_utils.SubCategory;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;

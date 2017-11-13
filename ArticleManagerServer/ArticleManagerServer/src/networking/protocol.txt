@@ -21,7 +21,7 @@ OPTYPE			ACTION		(ACTION)		PURPOSE
 4*				"main ID"	"sub ID"		Searches database for all articles matching the main and sub id, and sends arraylist<ArticleInfo> through object stream.
 5*				"bytesize"	(none)			Prepares the server to receive an article file via a byte stream and a following articleInfo object.
 6*				"articleID"	(none)			Asks the server to send an articleInfo object with the information regarding the given article through an object stream.
-7*				"articleID"	(none)			Asks the server to send the given article file through a bytestream, followed by the associated articleInfo
+7*				"articleID"	(none)			Asks the server to send the given article file through a file stream, followed by the associated articleInfo
 											Note that the client will have to prepare to receive another text line with the byte size of the file before receiving the article file.
 8*				(none)		(none)			Returns the permission level number in string format.
 
