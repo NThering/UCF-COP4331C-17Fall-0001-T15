@@ -1,6 +1,4 @@
 package am_utils;
-
-import java.io.File;
 /**
  * Created by Kelsey on 10/31/17.
  */
@@ -329,94 +327,15 @@ public class DefaultCategories {
         mainCat[18].addNewSubcategory(otherList);
 
 
-
-        // Always Update
-        index = 18;
-
-
-
-
     }
 
-        public ArticleInfo categorize(File uploadedFile){
-
-             ArticleInfo filledArticle = new ArticleInfo(0);
-
-            FileConverter convert = new FileConverter();
-            File pdfFile = convert.convertToPDF(uploadedFile);
 
 
-            for(int z = 1; z < 5; z++){
-            String data = convert.extractTextFromPDF(pdfFile.getName(), z);
-
-
-            for(int x = 0; x < this.index; x++){
-               if(data.contains(mainCat[x].printName()) || uploadedFile.getName().contains(mainCat[x].printName())) {
-                   SubCategory[] children = mainCat[x].children();
-                   filledArticle.setMainCategoryIndex(x);
-
-                   for (int y = 0; y < mainCat[x].size(); y++) {
-                       if (data.contains(children[y].printName())
-                               || uploadedFile.getName().contains(children[y].printName())
-                               || data.contains(checkModifiedWord(children[y].printName()))) {
-
-                           test = mainCat[x].printName() + " " + children[y].printName();
-                           filledArticle.setSubCategoryIndex(y);
-
-                           filledArticle = addExtraData(filledArticle, data);
-                           return filledArticle;
-
-                       }
-
-
-                   }
-
-
-               }
-                }
-
-
-            }
-
-
-
-            return filledArticle;
-        }
-        private ArticleInfo addExtraData(ArticleInfo article, String data){
-
-            FileConverter convert = new FileConverter();
-            article.setDoiNumber(convert.getDoiFromText(data));
-            article.setAbstractText(convert.getAbstractFromText(data));
-            article.setAuthor(convert.getAuthorFromText(data));
-            return article;
-        }
 
         public int size(){
             return index;
         }
-        private String checkModifiedWord(String word){
-            if(word.contains("ology")){
-                word = word.substring(0, word.indexOf("ology"));
-                word += "ological";
 
-            }
-
-
-            if(word.contains("s")){
-                word = word.substring(0, word.lastIndexOf("s"));
-            }
-
-
-            if(word.contains("aphy")){
-                word = word.substring(0, word.indexOf("aphy"));
-                word += "aphical";
-            }
-            if(word.contains(" ")){
-                word.replace(" ", "");
-            }
-            return word;
-
-        }
     public MainCategory[] getDefaultCategories(){
         return mainCat;
     }
