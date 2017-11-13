@@ -13,7 +13,8 @@ public class ArticleInfo {
      * Used in identifying the article for all critical article functions.
      */
     private int articleID;
-
+    private int mainCategoryIndex;
+    private int subCategoryIndex;
     /**
      * DOI number of the article, if any.
      * Assigned a value of null if no DOI number exists.
@@ -81,7 +82,15 @@ public class ArticleInfo {
         this.abstractText = null;
         this.uploadTime = null;
     }
-
+    public ArticleInfo(int id, int sub, int articleID)
+    {
+        mainCategoryIndex = id;
+        subCategoryIndex = sub;
+        author = "";
+        owner = "";
+        abstractText = "";
+        doiNumber = "";
+    }
 
     /** Constructor that builds an ArticleInfo with all the data that Article Processing needs to fill out.
      * articleID should be 0 on fresh upload, once a value other than 0 is assigned it cannot be changed.
@@ -116,5 +125,46 @@ public class ArticleInfo {
     }
 
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
-    int getArticleID() { return articleID; }
+    public int getArticleID() { return articleID; }
+    
+    public void setMainCategoryIndex( int mainID )
+    {
+        if ( articleID == -1 ) {
+            this.mainCategoryID = mainID;
+        }
+
+        else{
+
+        }
+
+    }
+    public void setSubCategoryIndex( int subID )
+    {
+        if ( articleID == -1 ) {
+            this.subCategoryID = subID;
+        }
+
+        else{
+
+        }
+
+    }
+    // author of article
+    public void setAuthor(String author){
+        this.author = author;
+    }
+
+    public void setDoiNumber(String doi){
+        this.doiNumber = doi;
+    }
+    public void setAbstractText(String abs){
+        this.abstractText = abs;
+    }
+    public void setOwner(String owner){
+        this.owner = owner;
+    }
+    /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
+    public int getMainArticleID() { return mainCategoryID; }
+    public int getSubArticleID() { return subCategoryID; }
+    
 }
