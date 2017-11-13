@@ -18,7 +18,7 @@ public class Connection extends Thread {
 	private int port; // Port to listen for clients on.
 	private Socket clientSocket; // Client socket object.
 	private int failTolerance; // Number of consecutive communication failures to tolerate before the connection is considered terminated.
-	private boolean waiting; // indicates whether thread is waiting on a client or not. If false, connection managed will place in connection list and spin up a new listener thread.
+	private boolean waiting; // indicates whether thread is waiting on a client or not. If false, connection manager will place in connection list and spin up a new listener thread.
 	private int consecFail;
 	private UserType permissionLevel;
 	private Object waitingLock = new Object();

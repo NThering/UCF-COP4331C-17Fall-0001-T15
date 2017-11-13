@@ -52,43 +52,33 @@ public class Public {
     	Connection con = getDBConnection();
     	Statement queryStatement;
     	ResultSet rs;
-    	ResultSet srs;
     	DateFormat dateConverter = DateFormat.getDateInstance();
     	ArrayList<ArticleInfo> articles = new ArrayList<ArticleInfo>();
     	ArticleInfo newArt = null;
 		try {
 			queryStatement = con.createStatement();
-			rs = queryStatement.executeQuery("select * from article inner join article_subcat on article.id = article_subcat.id");
+			rs = queryStatement.executeQuery("select * from article where mainID=" + mainCategoryID + " and subID=" + subCategoryID);
 			
 			
 			while(rs.next())
 			{
-				if(rs.getString("mainCategory") == articleCategory.getName() && rs.getString("subcatName") == subCategory.printName())
 				newArt = new ArticleInfo(rs.getInt("id"));
 				newArt.doiNumber = rs.getString("doiNumber");
 				newArt.printName = rs.getString("printName");
-				newArt.mainCategory.setName(rs.getString("mainCategory"));
-				newArt.mainCategory.setID(rs.getInt("mainID"));
+				newArt.mainCategoryID = rs.getInt("mainID");
+				newArt.subCategoryID = rs.getInt("subID");
 				newArt.author = rs.getString("author");
 				newArt.owner = rs.getString("owner");
 				newArt.abstractText = rs.getString("abstractText");
 				newArt.uploadTime = dateConverter.parse(rs.getString("uploadDate"));
-				srs = queryStatement.executeQuery("select * from article_subcat where id=" + rs.getInt("id"));
-				
-				while(srs.next())
-				{
-					newArt.mainCategory.addNewSubcategory(srs.getString("subcatName"));
-				}
 				
 				articles.add(newArt);
 			}
 			return articles;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.exit(0);
 		} catch (ParseException e) {
 			e.printStackTrace();
-			System.exit(0);
 		}
         return null;
     }
