@@ -341,7 +341,7 @@ public class DefaultCategories {
 
         public ArticleInfo categorize(File uploadedFile){
 
-             ArticleInfo filledArticle = new ArticleInfo();
+             ArticleInfo filledArticle = new ArticleInfo(0);
 
             FileConverter convert = new FileConverter();
             File pdfFile = convert.convertToPDF(uploadedFile);
