@@ -13,8 +13,7 @@ public class ArticleInfo {
      * Used in identifying the article for all critical article functions.
      */
     private int articleID;
-    private int mainCategoryID;
-    private int subCategoryID;
+   
     /**
      * DOI number of the article, if any.
      * Assigned a value of null if no DOI number exists.
