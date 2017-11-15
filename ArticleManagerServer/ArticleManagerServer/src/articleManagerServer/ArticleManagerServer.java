@@ -10,7 +10,7 @@ public class ArticleManagerServer {
 		
 		ConnectionHandler serverConnectionHandler = new ConnectionHandler(10);
 		
-		System.out.println("Connection handle successfully created.");
+		System.out.println("Connection handler successfully created.");
 		
 		while(running)
 		{

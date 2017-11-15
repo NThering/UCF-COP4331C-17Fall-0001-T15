@@ -5,11 +5,17 @@
  */
 package database;
 import am_utils.ArticleInfo;
+
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.sql.*;
+import java.util.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import org.mariadb.jdbc.Driver;
 
 /**
@@ -22,7 +28,7 @@ public class Public {
 	
 	
 	// Returns null object if the creation of the connection fails.
-	public static Connection getDBConnection()
+	private static Connection getDBConnection()
 	{
 		Connection dbCon = null;
 		try {
@@ -43,14 +49,34 @@ public class Public {
     	return dbCon;
 	}
 	
+	private static String dateToString(Date dateObject)
+	{
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		String dateString = df.format(dateObject);
+		
+		return dateString;
+	}
+	
+	private static Date stringToDate(String dateString)
+	{
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		try {
+			Date returnDate = df.parse(dateString);
+			return returnDate;
+		} catch (ParseException e) {
+			System.err.println("Error parsing date string.");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
     /** Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server. 
      * @throws ParseException */
     public static ArrayList<ArticleInfo> getArticlesFromCategory( int mainCategoryID, int subCategoryID )
     {	
     	Connection con = getDBConnection();
-    	Statement queryStatement;
+    	java.sql.Statement queryStatement;
     	ResultSet rs;
-    	DateFormat dateConverter = DateFormat.getDateInstance();
     	ArrayList<ArticleInfo> articles = new ArrayList<ArticleInfo>();
     	ArticleInfo newArt = null;
 		try {
@@ -68,14 +94,12 @@ public class Public {
 				newArt.author = rs.getString("author");
 				newArt.owner = rs.getString("owner");
 				newArt.abstractText = rs.getString("abstractText");
-				newArt.uploadTime = dateConverter.parse(rs.getString("uploadDate"));
+				newArt.uploadTime = stringToDate(rs.getString("uploadDate"));
 				
 				articles.add(newArt);
 			}
 			return articles;
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
 			e.printStackTrace();
 		}
         return null;
@@ -85,7 +109,63 @@ public class Public {
      if ArticleID matches an articleID already in the database, replace it if the uploader is the owner of that article or is an admin.  Refuse to insert the new article if not.*/
     public static int insertArticle( File articleFile, ArticleInfo articleInfo, int userPermissions )
     {
-        return 1;
+    	Connection con = getDBConnection();
+    	java.sql.Statement stmnt;
+    	String finalString;
+    	ResultSet rs;
+    	
+    	try {
+    		stmnt = con.createStatement();
+    		rs = stmnt.executeQuery("select owner from article where id = " + articleInfo.getArticleID());
+    		if(rs.first())
+    		{
+    			if((rs.getString("owner") == articleInfo.owner) || userPermissions == 1)
+    			{
+    				finalString = "update article set "
+							+ "printName=" + "\""+articleInfo.printName+"\""
+							+ ", mainID=" + articleInfo.mainCategoryID
+							+ ", author = " + "\""+articleInfo.author+"\""
+							+ ", owner = " + "\""+articleInfo.owner+"\""
+							+ ", abstractText = " + "\""+articleInfo.abstractText+"\""
+							+ ", uploadDate = " + "\""+dateToString(articleInfo.uploadTime)+"\""
+							+ ", doiNumber = " + "\""+articleInfo.doiNumber+"\""
+							+ ", subID = " + articleInfo.subCategoryID
+							+ ", filePath=" + "\""+articleFile.getPath()+"\""
+							+ " where id=" + articleInfo.getArticleID() +";";
+    				stmnt.close();
+    				stmnt = con.createStatement();
+    	    		stmnt.executeUpdate(finalString);
+    				return 0;
+    			} else
+    			{
+    				return -1; // User does not have sufficient permissions to modify database entry.
+    			}
+    		}
+    		
+    		finalString = "insert into article values ("
+    				+ "NULL" // Article ID will be automatically assigned by the database through increment.
+    				+ ", " + "\""+articleInfo.printName+"\""
+    				+ ", " + "\""+articleInfo.mainCategoryID+"\""
+    				+ ", " + "\""+articleInfo.author+"\""
+    				+ ", " + "\""+articleInfo.owner+"\""
+    				+ ", " + "\""+articleInfo.abstractText+"\""
+    				+ ", " + "\""+dateToString(articleInfo.uploadTime)+"\""
+    				+ ", " + "\""+articleInfo.doiNumber+"\""
+    				+ ", " + articleInfo.subCategoryID
+    				+ ", " + "\""+articleFile.getPath()+"\"" + ");";
+    		stmnt.close();
+    		stmnt = con.createStatement();
+    		stmnt.executeUpdate(finalString);
+    		stmnt.close();
+    		
+    		return 0;
+    		
+    	} catch(SQLException e)
+    	{
+    		e.printStackTrace();
+    	}
+    	
+    	return -1;
     }
     
     /** Deletes the article under the specified ID, if the user has ownership of it or is an admin. */
