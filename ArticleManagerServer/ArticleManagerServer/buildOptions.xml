@@ -4,6 +4,7 @@
 <project basedir="." default="build" name="ArticleManagerServer">
 
 <target depends="build-project" description="create JAR file of compiled classes." name="build-jar">
+		<mkdir dir="build"/>
 		<manifestclasspath property="jar.classpath" jarfile="build/${ant.project.name}.jar">
 			<classpath refid="ArticleManagerServer.classpath"/>
 		</manifestclasspath>
@@ -13,5 +14,6 @@
     			<attribute name="Class-Path" value="dbConnector/mariadb-java-client-2.2.0.jar"/>
     		</manifest>
     	</jar>
+	<copy file="src/dbConnector/mariadb-java-client-2.2.0.jar" todir="build/dbConnector"/>
 </target>
 </project>
