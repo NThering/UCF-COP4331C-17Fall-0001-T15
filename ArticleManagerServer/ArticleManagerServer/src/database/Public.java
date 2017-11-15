@@ -245,6 +245,29 @@ public class Public {
     /** Returns a handle to the given article file. */
     public static File downloadArticle( int articleID )
     {
+    	Connection con = getDBConnection();
+    	java.sql.Statement stmnt;
+    	ResultSet rs;
+    	File returnedFile = null;
+    	
+    	try
+    	{
+    		stmnt = con.createStatement();
+    		stmnt.executeQuery("select filePath from article where id=" + articleID + ";");
+    		rs = stmnt.getResultSet();
+    		if(rs.next())
+    		{
+    			returnedFile = new File(rs.getString("filePath"));
+    		} else
+    		{
+    			return null; //Article does not exist in database.
+    		}
+    		stmnt.close();
+    		return returnedFile;
+    	}catch(SQLException e)
+    	{
+    		e.printStackTrace();
+    	}
         return null;
     }
 }
