@@ -6,6 +6,7 @@
 package database;
 import am_utils.ArticleInfo;
 
+import java.beans.Statement;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -192,7 +193,7 @@ public class Public {
     				deleteFile = new File(rs.getString("filePath"));
     				deleteFile.delete();
     				stmnt.close();
-    				stmnt.executeUpdate("delete from article where id=" + articleID);
+    				stmnt.executeUpdate("delete from article where id=" + articleID + ";");
     				return 0;
     			}
     		} else
@@ -211,6 +212,33 @@ public class Public {
     /** Gets information on the given article from the database. */
     public static ArticleInfo getArticleInfo( int articleID )
     {
+    	Connection con = getDBConnection();
+    	java.sql.Statement stmnt;
+    	ResultSet rs;
+    	ArticleInfo returnedInfo = new ArticleInfo(articleID);
+    	
+    	try {
+    		stmnt = con.createStatement();
+    		stmnt.executeQuery("select * from article where id=" + articleID + ";");
+    		rs = stmnt.getResultSet();
+    		if(rs.next())
+    		{
+    			returnedInfo.doiNumber = rs.getString("doiNumber");
+    			returnedInfo.printName = rs.getString("printName");
+    			returnedInfo.mainCategoryID = rs.getInt("mainID");
+    			returnedInfo.subCategoryID = rs.getInt("subID");
+    			returnedInfo.author = rs.getString("author");
+    			returnedInfo.owner = rs.getString("owner");
+    			returnedInfo.abstractText = rs.getString("abstractText");
+    			returnedInfo.uploadTime = stringToDate(rs.getString("uploadDate"));
+    		}
+    		
+    		stmnt.close();
+    		return returnedInfo;
+    	}catch(SQLException e)
+    	{
+    		e.printStackTrace();
+    	}
         return null;
     }
         
