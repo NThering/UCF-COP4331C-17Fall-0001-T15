@@ -36,7 +36,7 @@ public class Public {
 		} catch (ClassNotFoundException e) {
 			System.err.println("Failed to create database driver.");
 			e.printStackTrace();
-			return dbCon;
+			System.exit(-1);
 		}
     	
     	try {
@@ -44,6 +44,7 @@ public class Public {
 		} catch (SQLException e) {
 			System.err.println("Failed to connect to database.");
 			e.printStackTrace();
+			System.exit(-1);
 			return dbCon;
 		}
     	return dbCon;
@@ -113,12 +114,15 @@ public class Public {
     	java.sql.Statement stmnt;
     	String finalString;
     	ResultSet rs;
+    	File oldFile;
     	
     	try {
     		stmnt = con.createStatement();
-    		rs = stmnt.executeQuery("select owner from article where id = " + articleInfo.getArticleID());
+    		rs = stmnt.executeQuery("select owner, filePath from article where id = " + articleInfo.getArticleID());
     		if(rs.first())
     		{
+    			oldFile = new File(rs.getString("filePath"));
+    			oldFile.delete();
     			if((rs.getString("owner") == articleInfo.owner) || userPermissions == 1)
     			{
     				finalString = "update article set "
@@ -171,6 +175,36 @@ public class Public {
     /** Deletes the article under the specified ID, if the user has ownership of it or is an admin. */
     public static int deleteArticle( int articleID, String userUsername, int userPermissions )
     {
+    	Connection con = getDBConnection();
+    	java.sql.Statement stmnt;
+    	ResultSet rs;
+    	File deleteFile;
+    	
+    	try
+    	{
+    		stmnt = con.createStatement();
+    		stmnt.executeQuery("select id, owner, filePath from article where id=" + articleID + ";");
+    		rs = stmnt.getResultSet();
+    		if(rs.next())
+    		{
+    			if((rs.getString("owner") == userUsername) || (userPermissions == 1) )
+    			{
+    				deleteFile = new File(rs.getString("filePath"));
+    				deleteFile.delete();
+    				stmnt.close();
+    				stmnt.executeUpdate("delete from article where id=" + articleID);
+    				return 0;
+    			}
+    		} else
+    		{
+    			//There was no matching article, so nothing to be deleted. Return 0 anyways.
+    			return 0;
+    		}
+    	} catch(SQLException e)
+    	{
+    		e.printStackTrace();
+    		System.exit(-1);
+    	}
         return 1;
     }
         
