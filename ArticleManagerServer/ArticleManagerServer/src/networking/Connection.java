@@ -1,13 +1,24 @@
 package networking;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import am_utils.ArticleInfo;
 
@@ -66,22 +77,93 @@ public class Connection extends Thread {
 	
 	private void sendObject(Object outObj)
 	{
-		//TODO: Write object sending code.
+		while(consecFail <= failTolerance)
+		{
+			try {
+				ObjectOutputStream sendStream = new ObjectOutputStream(clientSocket.getOutputStream());
+				sendStream.writeObject(outObj);
+			} catch (IOException e) {
+				consecFail++;
+			}
+		}
 	}
 	
 	private Object receiveObject()
 	{
-		//TODO: Write object receiving code.
+		Object receiveObject;
+		try {
+			ObjectInputStream receiveStream = new ObjectInputStream(clientSocket.getInputStream());
+			try {
+				receiveObject = receiveStream.readObject();
+			} catch (ClassNotFoundException e) {
+				System.err.println("Error reconstituting serialized object from stream.");
+				e.printStackTrace();
+				return null;
+			}
+			return receiveObject;
+		} catch (IOException e) {
+			consecFail++;
+		}
 		return null;
 	}
 	
 	private void sendFile(File fp)
 	{
-		//TODO: Send file pointed to by the file path retrieved from the DB. 
+		byte[] fileBytes = new byte[(int)fp.length()];
+		OutputStream byteOutput;
+		BufferedInputStream inputStream;
+		
+		try {
+		inputStream = new BufferedInputStream(new FileInputStream(fp));
+		} catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+			return;
+		}
+		while(consecFail <= failTolerance)
+		{
+			try {
+				
+				inputStream.read(fileBytes, 0, fileBytes.length);
+				byteOutput = clientSocket.getOutputStream();
+				byteOutput.write(fileBytes, 0, fileBytes.length);
+				byteOutput.flush();
+				byteOutput.close();
+				return;
+			} catch (IOException e) {
+				consecFail++;
+			}
+		}
+		try {
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 	}
 	
 	private File receiveFile() // writes file to disk and returns file location as File object.
 	{
+		
+		String byteString = receiveString();
+		int byteCount = Integer.parseInt(byteString);
+		byte[] receivedBytes = new byte[byteCount];
+		File newFile = new File(new SimpleDateFormat("files/yyyyMMddHHmm.pdf").format(new Date()));
+		
+		while(consecFail <= failTolerance)
+		{
+			try {
+				FileOutputStream fos = new FileOutputStream(newFile);
+				BufferedOutputStream bos = new BufferedOutputStream(fos);
+				int bytesRead = clientSocket.getInputStream().read(receivedBytes, 0, receivedBytes.length);
+				bos.write(receivedBytes,0 , bytesRead);
+				bos.close();
+				return newFile;
+			} catch (IOException e) {
+				consecFail++;
+			}
+		}
+		
 		return null;
 	}
 	
