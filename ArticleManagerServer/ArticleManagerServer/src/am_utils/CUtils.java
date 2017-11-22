@@ -40,15 +40,17 @@ public final class CUtils
     
     
     /** Print out a nice list of all categories and subcategories.*/
-    /*
     public static void printOutCategories()
     {
         CUtils.msg("Printing categories!\n");
-        for( CategoryEnums.MainCategory mainCat: CategoryEnums.MainCategory.values() )
+        
+        MainCategory mainCatList[] = new DefaultCategories().getDefaultCategories();
+        
+        for( MainCategory mainCat: mainCatList )
         {
             CUtils.msg(mainCat.printName());
-            for( CategoryEnums.SubCategory subCat: mainCat.children() )
+            for( SubCategory subCat: mainCat.children() )
                 CUtils.msg( "\t" + subCat.printName() );
         }
-    }*/
+    }
 }

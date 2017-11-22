@@ -1,8 +1,14 @@
 package am_utils;
 
+import am_utils.MainCategory;
+import am_utils.SubCategory;
+import am_utils.DefaultCategories;
+
 /**
  *
  * @author NThering
+ *
+ * Console Utils; Utility functions concerning the console.
  */
 
 public final class CUtils
@@ -35,16 +41,19 @@ public final class CUtils
 
 
     /** Print out a nice list of all categories and subcategories.*/
-    // Invalidated, Kelsey will have to fix.
-    /*
     public static void printOutCategories()
     {
         CUtils.msg("Printing categories!\n");
-        for( CategoryEnums.MainCategory mainCat: CategoryEnums.MainCategory.values() )
+
+        // This is the safe way to navigate Kelsey's category system.
+        DefaultCategories defaultCat = new DefaultCategories();
+        MainCategory mainCatList[] = defaultCat.getDefaultCategories();
+
+        for( int i = 0; i < defaultCat.size(); i++ )
         {
-            CUtils.msg(mainCat.printName());
-            for( CategoryEnums.SubCategory subCat: mainCat.children() )
-                CUtils.msg( "\t" + subCat.printName() );
+            CUtils.msg( mainCatList[i].printName() );
+            for( int g = 0; g < mainCatList[i].size(); g++ )
+                CUtils.msg( "\t" + mainCatList[i].children()[g].printName() );
         }
-    }*/
+    }
 }
