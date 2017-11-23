@@ -15,5 +15,17 @@ A tentative mapping of the API codes is listed below:
 OPTYPE			ACTION		(ACTION)		PURPOSE
 0				(none)		(none)			(heartbeat) Notifies server that connection is still live. Has no function otherwise and is simply discarded by parser
 1				"username"	"Password"		logs in to the server. The majority of other commands will not be accessible until a valid login occurs.
-2*				"search string"				Search catalogue?
-10				(none)		(none)			Close connection
+											Sends string "0" upon success, "-1" upon failure.
+2*				(none)		(none)			Logs the user out of the server.
+3				"Username"	"Password"		Registers new user. Sends string "0" Upon success and "-1" upon failure.
+4*				"main ID"	"sub ID"		Searches database for all articles matching the main and sub id, and sends arraylist<ArticleInfo> through object stream.
+5*				"bytesize"	(none)			Prepares the server to receive an article file via a byte stream and a following articleInfo object.
+6*				"articleID"	(none)			Asks the server to send an articleInfo object with the information regarding the given article through an object stream.
+7*				"articleID"	(none)			Asks the server to send the given article file through a file stream, followed by the associated articleInfo
+											Note that the client will have to prepare to receive another text line with the byte size of the file before receiving the article file.
+8*				(none)		(none)			Returns the permission level number in string format.
+
+THREE PRIMARY TYPES OF STREAM WILL BE USED:
+1. BufferedReader/PrintWriter: For simple textual/numeric communications.
+2. ObjectInputStream/ObjectOutputStream: For singular objects such as article info, array list, etc.
+3. FileInputStream/FileOutputStream: For files. See http://www.java2s.com/Code/Java/Network-Protocol/TransferafileviaSocket.htm for examples.
