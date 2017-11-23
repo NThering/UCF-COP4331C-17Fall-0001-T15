@@ -158,7 +158,7 @@ public class Public extends Thread {
     }
 
     /** Downloads the given article from the database. */
-    public static ArticleInfo downloadArticle( int articleID )
+    public static File downloadArticle( int articleID )
     {
         writer.println("7 " + articleID.toString());
 
@@ -176,8 +176,8 @@ public class Public extends Thread {
             System.err.println("Article download failed");
         }
 
-        //receive ArticleInfo
-        return inputObject.readObject();
+        //receive article
+        return ;
     }
 
     /** Gets the permissions flags for the user, returning -1 if not logged in. */
