@@ -12,7 +12,7 @@ public class SessionManager extends Context implements SharedPreferences{
     public SharedPreferences instance;
     private Context context;
     private Editor editor;
-    int PRIVATE_MODE = 0;
+    private int PRIVATE_MODE = 0;
 
     public SessionManager(Context contxt)
     {
