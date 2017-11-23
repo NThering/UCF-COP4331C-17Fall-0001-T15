@@ -168,6 +168,7 @@ public class Public extends Thread {
         byte[] articleByteArray = new byte[fileSize];
 
         InputStream inStream = clientSocket.getInputStream();
+
         try {
             int bytesReadIn = inStream.read(articleByteArray, 0, fileSize);
         }
