@@ -135,24 +135,13 @@ public class ArticleInfo {
     
     public void setMainCategoryIndex( int mainID )
     {
-        if ( articleID == -1 ) {
+       
             this.mainCategoryID = mainID;
-        }
-
-        else{
-
-        }
 
     }
     public void setSubCategoryIndex( int subID )
     {
-        if ( articleID == -1 ) {
             this.subCategoryID = subID;
-        }
-
-        else{
-
-        }
 
     }
     // author of article
