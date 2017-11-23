@@ -104,7 +104,7 @@ public class Public {
     }
 
     /** Downloads the given article from the database. */
-    public static ArticleInfo downloadArticle( int articleID )
+    public static File downloadArticle( int articleID )
     {
         return null;
     }
