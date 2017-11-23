@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import am_utils.ArticleInfo;
-import am_utils.CategoryEnums.MainCategory;
-import am_utils.CategoryEnums.SubCategory;
 import java.sql.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import static java.util.concurrent.TimeUnit.*;
 
 public class Public extends Thread {
@@ -65,7 +68,7 @@ public class Public extends Thread {
 
         System.out.println("Connection successful");
     }
-    catch (UnkownHostException e) {
+    catch (UnknownHostException e) {
         System.err.println("Unknown host: " + HOSTNAME);
     }
     catch (IOException e) {
@@ -112,7 +115,7 @@ public class Public extends Thread {
           int subCategoryID, boolean IncludeAbstracts )
     {
         //prepare includeAbstacts for output
-        String bool = (includeAbstracts) ? "1" : "0";
+        String bool = (IncludeAbstracts) ? "1" : "0";
 
         writer.println("4 " + bool);
         outputObject.writeObject(articleCategory);
@@ -140,7 +143,7 @@ public class Public extends Thread {
 
             return 0;
         }
-        catch (FileNotFoundException e) {
+        catch (Exception e) {
             System.err.println("File not found");
             return 1;
         }
