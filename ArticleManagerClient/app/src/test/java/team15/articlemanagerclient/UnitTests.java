@@ -190,6 +190,7 @@ public class UnitTests
         int failFieldCount = 0;
         int totalFieldCount = 0;
 
+        // HARDCODED TEST DIRECTORY, BE SURE TO UPDATE THIS!!!
         File testDirectory = new File("T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers");
 
         // If the papers directory doesn't exist we've already failed.
@@ -197,6 +198,8 @@ public class UnitTests
             assert(false);
 
         File[] files = testDirectory.listFiles();
+        
+        ArrayList<ArticleInfo> completeArticles = new ArrayList<ArticleInfo>();
 
         for (int i = 0; i < files.length; i++)
         {
@@ -225,18 +228,39 @@ public class UnitTests
             // TC202 - All articles must be assigned a category.
             assertNotEquals("MAIN CATEGORY NOT ASSIGNED TO ARTICLE" + files[i].getName(), info.mainCategoryID, -1);
             assertNotEquals("SUB CATEGORY NOT ASSIGNED TO ARTICLE" + files[i].getName(),info.subCategoryID, -1);
+            
+            boolean hasAllFields = true;
 
             for ( int g = 0; g < fieldNames.length; g++ )
             {
-                if (fieldValues[g] != null)
+                if (fieldValues[g] == null)
+                {
+                    hasAllFields = false;
                     failFieldCount++;
+                }
 
                 CUtils.msg("\t" + fieldNames[g] + " " + (fieldValues[g] != null ? fieldValues[g] : "[NO VALUE]"));
 
                 totalFieldCount++;
             }
+            
+            if (hasAllFields)
+            {
+                CUtils.msg("-----------------------------------------------------------");
+                CUtils.msg("THE ABOVE ARTICLE HAS NO NULL FIELDS!!!!");
+                CUtils.msg("-----------------------------------------------------------");
+                
+                completeArticles.add(info);
+            }
         }
+        
+        
+        CUtils.msg("Complete Articles:");
+        for ( CatContainer passArtInfo : completeArticles )
+               CUtils.msg("\t" + passArtInfo.printName);
 
+        CUtils.msg("Total Complete Articles is " + String.valueOf(completeArticles.size()) );
+        
         // TC201, [NO VALUE] entries must be less than 25% of the metadata entries.
         assertFalse("ONLY" + String.valueOf(1 - ((float)failFieldCount)/totalFieldCount) + "METADATA ENTRIES FILLED.  Need 0.75 or more.", ((float)failFieldCount)/totalFieldCount > 0.25);
     }
