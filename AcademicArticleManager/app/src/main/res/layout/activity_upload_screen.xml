@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="#000000"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fileTextView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="10dp"
+            android:text="File to Upload"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/filepath"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="#FFFFFF"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/filepath"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="10dp"
+                android:weightSum="2"
+                android:gravity="right">
+
+                <Button
+                    android:id="@+id/browseButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Browse"
+                    android:textAllCaps="false"
+                    android:background="@drawable/popupbutton"
+                    android:textColor="#FFFFFF"
+                    android:textSize="25sp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="2sp"/>
+
+                <Button
+                    android:id="@+id/uploadButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Upload"
+                    android:textAllCaps="false"
+                    android:background="@drawable/popupbutton"
+                    android:textColor="#FFFFFF"
+                    android:textSize="25sp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="2sp"/>
+            </LinearLayout>
+
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>
