@@ -17,7 +17,7 @@ public class PublicUsage {
 
 
 
-    public ArticleInfo categorize(File uploadedFile, MainCategory[] mainCat, int numberOfCat){
+    public static ArticleInfo categorize(File uploadedFile, MainCategory[] mainCat, int numberOfCat){
 
         ArticleInfo filledArticle = new ArticleInfo(0);
 
@@ -62,7 +62,7 @@ public class PublicUsage {
         return filledArticle;
     }
 
-    private ArticleInfo addExtraData(ArticleInfo article, String data){
+    private static ArticleInfo addExtraData(ArticleInfo article, String data){
 
         FileConverter convert = new FileConverter();
         article.setDoiNumber(convert.getDoiFromText(data));
@@ -71,7 +71,7 @@ public class PublicUsage {
         return article;
     }
 
-    private String checkModifiedWord(String word){
+    private static String checkModifiedWord(String word){
         if(word.contains("ology")){
             word = word.substring(0, word.indexOf("ology"));
             word += "ological";
