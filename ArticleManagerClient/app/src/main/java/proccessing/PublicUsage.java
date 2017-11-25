@@ -70,6 +70,8 @@ public class PublicUsage {
         article.setDoiNumber(convert.getDoiFromText(data));
         article.setAbstractText(convert.getAbstractFromText(data));
         // article.setAuthor(convert.getAuthorFromText(data));
+        article.setAuthor("Various Authors");
+
         return article;
     }
 
