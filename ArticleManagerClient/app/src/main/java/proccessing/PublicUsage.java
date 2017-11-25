@@ -24,25 +24,26 @@ public class PublicUsage {
         FileConverter convert = new FileConverter();
         File pdfFile = convert.convertToPDF(uploadedFile);
 
-
-        for(int z = 1; z < 5; z++){
+   for(int z = 1; z < 5; z++){
             String data = convert.extractTextFromPDF(pdfFile.getName(), z);
 
 
             for(int x = 0; x < numberOfCat; x++){
-                if(data.contains(mainCat[x].printName()) || uploadedFile.getName().contains(mainCat[x].printName())) {
+                if(data.toLowerCase().contains(mainCat[x].printName().toLowerCase()) || uploadedFile.getName().toLowerCase().contains(mainCat[x].printName().toLowerCase())) {
                     SubCategory[] children = mainCat[x].children();
                     filledArticle.setMainCategoryIndex(x);
 
                     for (int y = 0; y < mainCat[x].size(); y++) {
-                        if (data.contains(children[y].printName())
-                                || uploadedFile.getName().contains(children[y].printName())
-                                || data.contains(checkModifiedWord(children[y].printName()))) {
+                        if (data.toLowerCase().contains(children[y].printName().toLowerCase())
+                                || uploadedFile.getName().toLowerCase().contains(children[y].printName().toLowerCase())
+                                || data.toLowerCase().contains(checkModifiedWord(children[y].printName().toLowerCase()))) {
 
-                           // test = mainCat[x].printName() + " " + children[y].printName();
+                          //  test = mainCat[x].printName() + " " + children[y].printName() + x + " " + y;
+                            filledArticle.setMainCategoryIndex(x);
+                            test = x + "";
                             filledArticle.setSubCategoryIndex(y);
-
                             filledArticle = addExtraData(filledArticle, data);
+
                             return filledArticle;
 
                         }
@@ -56,6 +57,7 @@ public class PublicUsage {
 
 
         }
+
 
 
 
