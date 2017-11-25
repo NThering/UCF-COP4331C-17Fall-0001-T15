@@ -133,13 +133,19 @@ public class FileConverter extends AppCompatActivity {
     }
 
 
+    
     public String getAbstractFromText(String text) {
 
 
         // first search for 10. and then skip the first / and substring on the following space
-        if (text.contains("abstract")) {
-            text = text.substring(text.indexOf("abstract", 5000));
+        if (text.contains("Abstract")) {
+            text = text.substring(text.indexOf("Abstract", 5000));
+            return text;
 
+        }
+        else if(text.contains("abstract")){
+            text = text.substring(text.indexOf("abstract", 5000));
+            return text;
         }
         else{
             if(text.length() > 5000){
