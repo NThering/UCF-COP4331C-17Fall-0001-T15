@@ -17,13 +17,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 
-/**
- * Created by Kelsey on 10/31/17.
- * // File pdffile = convertToPDF(createNewFile("helloworld2.txt"));
- //convertFromPDF(pdffile,3);
- */
 public class FileConverter extends AppCompatActivity {
-    String toast = "";
+    public static String toast = "";
 
 
     public FileConverter(){
@@ -76,15 +71,15 @@ public class FileConverter extends AppCompatActivity {
         String result = "";
 
         filename = setPath(filename);
+
         try{
             PdfReader reader = new PdfReader(filename);
 
             result = PdfTextExtractor.getTextFromPage(reader, pageNumber);
-
             reader.close();
 
         }
-        catch(IOException e){
+        catch(Exception e){
 
             result = "fail";
 
@@ -142,8 +137,6 @@ public class FileConverter extends AppCompatActivity {
     }
 
 
-
-    
     public String getAbstractFromText(String text) {
 
 
@@ -181,12 +174,29 @@ public class FileConverter extends AppCompatActivity {
 
     }
     public void convertFromPDF(String filename, int filetype) {
-        String result = extractTextFromPDF(filename, 1);
 
+        String result = " ";
+        String nextline = "";
+        int x = 1;
+        while(nextline != "fail"){
+            result += nextline;
+            toast = nextline;
+            try {
+                nextline = extractTextFromPDF(filename, x);
+            }
+            catch (Exception e){
+
+            }
+
+            x++;
+        }
+
+
+        toast = getFileWithoutExt(filename) + ".txt";
         switch (filetype) {
             case 1:
                 // text file
-                createNewFile(getFileWithoutExt(filename) + ".txt", result);
+               createNewFile(getFileWithoutExt(filename) + ".txt", result);
 
                 break;
             case 2:
@@ -215,7 +225,6 @@ public class FileConverter extends AppCompatActivity {
         String root = dir.getAbsolutePath() + "/" +filename;
 
         File sdcard = new File(root);
-        //  Toast.makeText(getApplicationContext(), "Reading file " + sdcard.getPath(), Toast.LENGTH_LONG).show();
 
         //ConvertToPDF(sdcard);
         StringBuilder text = new StringBuilder();
@@ -290,10 +299,13 @@ public class FileConverter extends AppCompatActivity {
     }
 
     public static String getFileWithoutExt(String fileName) {
+            String removeDot = "";
 
-        String removeDot = fileName.substring(0, fileName.lastIndexOf("."));
-        String removeSlash = removeDot.substring(fileName.lastIndexOf("/"));
-        return removeSlash;
+        if(fileName.contains(".")) {
+             removeDot = fileName.substring(0, fileName.lastIndexOf("."));
+        }
+
+        return removeDot;
     }
     public File createNewDirectory(String nameOfDir){
         // get the path to sdcard
@@ -314,13 +326,12 @@ public class FileConverter extends AppCompatActivity {
     public File createNewFile(String name, String data){
         // get the path to sdcard
         File sdcard = Environment.getExternalStorageDirectory();
+
         // to this path add a new directory path
         File dir = createNewDirectory("Article Manager");
 
         // create the file in which we will write the contents
         File file = new File(dir, name);
-
-        toast = file.getAbsolutePath();
 
 
         try {
@@ -333,7 +344,7 @@ public class FileConverter extends AppCompatActivity {
             return null;
         }
 
-      //  Toast.makeText(getApplicationContext(),file.getAbsolutePath() + " created.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),file.getAbsolutePath() + " created.", Toast.LENGTH_LONG).show();
 
         return file;
     }
