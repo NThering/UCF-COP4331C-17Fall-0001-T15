@@ -29,4 +29,5 @@ dependencies {
     compile 'com.itextpdf:itextg:5.5.10'
 
     testCompile 'junit:junit:4.12'
+    compile 'in.gauriinfotech:commons:1.0.8' // MAKES FILE PATHS EASY -- Ian
 }

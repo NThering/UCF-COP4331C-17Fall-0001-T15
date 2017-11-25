@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#a4ca8d"
+    android:weightSum="6"
+    tools:context="user_interface.ArticlesPage">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#745924"
+        android:layout_weight=".1">
+
+        <TextView
+            android:id="@+id/articleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="35sp"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5.8">
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#745924"
+        android:weightSum="2"
+        android:layout_weight=".1">
+
+        <Button
+            android:id="@+id/downloadArticles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/roundedbuttonblack"
+            android:textAllCaps="false"
+            android:text="Articles.txt"
+            android:textColor="#FFFFFF"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"/>
+
+        <Button
+            android:id="@+id/downloadAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/roundedbuttonblack"
+            android:textAllCaps="false"
+            android:text="Categories.txt"
+            android:textColor="#FFFFFF"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="15sp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="#a4ca8d"
+    tools:context="user_interface.TitleScreenLoggedIn">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="56dp"
+        android:paddingRight="24dp"
+        android:paddingLeft="24dp">
+
+        <ImageView android:src="@drawable/flash"
+            android:layout_width="wrap_content"
+            android:layout_height="224dp"
+            android:layout_marginBottom="50dp"
+            android:layout_gravity="center_horizontal" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/viewArticlesButtonLogged"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="36dp"
+            android:padding="12dp"
+            android:text="View Articles"
+            android:background="@drawable/roundedbutton"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textAllCaps="false"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/myArticlesButton"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="36dp"
+            android:padding="12dp"
+            android:text="My Articles"
+            android:background="@drawable/roundedbutton"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+</ScrollView>
+
