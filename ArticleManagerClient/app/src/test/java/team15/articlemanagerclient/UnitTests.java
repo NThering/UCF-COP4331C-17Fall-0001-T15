@@ -256,7 +256,7 @@ public class UnitTests
         
         
         CUtils.msg("Complete Articles:");
-        for ( CatContainer passArtInfo : completeArticles )
+        for ( ArticleInfo passArtInfo : completeArticles )
                CUtils.msg("\t" + passArtInfo.printName);
 
         CUtils.msg("Total Complete Articles is " + String.valueOf(completeArticles.size()) );
