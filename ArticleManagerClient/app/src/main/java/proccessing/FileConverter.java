@@ -106,6 +106,8 @@ public class FileConverter extends AppCompatActivity {
             text = text.substring(text.indexOf("10."));
 
 
+            char c = (char)0x0A;
+
             if (text.contains("/")) {
 
                // text = text.substring(0, text.indexOf((char)0x0A));
@@ -117,11 +119,18 @@ public class FileConverter extends AppCompatActivity {
 
                 }
                 try{
-                    text = text.substring(0, text.indexOf((char)0x0A));
+                    if(text.contains(c + "")) {
+                        text = text.substring(0, text.indexOf(c));
+                    }
+                    if(text.contains(" ")){
+                        text = text.substring(0, text.indexOf(" "));
+                    }
                 }
                 catch (Exception e){
 
                 }
+
+
 
 
             }
@@ -131,6 +140,7 @@ public class FileConverter extends AppCompatActivity {
         return text;
 
     }
+
 
 
     
