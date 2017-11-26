@@ -8,13 +8,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
-
 import team15.articlemanagerclient.R;
+import am_utils.ArticleInfo;
+import am_utils.CUtils;
+import am_utils.DefaultCategories;
+import am_utils.MainCategory;
+import am_utils.SubCategory;
+
 
 public class AllArticles extends AppCompatActivity {
-
     // UI variables
     ListView lv;
     ArrayList<String> categories = new ArrayList<>();
@@ -32,7 +37,7 @@ public class AllArticles extends AppCompatActivity {
         // Adapter to make it dynamic
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, categories);
         lv.setAdapter(adapter);
-        addCategories();
+        browseCategories();
 
         // Send title of category to next activity when clicked
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -56,25 +61,23 @@ public class AllArticles extends AppCompatActivity {
         });
     }
 
-    // Testing method until I can pull categories from database
-    public void addCategories() {
-        categories.add("CS");
-        categories.add("Math");
-        categories.add("Reading");
-        categories.add("History");
-        categories.add("Literature");
-        categories.add("Science");
-        categories.add("Astronomy");
-        categories.add("Philosophy");
-        categories.add("Databases");
-        categories.add("Life");
-        categories.add("Help");
-        categories.add("Out");
-        categories.add("Of");
-        categories.add("Ideas");
-        categories.add("Send");
-        categories.add("Help");
-        categories.add("Please");
+    // Adds category to the list
+    public void addCategories(String catName) {
+        categories.add(catName);
         adapter.notifyDataSetChanged();
+    }
+
+    public void browseCategories() {
+        DefaultCategories defaultCat = new DefaultCategories();
+        convertToArrayLists( defaultCat.getDefaultCategories(), defaultCat.size());
+    }
+
+    void convertToArrayLists( MainCategory[] categoryList, int categoryListSize ) {
+        for(int i = 0; i < categoryListSize; i++) {
+            if ( categoryList[i] == null )
+                continue;
+
+            addCategories(categoryList[i].getName());
+        }
     }
 }

@@ -16,11 +16,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-
 import in.gauriinfotech.commons.Commons;
 import team15.articlemanagerclient.R;
+import networking.Public;
 
 public class MyArticles extends AppCompatActivity {
 
@@ -73,11 +72,16 @@ public class MyArticles extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                SharedPreferences preference = getSharedPreferences("loggedIn", MODE_PRIVATE);
-                preference.edit().remove("logged").commit();
-                startActivity(intent);
+             //   int logSuccess = -1;
+             //   logSuccess = Public.logout();
+
+             //   if(logSuccess == 0) {
+                    Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    SharedPreferences preference = getSharedPreferences("loggedIn", MODE_PRIVATE);
+                    preference.edit().remove("logged").commit();
+                    startActivity(intent);
+             //   }
             }
         });
     }

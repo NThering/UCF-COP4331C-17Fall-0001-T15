@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 import team15.articlemanagerclient.R;
+import networking.Public;
 
 public class TitleScreenLoggedOut extends AppCompatActivity {
 
@@ -80,6 +81,18 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                 else {
                     Toast.makeText(getApplicationContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
                 }
+
+                /*     String un = username.getText().toString();
+                String pw = password.getText().toString();
+                int logSuccess = -1;
+
+                if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
+                    logSuccess = Public.login(un, pw);
+
+                if(logSuccess == 0) {
+                    Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
+                    loginSuccess();
+                } */
             }
         });
 
@@ -87,8 +100,20 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // register
-                Toast.makeText(getApplicationContext(), "Register works", Toast.LENGTH_SHORT).show();
+           /*     String un = username.getText().toString();
+                String pw = password.getText().toString();
+                int regSuccess = -1;
+                int logSuccess = -1;
+
+                if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
+                    regSuccess = Public.register(un, pw);
+
+                if(regSuccess == 0) {
+                    Toast.makeText(getApplicationContext(), "Register successful, logging in...", Toast.LENGTH_SHORT).show();
+                    logSuccess = Public.login(un, pw);
+                    if(logSuccess == 0)
+                        loginSuccess();
+                } */
             }
         });
     }
