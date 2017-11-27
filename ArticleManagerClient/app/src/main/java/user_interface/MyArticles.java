@@ -3,6 +3,7 @@ package user_interface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import am_utils.ArticleInfo;
 import am_utils.MainCategory;
 import in.gauriinfotech.commons.Commons;
+import proccessing.FileConverter;
 import team15.articlemanagerclient.R;
 //import networking.Public;
 import proccessing.PublicUsage;
@@ -40,6 +42,7 @@ public class MyArticles extends AppCompatActivity {
     String fullpath; // Universal so I can call from the inner classes/methods
     EditText filePath; // Universal so I can call from the inner classes/methods
     DefaultCategories defaultCat = new DefaultCategories();
+    Uri path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +64,11 @@ public class MyArticles extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String data = (String)parent.getItemAtPosition(position);
                 Intent newActivity = new Intent(MyArticles.this, ArticlePreview.class);
+                newActivity.putExtra("messageSub", data);
+                newActivity.putExtra("mainCatId", 1); // CHANGE 1 WHEN WE TRACK USERNAME
+                newActivity.putExtra("subCatId", 1); // CHANGE 1 WHEN WE TRACK USERNAME
                 startActivity(newActivity);
             }
         });
@@ -150,24 +157,55 @@ public class MyArticles extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Will call the upload file method from networking I believe
-                //File source = new File(filePath.getText().toString());
-                //ArticleInfo info = proccessing.PublicUsage.categorize(new File(fullpath), GetMainCategoryArray(), GetMainCategoryArraySize() );
-                //Toast.makeText(getApplicationContext(), info.doiNumber, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getApplicationContext(), info.printName, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getApplicationContext(), info.author, Toast.LENGTH_SHORT).show();
-                if(new File("storage/emulated/0/Downloaded/fun.txt").isFile()) {
-                    Toast.makeText(getApplicationContext(), "yes it is", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(), new File(fullpath).getPath(), Toast.LENGTH_SHORT).show();
-                }
+               // String uri = Environment.getExternalStorageDirectory().toString();
+               // uri = uri + "/6.pdf";
+               // filePath.setText(uri);
+
+              //  File file = (getExternalFilesDir(null));
+
+              //  Toast.makeText(getApplicationContext(), file.toString(), Toast.LENGTH_LONG).show();
+
+               File meow = new File("/storage/emulated/0/Android/data/team15.articlemanagerclient/files" + File.separator + "101.pdf");
+
+              // getFilesFromDir(new File("/storage/emulated/0/Android/data/team15.articlemanagerclient/files"));
+
+             /*  if(meow.canRead())
+                    Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_SHORT).show();
+
+                if(meow.isFile())
+                    Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_SHORT).show();
+
+                if(meow.exists())
+                    Toast.makeText(getApplicationContext(), "3", Toast.LENGTH_SHORT).show(); */
+                //getFilesFromDir(file);
+                ArticleInfo info = proccessing.PublicUsage.categorize(meow, GetMainCategoryArray(), GetMainCategoryArraySize() );
+                Toast.makeText(getApplicationContext(), info.doiNumber, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), info.printName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), info.author, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void getFilesFromDir(File filesFromSD) {
+        File[] listAllFiles = filesFromSD.listFiles();
+
+        if (listAllFiles != null && listAllFiles.length > 0) {
+            for (File currentFile : listAllFiles) {
+                    // File absolute path
+                   // Log.e("File path", currentFile.getAbsolutePath());
+                    // File Name
+                   // Log.e("File path", currentFile.getName());
+                if (currentFile.getName().endsWith(".pdf"))
+                    Toast.makeText(getApplicationContext(), currentFile.getName(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     // Method to set filepath once a file is picked -- set globals to file path when file is picked
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null) { // Prevents crashing when back button is pressed
-            Uri path = data.getData();
+            path = data.getData();
 
             fullpath = Commons.getPath(path, getApplicationContext());
             filePath.setText(fullpath);
