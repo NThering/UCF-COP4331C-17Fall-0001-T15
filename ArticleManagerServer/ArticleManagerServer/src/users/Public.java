@@ -30,7 +30,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
     public static Connection conn = null;
 
-    public static int login(String username, String password) throws NoSuchAlgorithmException, NoSuchProviderException
+    public static int login(String username, String password)
     {
         /**	Checks the username and password against the stored password hashes on the database.  Returns -1 if login failed and an integer corresponding to that user's permissions if successful. */
         /** Passwords must be stored securely ( NOT IN PLAINTEXT ) so that a data breach would not compromise them. */
@@ -67,7 +67,13 @@ private static String driver = "org.mariadb.jdbc.Driver";
         catch (ClassNotFoundException ce)
         {
             System.out.println("Class Not Found Exception: " + ce.toString());
-        }
+        } catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
         return -1;
     }
 
