@@ -78,7 +78,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
     }
 
     /** Ensures that the username is unique and can be registered in the database, then registers it if so.  Returns true if registration successful and false if not. */
-    public static boolean register(String username, String password) throws NoSuchAlgorithmException, NoSuchProviderException
+    public static boolean register(String username, String password)
     {
         try
         {
@@ -116,13 +116,19 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
         catch (SQLException e)
         {
-            System.out.println("SQL Excpetion: " + e.toString());
+            System.out.println("SQL Exception: " + e.toString());
         }
 
         catch (ClassNotFoundException ce)
         {
             System.out.println("Class Not Found Exception: " + ce.toString());
-        }
+        } catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
         return true;
     }
 
