@@ -27,6 +27,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.itextpdf:itextg:5.5.10'
+    compile group: 'com.madgag', name: 'scprov-jdk15on', version: '1.47.0.2'
+    compile group: 'com.madgag', name: 'scpkix-jdk15on', version: '1.47.0.2'
 
     testCompile 'junit:junit:4.12'
     compile 'in.gauriinfotech:commons:1.0.8' // MAKES FILE PATHS EASY -- Ian

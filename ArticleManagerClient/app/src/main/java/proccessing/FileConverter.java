@@ -6,6 +6,7 @@ import android.graphics.pdf.PdfDocument;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
@@ -15,15 +16,213 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+
+import am_utils.CUtils;
 
 
 public class FileConverter extends AppCompatActivity {
     public static String toast = "";
+    HashSet<String> englishWordSet;
+
+    public FileConverter()
+    {
+        BufferedReader wordList = null;
+        try
+        {
+            // IAN PLEASE FIGURE OUT HOW TO OPEN THIS FILE ON ANDROID.
+            // From what I've read, "getAssets().open("english_words.txt") works but I can't test it with unit tests.
+            // If that doesn't work you might need to call it from a context but that needs to be created in the higher levels or something.
+
+            // To use unit tests, just link "english_words" to its location on your computer.
+            wordList = new BufferedReader(new FileReader("english_words.txt"));
+        }
+        catch(Exception e)
+        {
+            CUtils.warning("FAILED TO LOCATE ENGLISH_WORDS.TXT!!!\n\n" + e.getMessage());
+            return; // We've failed to build a useful word database.
+        }
+
+        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
+
+        try
+        {
+            // Insert all of our words into the "dictionary" for quick access times.
+            String word;
+            while ((word = wordList.readLine()) != null)
+            {
+                if (Character.isUpperCase(word.charAt(0)))  // Root out any names that might be in there.
+                {
+                    int upperCount = 0;
+                    for (char character : word.toCharArray())
+                    {
+                        if (Character.isUpperCase(character))
+                            upperCount++;
+                    }
 
 
-    public FileConverter(){
+                    if (upperCount == 1 && word.length() != 1) // If there's more than one capital letter it's probably just an abbreviation.
+                        continue;
+                }
+
+                englishWordSet.add(word.toLowerCase());
+            }
+        }
+        catch(Exception e)
+        {
+            CUtils.warning("FAILED TO PARSE ENGLISH_WORDS.TXT!!!\n\n" + e.getMessage());
+        }
+
+    }
+
+    public boolean isWord(String word)
+    {
+        return englishWordSet.contains(word.toLowerCase());
+    }
+
+    public boolean isName(String word)
+    {
+        String simpleWord = word.replaceAll("\\P{Print}", "");
+
+        if ( simpleWord.length() < 4 ) // Too short to be a name.  Sorry Sue and Tom.
+            return false;
+
+        if ( simpleWord.matches(".*\\d+.*") ) // If our string has digits, it's probably not a name.
+            return false;
+
+        if ( Character.isLowerCase(simpleWord.charAt(0)) ) // If we don't start with an upper case letter, we're not a name!
+            return false;
+
+        if ( isWord( simpleWord ) ) // If it's a word it's probably not a name.
+            return false;
+
+        return true;
+    }
+
+    public String getAuthorFromText( String inputText )
+    {
+        String authors = "";
+        String[] lines =  inputText.split("\n");
+
+        if ( lines.length > 50 )
+            lines = java.util.Arrays.copyOf(lines, 50);
+
+        lines[0] = ""; // No authors have appeared on the first line in our examinations.
+
+        // If an author is mentioned they probably came up in the first few lines.
+        // Don't want to scan too many because our dictionary is kind of bad and
+        // the chance of random non-words popping up past the first few gets higher and higher.
+        for ( String line : lines )
+        {
+            String[] words =  line.split(" ");
+
+            int lineScore = 0;
+
+            for ( String word : words )
+            {
+                if (isName(word))
+                    lineScore++;
+            }
+
+            // If we've got 4 unidentified words, or every word on the line is unidentified, we probably hit our target.
+            if (lineScore > 4 || (lineScore == line.length() && lineScore > 1))
+                return line;
+        }
+
+        return null;
+    }
+
+    public String getAbstractFromText(String text)
+    {
+        String[] lines = text.split("\n");
+        boolean collectAbstract = false;
+        boolean collectingAbstract = false;
+        String abstractLines = "";
+
+        for (String line : lines)
+        {
+            String simpleLine = line.toLowerCase().replaceAll("\\P{Print}", "");
+
+            //CUtils.msg(simpleLine);
+
+            // We've already found the Abstract tag and want to get the actual abstract.
+            if ( collectAbstract )
+            {
+                // Just a blank line.
+                if ( simpleLine.replaceAll(" ", "").isEmpty() )
+                {
+                    if (collectingAbstract)
+                    {
+                        break;
+                    }
+                    else
+                        continue;
+                }
+
+                collectingAbstract = true;
+                abstractLines += line;
+                continue;
+            }
+
+            if ( simpleLine.startsWith("abstract") ) // "abstract" is a pretty uncommon word to start a line with, unless specifying one.
+            {
+                collectAbstract = true;
+                // That was just the word "abstract" by itself pretty much so the next paragraph is probably the abstract.
+                if (simpleLine.length() < 10)
+                    continue;
+
+                // Otherwise add this line, minus the word "abstract" of course.
+                if ( line.length() > 8)
+                    abstractLines += line.substring(8, line.length());
+            }
+        }
 
 
+        if (!abstractLines.isEmpty())
+        {
+            if (abstractLines.length() < 5000)
+                return abstractLines;
+            else
+                return abstractLines.substring(0, 4997) + "...";
+        }
+        else
+            return null; // Failed to locate abstract!
+    }
+
+    public String getDoiFromText(String text)
+    {
+        // first search for 10. and then skip the first / and substring on the following space
+        if (text.contains("10."))
+        {
+            text = text.substring(text.indexOf("10."));
+
+            if (text.contains("/"))
+            {
+                try
+                {
+                    if(text.contains("\n"))
+                    {
+                        text = text.substring(0, text.indexOf('\n'));
+                    }
+                    if(text.contains(" "))
+                    {
+                        text = text.substring(0, text.indexOf(" "));
+                    }
+                }
+                catch (Exception e)
+                {
+                    CUtils.warning("Messed up DOI number parsing somehow!!!");
+                }
+            }
+            else
+                return null; // This isn't a DOI number, probably a page number or something.
+        }
+        else
+            return null; // Doesn't have a DOI number so don't just return the entire text as one.
+
+        return text;
     }
 
     public File convertToPDF(File inputFile ){
@@ -60,105 +259,24 @@ public class FileConverter extends AppCompatActivity {
     }
 
 
-    /*
-    1 = convert to .txt
-    2 = convert to .odt
-    3 = convert to .html
-    default converts to .txt
-    NOTE: CURRENTLY ONLY READS FROM ONE PAGE!
-     */
-    public String extractTextFromPDF(String filename, int pageNumber){
+    public String extractTextFromPDF(String filePath, int pageNumber){
         String result = "";
 
-        filename = setPath(filename);
-
-        try{
-            PdfReader reader = new PdfReader(filename);
+        try
+        {
+            PdfReader reader = new PdfReader(filePath);
 
             result = PdfTextExtractor.getTextFromPage(reader, pageNumber);
             reader.close();
-
         }
-        catch(Exception e){
-
+        catch(Exception e)
+        {
             result = "fail";
-
         }
-
-
-
 
         return result;
     }
 
-
-
-    public String getDoiFromText(String text) {
-
-
-        // first search for 10. and then skip the first / and substring on the following space
-        if (text.contains("10.")) {
-            text = text.substring(text.indexOf("10."));
-
-
-            char c = (char)0x0A;
-
-            if (text.contains("/")) {
-
-               // text = text.substring(0, text.indexOf((char)0x0A));
-
-                try{
-                  //  text = text.substring(0, text.indexOf((char)0x20));
-                }
-                catch (Exception e){
-
-                }
-                try{
-                    if(text.contains(c + "")) {
-                        text = text.substring(0, text.indexOf(c));
-                    }
-                    if(text.contains(" ")){
-                        text = text.substring(0, text.indexOf(" "));
-                    }
-                }
-                catch (Exception e){
-
-                }
-
-
-
-
-            }
-
-
-        }
-        return text;
-
-    }
-
-
-    public String getAbstractFromText(String text) {
-
-
-        // first search for 10. and then skip the first / and substring on the following space
-        if (text.contains("Abstract")) {
-            text = text.substring(text.indexOf("Abstract", 5000));
-            return text;
-
-        }
-        else if(text.contains("abstract")){
-            text = text.substring(text.indexOf("abstract", 5000));
-            return text;
-        }
-        else{
-            if(text.length() > 5000){
-
-                text = text.substring(0, 5000);
-            }
-        }
-        return text;
-
-    }
     public String setPath(String filepath){
         String correctedPath = "";
 
@@ -173,8 +291,15 @@ public class FileConverter extends AppCompatActivity {
         return correctedPath;
 
     }
-    public void convertFromPDF(String filename, int filetype) {
 
+    /*
+    1 = convert to .txt
+    2 = convert to .odt
+    3 = convert to .html
+    default converts to .txt
+    */
+    public File convertFromPDF(String filename, int filetype)
+    {
         String result = " ";
         String nextline = "";
         int x = 1;
@@ -193,28 +318,19 @@ public class FileConverter extends AppCompatActivity {
 
 
         toast = getFileWithoutExt(filename) + ".txt";
-        switch (filetype) {
-            case 1:
-                // text file
-               createNewFile(getFileWithoutExt(filename) + ".txt", result);
 
-                break;
-            case 2:
-                createNewFile(getFileWithoutExt(filename) + ".odt", result);
-                break;
-            case 3:
-                createNewFile(getFileWithoutExt(filename) + ".html", result);
-                break;
-            default:
-                createNewFile(getFileWithoutExt(filename) + ".txt", result);
-                break;
-            case 4:
-                break;
+        // List of our supported extensions, the index of the array being the ID.
+        // Add more extensions at will to the end of the array!
+        // of course, createNewFile will have to support them first.
+        String[] supportedExtensions = {".txt", ".txt", ".odt", ".html"};
 
-
+        if ( filetype >= supportedExtensions.length || filetype < 0)
+        {
+            CUtils.warning("Tried to convert to invalid filetype!");
+            return null;
         }
 
-
+        return createNewFile(getFileWithoutExt(filename) + supportedExtensions[filetype], result);
     }
 
 

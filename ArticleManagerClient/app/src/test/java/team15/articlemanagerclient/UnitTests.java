@@ -13,6 +13,7 @@ import am_utils.DefaultCategories;
 import am_utils.MainCategory;
 import am_utils.SubCategory;
 
+import proccessing.FileConverter;
 import proccessing.PublicUsage;
 
 import static org.junit.Assert.*;
@@ -171,6 +172,61 @@ public class UnitTests
     }
 
 
+    @Test
+    public void testDict() throws Exception
+    {
+        FileConverter testConverter = new proccessing.FileConverter();
+
+        assertTrue(testConverter.isWord("my"));
+        assertTrue(testConverter.isWord("Testing"));
+        assertFalse(testConverter.isWord("strats"));
+        assertTrue(testConverter.isWord("are"));
+        assertTrue(testConverter.isWord("Very"));
+        assertTrue(testConverter.isWord("good"));
+
+        assertFalse(testConverter.isWord("Johnathan"));
+        assertFalse(testConverter.isWord("Ashley"));
+        assertTrue(testConverter.isWord("horrible"));
+        assertTrue(testConverter.isWord("environment"));
+        assertTrue(testConverter.isWord("salvation"));
+
+        assertTrue(testConverter.isWord("I"));
+        assertTrue(testConverter.isWord("actually"));
+        assertTrue(testConverter.isWord("had"));
+        assertTrue(testConverter.isWord("a"));
+        assertTrue(testConverter.isWord("lot"));
+        assertTrue(testConverter.isWord("of"));
+        assertTrue(testConverter.isWord("trouble"));
+        assertTrue(testConverter.isWord("getting"));
+        assertTrue(testConverter.isWord("a"));
+        assertTrue(testConverter.isWord("good"));
+        assertTrue(testConverter.isWord("dictionary"));
+
+        assertTrue(testConverter.isWord("this"));
+        assertTrue(testConverter.isWord("one"));
+        assertTrue(testConverter.isWord("and"));
+        assertTrue(testConverter.isWord("many"));
+        assertTrue(testConverter.isWord("others"));
+        assertTrue(testConverter.isWord("have"));
+        assertTrue(testConverter.isWord("names"));
+        assertTrue(testConverter.isWord("in"));
+        assertTrue(testConverter.isWord("them"));
+        assertTrue(testConverter.isWord("for"));
+        assertTrue(testConverter.isWord("some"));
+        assertTrue(testConverter.isWord("reason"));
+
+        assertTrue(testConverter.isWord("also"));
+        assertTrue(testConverter.isWord("random"));
+        assertTrue(testConverter.isWord("words"));
+        assertTrue(testConverter.isWord("are"));
+        assertTrue(testConverter.isWord("capitalized"));
+        assertTrue(testConverter.isWord("so"));
+        assertTrue(testConverter.isWord("what"));
+        assertTrue(testConverter.isWord("the"));
+        assertTrue(testConverter.isWord("heck"));
+    }
+
+
     //----------------
     //-----TC20X------
     //----------------
@@ -190,12 +246,12 @@ public class UnitTests
         int failFieldCount = 0;
         int totalFieldCount = 0;
 
-        // HARDCODED TEST DIRECTORY, BE SURE TO UPDATE THIS!!!
-        File testDirectory = new File("T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers");
+        // HARDCODED TEST DIRECTORY, BE SURE TO POINT THIS AT WHEREVER ARTICLE_MANAGER_PAPERS IS ON YOUR COMPUTER!
+        File testDirectory = new File("Article Manager Papers");
 
         // If the papers directory doesn't exist we've already failed.
         if ( !testDirectory.exists() )
-            assert(false);
+            assertFalse("DID NOT FIND TEST DIRECTORY, CANNOT RUN TESTS", true);
 
         File[] files = testDirectory.listFiles();
         
@@ -233,7 +289,7 @@ public class UnitTests
 
             for ( int g = 0; g < fieldNames.length; g++ )
             {
-                if (fieldValues[g] == null)
+                if (fieldValues[g] == null && g != 2)
                 {
                     hasAllFields = false;
                     failFieldCount++;
@@ -245,13 +301,9 @@ public class UnitTests
             }
             
             if (hasAllFields)
-            {
-                CUtils.msg("-----------------------------------------------------------");
-                CUtils.msg("THE ABOVE ARTICLE HAS NO NULL FIELDS!!!!");
-                CUtils.msg("-----------------------------------------------------------");
-                
                 completeArticles.add(info);
-            }
+
+            CUtils.msg("-----------------------------------------------------------");
         }
         
         
@@ -259,7 +311,7 @@ public class UnitTests
         for ( ArticleInfo passArtInfo : completeArticles )
                CUtils.msg("\t" + passArtInfo.printName);
 
-        CUtils.msg("Total Complete Articles is " + String.valueOf(completeArticles.size()) );
+        CUtils.msg("Total Complete Articles is " + String.valueOf( completeArticles.size() ));
         
         // TC201, [NO VALUE] entries must be less than 25% of the metadata entries.
         assertFalse("ONLY" + String.valueOf(1 - ((float)failFieldCount)/totalFieldCount) + "METADATA ENTRIES FILLED.  Need 0.75 or more.", ((float)failFieldCount)/totalFieldCount > 0.25);

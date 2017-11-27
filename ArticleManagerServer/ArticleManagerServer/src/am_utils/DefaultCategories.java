@@ -1,6 +1,4 @@
 package am_utils;
-
-import java.io.File;
 /**
  * Created by Kelsey on 10/31/17.
  */
@@ -35,12 +33,11 @@ public class DefaultCategories {
     };
 
 
-    DefaultCategories(){
+    public DefaultCategories(){
         index = -1;
         mainCat = new MainCategory[50];
 
         createCategories();
-
     }
     private void createCategories() {
 
@@ -313,10 +310,9 @@ public class DefaultCategories {
 
 
         String[] healthList={
-                "Health",
+                "Dental",
                 "Nutrition",
-                "Excersise",
-
+                "Excersice"
         };
         mainCat[17].addNewSubcategory(healthList);
 
@@ -330,17 +326,15 @@ public class DefaultCategories {
         mainCat[18].addNewSubcategory(otherList);
 
 
-
-        // Always Update
-        index = 18;
-
-
-
-
     }
 
-    public int size(){ return index; }
-    
+
+
+
+        public int size(){
+            return index;
+        }
+
     public MainCategory[] getDefaultCategories(){
         return mainCat;
     }

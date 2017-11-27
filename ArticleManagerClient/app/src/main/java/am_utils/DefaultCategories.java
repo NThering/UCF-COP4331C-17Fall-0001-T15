@@ -310,10 +310,9 @@ public class DefaultCategories {
 
 
         String[] healthList={
-                "Health",
+                "Dental",
                 "Nutrition",
-                "Excersise",
-
+                "Excersice"
         };
         mainCat[17].addNewSubcategory(healthList);
 

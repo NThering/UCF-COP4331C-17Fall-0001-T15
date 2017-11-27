@@ -9,24 +9,18 @@ import am_utils.SubCategory;
 public class PublicUsage {
 
     /** Takes a reference to an article and returns a filled out ArticleInfo object.  This includes extracting the Abstract of the paper, but not assigning an ArticleID, Owner, or UploadTime as these are determined elsewhere.
-     * Returns null on complete failure to parse article, Abstract  */
-    public static ArticleInfo categorizeArticle( File articleFile )
+     * Returns null on complete failure to parse article, Abstract
+     * ONLY TAKES PDF FILES
+     * */
+    public static ArticleInfo categorize(File uploadedFile, MainCategory[] mainCat, int numberOfCat)
     {
-        return null;
-    }
-
-
-
-    public static ArticleInfo categorize(File uploadedFile, MainCategory[] mainCat, int numberOfCat){
-
         ArticleInfo filledArticle = new ArticleInfo(0);
+        filledArticle.printName = uploadedFile.getName().replace(".pdf", "");
 
         FileConverter convert = new FileConverter();
-        File pdfFile = convert.convertToPDF(uploadedFile);
 
-   for(int z = 1; z < 5; z++){
-            String data = convert.extractTextFromPDF(pdfFile.getName(), z);
-
+        for(int z = 1; z < 5; z++){
+            String data = convert.extractTextFromPDF(uploadedFile.getPath(), z);
 
             for(int x = 0; x < numberOfCat; x++){
                 if(data.toLowerCase().contains(mainCat[x].printName().toLowerCase()) || uploadedFile.getName().toLowerCase().contains(mainCat[x].printName().toLowerCase())) {
@@ -38,41 +32,28 @@ public class PublicUsage {
                                 || uploadedFile.getName().toLowerCase().contains(children[y].printName().toLowerCase())
                                 || data.toLowerCase().contains(checkModifiedWord(children[y].printName().toLowerCase()))) {
 
-                          //  test = mainCat[x].printName() + " " + children[y].printName() + x + " " + y;
                             filledArticle.setMainCategoryIndex(x);
-                            test = x + "";
                             filledArticle.setSubCategoryIndex(y);
                             filledArticle = addExtraData(filledArticle, data);
 
                             return filledArticle;
-
                         }
-
-
                     }
-
-
                 }
             }
-
-
         }
-
-
-
 
         return filledArticle;
     }
 
-    private static ArticleInfo addExtraData(ArticleInfo article, String data){
-
+    private static ArticleInfo addExtraData(ArticleInfo articleInfo, String data)
+    {
         FileConverter convert = new FileConverter();
-        article.setDoiNumber(convert.getDoiFromText(data));
-        article.setAbstractText(convert.getAbstractFromText(data));
-        // article.setAuthor(convert.getAuthorFromText(data));
-        article.setAuthor("Various Authors");
+        articleInfo.setDoiNumber(convert.getDoiFromText(data));
+        articleInfo.setAbstractText(convert.getAbstractFromText(data));
+        articleInfo.setAuthor(convert.getAuthorFromText(data));
 
-        return article;
+        return articleInfo;
     }
 
     private static String checkModifiedWord(String word){
@@ -101,12 +82,14 @@ public class PublicUsage {
     /** Takes a pdf file and turns it into a file of the designated type. Returns null on error. */
     public static File convertFromPDF( File inputFile, int fileType )
     {
-        return null;
+        // Just linking Kelsey's system to her public class.
+        return (new FileConverter()).convertFromPDF( inputFile.getPath(), fileType);
     }
 
     /** Takes a file of a supported type and turns it into a pdf.  Returns null on error or unsupported filetype. */
     public static File convertToPDF( File inputFile )
     {
-        return null;
+        // Just linking Kelsey's system to her public class.
+        return (new FileConverter()).convertToPDF( inputFile );
     }
 }
