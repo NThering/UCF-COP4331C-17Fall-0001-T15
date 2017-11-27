@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import team15.articlemanagerclient.R;
 import am_utils.ArticleInfo;
@@ -18,11 +19,25 @@ import am_utils.DefaultCategories;
 import am_utils.MainCategory;
 import am_utils.SubCategory;
 
+// Format for categories that's easier to enumerate through.
+class CatContainer implements Serializable {
+    public String name;
+    public Integer id;
+    public ArrayList<SubCatContainer> subcategories;
+}
+
+// Format for sub-categories that's easier to enumerate through.
+// Only really need this so we can have ID without using null entries.
+class SubCatContainer implements Serializable {
+    public String name;
+    public Integer id;
+}
 
 public class AllArticles extends AppCompatActivity {
     // UI variables
     ListView lv;
     ArrayList<String> categories = new ArrayList<>();
+    ArrayList<CatContainer> finalCatList = new ArrayList<CatContainer>();
     ArrayAdapter<String> adapter;
     String data;
     Button downloadAllArticles;
@@ -46,6 +61,7 @@ public class AllArticles extends AppCompatActivity {
                 data = (String)parent.getItemAtPosition(position);
                 Intent newActivity = new Intent(AllArticles.this, SubCategories.class);
                 newActivity.putExtra("message", data);
+                newActivity.putExtra("final_cat_list", finalCatList);
                 startActivity(newActivity);
             }
         });
@@ -69,15 +85,34 @@ public class AllArticles extends AppCompatActivity {
 
     public void browseCategories() {
         DefaultCategories defaultCat = new DefaultCategories();
-        convertToArrayLists( defaultCat.getDefaultCategories(), defaultCat.size());
+        convertToArrayLists(defaultCat.getDefaultCategories(), defaultCat.size());
     }
 
-    void convertToArrayLists( MainCategory[] categoryList, int categoryListSize ) {
+    void convertToArrayLists(MainCategory[] categoryList, int categoryListSize) {
         for(int i = 0; i < categoryListSize; i++) {
             if ( categoryList[i] == null )
                 continue;
 
+            CatContainer newCat = new CatContainer();
+            newCat.name = categoryList[i].getName();
+            newCat.subcategories = new ArrayList<SubCatContainer>();
+            newCat.id = i;
+            finalCatList.add(newCat);
             addCategories(categoryList[i].getName());
+
+            for(int j = 0; j < categoryList[i].size(); j++) {
+                // Same story as before.
+                if (categoryList[i].children()[j] == null)
+                    continue;
+
+                SubCatContainer newSubCat = new SubCatContainer();
+                newSubCat.name = categoryList[i].children()[j].printName();
+                newSubCat.id = j;
+
+                newCat.subcategories.add(newSubCat);
+            }
         }
+
+
     }
 }

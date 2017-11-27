@@ -9,18 +9,22 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import team15.articlemanagerclient.R;
+import am_utils.ArticleInfo;
+//import networking.Public;
 
 public class ArticlesPage extends AppCompatActivity {
 
     // UI Variables
     ListView lv;
-    ArrayList<String> subcategories = new ArrayList<>();
+    ArrayList<String> articles = new ArrayList<>();
+    ArrayList<ArticleInfo> articleTitles;
     ArrayAdapter<String> adapter;
     TextView title;
     Button downloadAllArticles, downloadUnderCategory;
+    Integer mainId, subId;
+    String data, message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +34,28 @@ public class ArticlesPage extends AppCompatActivity {
         // Pull the category passed in through intent
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
-        String message = bundle.getString("messageSub");
+        message = bundle.getString("messageSub");
+        mainId = bundle.getInt("mainCatId");
+        subId = bundle.getInt("subCatId");
 
         title = (TextView) findViewById(R.id.articleTextView);
         title.setText(message + " Articles");
 
         // Dynamic list
         lv = (ListView) findViewById(R.id.list);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, subcategories);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, articles);
         lv.setAdapter(adapter);
+        //articleTitles = Public.getArticlesFromCategory(mainId, subId, false); NEEDS NETWORKING TO WORK
         addCategories();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               Intent newActivity = new Intent(ArticlesPage.this, ArticlePreview.class);
+                data = (String)parent.getItemAtPosition(position);
+                Intent newActivity = new Intent(ArticlesPage.this, ArticlePreview.class);
+                newActivity.putExtra("titleMessage", data);
+                newActivity.putExtra("mainCatId", mainId);
+                newActivity.putExtra("subCatId", subId);
                startActivity(newActivity);
             }
         });
@@ -71,15 +82,19 @@ public class ArticlesPage extends AppCompatActivity {
 
     // Testing method until I can pull categories from database
     public void addCategories() {
-        subcategories.add("Dog");
-        subcategories.add("Cat");
-        subcategories.add("Cow");
-        subcategories.add("Pig");
-        subcategories.add("Chicken");
-        subcategories.add("Creeper");
-        subcategories.add("Spider");
-        subcategories.add("Animal");
-        subcategories.add("Default");
+       /* for(ArticleInfo listyList : articleTitles) { WON'T WORK WITHOUT NETWORKING
+            articles.add(listyList.printName);
+        } */
+
+        articles.add("Dog");
+        articles.add("Cat");
+        articles.add("Cow");
+        articles.add("Pig");
+        articles.add("Chicken");
+        articles.add("Creeper");
+        articles.add("Spider");
+        articles.add("Animal");
+        articles.add("Default");
         adapter.notifyDataSetChanged();
     }
 }

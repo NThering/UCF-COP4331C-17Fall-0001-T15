@@ -8,15 +8,21 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import am_utils.ArticleInfo;
 import in.gauriinfotech.commons.Commons;
 import team15.articlemanagerclient.R;
+import am_utils.DefaultCategories;
+//import networking.Public;
+import proccessing.FileConverter;
 
 public class ArticlePreview extends AppCompatActivity {
 
@@ -24,13 +30,24 @@ public class ArticlePreview extends AppCompatActivity {
     TextView title, categories, authors, dateUploaded, uploader;
     Button download, viewButton, deleteButton, reupload;
     private static final int fileSelectCode = 42; // For filepicker, can be any number I believe
-    String fullpath; // Universal so I can call from the inner classes/methods
+    String fullpath, message; // Universal so I can call from the inner classes/methods
     EditText filePath; // Universal so I can call from the inner classes/methods
+    Integer mainId, subId;
+    DefaultCategories defaultCat = new DefaultCategories();
+    ArrayList<ArticleInfo> articleInformation;
+    int downloadFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_preview);
+
+        // Pull the category passed in through intent
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        message = bundle.getString("titleMessage");
+        mainId = bundle.getInt("mainCatId");
+        subId = bundle.getInt("subCatId");
 
         // Initialize the elements
         title = (TextView) findViewById(R.id.articleTitleTextView);
@@ -38,21 +55,21 @@ public class ArticlePreview extends AppCompatActivity {
         authors = (TextView) findViewById(R.id.authorsTextView);
         dateUploaded = (TextView) findViewById(R.id.dateUploadedTextView);
         uploader = (TextView) findViewById(R.id.uploaderTextView);
-
         download = (Button) findViewById(R.id.downloadArticleButton);
         viewButton = (Button) findViewById(R.id.viewArticleButton);
         deleteButton = (Button) findViewById(R.id.deleteArticleButton);
         reupload = (Button) findViewById(R.id.reuploadArticleButton);
 
         // Hard code until I get real code
-        title.setText("Why Ian is the best");
-        categories.setText("Philosophy, Life");
-        authors.setText("Ian Holdeman");
-        dateUploaded.setText("Date Uploaded: 10/28/17");
-        uploader.setText("Uploaded by: admin");
+        title.setText(message);
+        categories.setText(getMainCategoryName(mainId) + ", " + getSubCategoryName(mainId, subId));
+        //articleInformation = Public.getArticlesFromCategory(mainId, subId, false); NEEDS NETWORKING TO WORK
+        //authors.setText(getAuthorName());
+        //dateUploaded.setText("Date Uploaded: " + getUploadDate().format(date));
+        //uploader.setText("Uploaded by: " + getUploaderName());
 
         // If you uploaded the article, get access to these two buttons
-        if(uploader.getText().toString().equals("Uploaded by: admin")) {
+        /*if(getUploaderName().equals(INSERT USER NAME HERE)) {
             deleteButton.setVisibility(View.VISIBLE);
             reupload.setVisibility(View.VISIBLE);
         }
@@ -61,13 +78,14 @@ public class ArticlePreview extends AppCompatActivity {
         else {
             deleteButton.setVisibility(View.INVISIBLE);
             reupload.setVisibility(View.INVISIBLE);
-        }
+        } */
 
         // Listener for the download button
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Call download popup
+                downloadFlag = -1;
                 callDownloadPopup(v);
             }
         });
@@ -109,6 +127,10 @@ public class ArticlePreview extends AppCompatActivity {
 
         // Instance variables -- Haven't done the individual file format buttons yet
         Button downloadButton = (Button) popupView.findViewById(R.id.downloadArticleButton);
+        final Button htmlButton = (Button) popupView.findViewById(R.id.htmlArticleButton);
+        final Button pdfButton = (Button) popupView.findViewById(R.id.pdfArticleButton);
+        final Button odtButton = (Button) popupView.findViewById(R.id.odtArticleButton);
+        final Button txtButton = (Button) popupView.findViewById(R.id.txtArticleButton);
 
         window.setFocusable(true);
         window.update();
@@ -116,7 +138,82 @@ public class ArticlePreview extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Works", Toast.LENGTH_SHORT).show();
+                if(downloadFlag != 1 && downloadFlag != 2 && downloadFlag != 3 && downloadFlag != 4)
+                    Toast.makeText(getApplicationContext(), "Select a file type", Toast.LENGTH_SHORT).show();
+
+                else {
+                    window.dismiss();
+                    htmlButton.setBackgroundResource(R.drawable.popupbutton);
+                    pdfButton.setBackgroundResource(R.drawable.popupbutton);
+                    odtButton.setBackgroundResource(R.drawable.popupbutton);
+                    txtButton.setBackgroundResource(R.drawable.popupbutton);
+
+                    /*int ID = getArticleID();
+
+                    if(ID != -1) {
+                        switch (downloadFlag) {
+                            case 1:
+                                // FileConverter.convertFromPDF(Public.downloadArticle(ID), 3)
+                                break;
+
+                            case 2:
+                                // FILE path = Public.downloadArticle(ID)
+                                break;
+
+                            case 3:
+                                // FileConverter.convertFromPDF(Public.downloadArticle(ID), 2)
+                                break;
+
+                            case 4:
+                                // FileConverter.convertFromPDF(Public.downloadArticle(ID), 1)
+                                break;
+                        }
+                    } */
+                }
+            }
+        });
+
+        htmlButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadFlag = 1;
+                htmlButton.setBackgroundResource(R.drawable.downloadpressed);
+                pdfButton.setBackgroundResource(R.drawable.popupbutton);
+                odtButton.setBackgroundResource(R.drawable.popupbutton);
+                txtButton.setBackgroundResource(R.drawable.popupbutton);
+            }
+        });
+
+        pdfButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadFlag = 2;
+                htmlButton.setBackgroundResource(R.drawable.popupbutton);
+                pdfButton.setBackgroundResource(R.drawable.downloadpressed);
+                odtButton.setBackgroundResource(R.drawable.popupbutton);
+                txtButton.setBackgroundResource(R.drawable.popupbutton);
+            }
+        });
+
+        odtButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadFlag = 3;
+                htmlButton.setBackgroundResource(R.drawable.popupbutton);
+                pdfButton.setBackgroundResource(R.drawable.popupbutton);
+                odtButton.setBackgroundResource(R.drawable.downloadpressed);
+                txtButton.setBackgroundResource(R.drawable.popupbutton);
+            }
+        });
+
+        txtButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadFlag = 4;
+                htmlButton.setBackgroundResource(R.drawable.popupbutton);
+                pdfButton.setBackgroundResource(R.drawable.popupbutton);
+                odtButton.setBackgroundResource(R.drawable.popupbutton);
+                txtButton.setBackgroundResource(R.drawable.downloadpressed);
             }
         });
     }
@@ -169,5 +266,55 @@ public class ArticlePreview extends AppCompatActivity {
             fullpath = Commons.getPath(path, getApplicationContext());
             filePath.setText(fullpath);
         }
+    }
+
+    public String getMainCategoryName(int mID) {
+        if (mID < 0)
+            return null;
+
+        return defaultCat.getDefaultCategories()[mID].printName();
+    }
+
+    public String getSubCategoryName(int mID, int sID) {
+        if (mID < 0 || sID < 0)
+            return null;
+
+        return defaultCat.getDefaultCategories()[mID].children()[sID].printName();
+    }
+
+    public String getAuthorName() {
+        for(ArticleInfo listyList : articleInformation) { //WON'T WORK WITHOUT NETWORKING
+            if(listyList.printName.equals(message))
+                return listyList.author;
+        }
+
+        return "";
+    }
+
+    public Date getUploadDate() {
+        for(ArticleInfo listyList : articleInformation) { //WON'T WORK WITHOUT NETWORKING
+            if(listyList.printName.equals(message))
+                return listyList.uploadTime;
+        }
+
+        return null;
+    }
+
+    public String getUploaderName() {
+        for(ArticleInfo listyList : articleInformation) { //WON'T WORK WITHOUT NETWORKING
+            if(listyList.printName.equals(message))
+                return listyList.owner;
+        }
+
+        return "";
+    }
+
+    public int getArticleID() {
+        for(ArticleInfo listyList : articleInformation) { //WON'T WORK WITHOUT NETWORKING
+            if (listyList.printName.equals(message))
+                return listyList.getArticleID();
+        }
+
+        return -1;
     }
 }

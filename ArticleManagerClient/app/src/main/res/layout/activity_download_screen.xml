@@ -21,6 +21,7 @@
             android:weightSum="4">
 
             <Button
+                android:id="@+id/pdfArticleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/popupbutton"
@@ -29,6 +30,7 @@
                 android:layout_weight="1"/>
 
             <Button
+                android:id="@+id/txtArticleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/popupbutton"
@@ -37,6 +39,7 @@
                 android:layout_weight="1"/>
 
             <Button
+                android:id="@+id/htmlArticleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/popupbutton"
@@ -45,6 +48,7 @@
                 android:layout_weight="1"/>
 
             <Button
+                android:id="@+id/odtArticleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/popupbutton"
