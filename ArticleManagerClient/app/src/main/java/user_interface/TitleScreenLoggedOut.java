@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 import team15.articlemanagerclient.R;
-import networking.Public;
+//import networking.Public;
 
 public class TitleScreenLoggedOut extends AppCompatActivity {
 

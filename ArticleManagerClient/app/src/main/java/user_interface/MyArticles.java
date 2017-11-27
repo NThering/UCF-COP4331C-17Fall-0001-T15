@@ -16,10 +16,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
 import java.util.ArrayList;
+
+import am_utils.ArticleInfo;
+import am_utils.MainCategory;
 import in.gauriinfotech.commons.Commons;
 import team15.articlemanagerclient.R;
-import networking.Public;
+//import networking.Public;
+import proccessing.PublicUsage;
+import am_utils.DefaultCategories;
 
 public class MyArticles extends AppCompatActivity {
 
@@ -31,6 +39,7 @@ public class MyArticles extends AppCompatActivity {
     private static final int fileSelectCode = 42; // For filepicker, can be any number I believe
     String fullpath; // Universal so I can call from the inner classes/methods
     EditText filePath; // Universal so I can call from the inner classes/methods
+    DefaultCategories defaultCat = new DefaultCategories();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +125,15 @@ public class MyArticles extends AppCompatActivity {
         window.setFocusable(true);
         window.update();
 
-        // Listener for the browse button
+        /*
+        ////////////////////////////////////////////////
+        ////////////////////////////////////////////////
+                            NOAH
+        ////////////////////////////////////////////////
+        ////////////////////////////////////////////////
+         */
+
+        // Listener for the browse button -- opens the file picker
         browse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,17 +145,25 @@ public class MyArticles extends AppCompatActivity {
             }
         });
 
-        // Listener for the upload button
+        // Listener for the upload button -- EXPERIMENTING WITH THIS ONE!!!
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Will call the upload file method from networking I believe
-                // Also need to learn more about our server
+                //File source = new File(filePath.getText().toString());
+                //ArticleInfo info = proccessing.PublicUsage.categorize(new File(fullpath), GetMainCategoryArray(), GetMainCategoryArraySize() );
+                //Toast.makeText(getApplicationContext(), info.doiNumber, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), info.printName, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), info.author, Toast.LENGTH_SHORT).show();
+                if(new File("storage/emulated/0/Downloaded/fun.txt").isFile()) {
+                    Toast.makeText(getApplicationContext(), "yes it is", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), new File(fullpath).getPath(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
-    // Method to set filepath once a file is picked
+    // Method to set filepath once a file is picked -- set globals to file path when file is picked
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null) { // Prevents crashing when back button is pressed
@@ -148,5 +173,9 @@ public class MyArticles extends AppCompatActivity {
             filePath.setText(fullpath);
         }
     }
+
+    public int GetMainCategoryArraySize() { return defaultCat.size(); }
+
+    public MainCategory[] GetMainCategoryArray() { return defaultCat.getDefaultCategories(); }
 
 }

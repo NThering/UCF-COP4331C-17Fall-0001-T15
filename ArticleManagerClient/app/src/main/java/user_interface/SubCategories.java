@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import java.util.ArrayList;
 import team15.articlemanagerclient.R;
 
@@ -18,10 +18,12 @@ public class SubCategories extends AppCompatActivity {
     // UI variables
     ListView lv;
     ArrayList<String> subcategories = new ArrayList<>();
+    ArrayList<CatContainer> finalCatList;
     ArrayAdapter<String> adapter;
     TextView title;
-    String data;
+    String data, message;
     Button downloadAllArticles, downloadUnderCategory;
+    Integer mainId, subId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,8 @@ public class SubCategories extends AppCompatActivity {
         // Get category passed in on intent
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
-        String message = bundle.getString("message");
+        message = bundle.getString("message");
+        finalCatList = (ArrayList<CatContainer>) bundle.getSerializable("final_cat_list");
 
         title = (TextView) findViewById(R.id.subTextView);
         title.setText(message + " Sub Categories");
@@ -46,8 +49,12 @@ public class SubCategories extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 data = (String)parent.getItemAtPosition(position);
+                mainId = getMainId(message);
+                subId = getSubId(message, data);
                 Intent newActivity = new Intent(SubCategories.this, ArticlesPage.class);
                 newActivity.putExtra("messageSub", data);
+                newActivity.putExtra("mainCatId", mainId);
+                newActivity.putExtra("subCatId", subId);
                 startActivity(newActivity);
             }
         });
@@ -74,18 +81,43 @@ public class SubCategories extends AppCompatActivity {
 
     // Testing method until I can pull categories from database
     public void addCategories() {
-        subcategories.add("Math");
-        subcategories.add("Reading");
-        subcategories.add("History");
-        subcategories.add("CS1");
-        subcategories.add("CS2");
-        subcategories.add("OOP");
-        subcategories.add("Intro to C");
-        subcategories.add("Databases");
-        subcategories.add("OS");
-        subcategories.add("Programming Languages");
-        subcategories.add("Meow");
-        subcategories.add("I give up");
+        for(CatContainer category : finalCatList) {
+            if(!category.name.equals(message))
+                continue;
+
+            for(SubCatContainer subCategory : category.subcategories) {
+                subcategories.add(subCategory.name);
+            }
+        }
         adapter.notifyDataSetChanged();
+    }
+
+    public int getMainId(String mainCat) {
+        for(CatContainer category : finalCatList) {
+            if (!category.name.equals(mainCat))
+                continue;
+
+            if(category.name.equals(mainCat))
+                return category.id;
+        }
+
+        return -1; // Shouldn't ever hit -1; that's the assumption
+    }
+
+    public int getSubId(String mainCat, String subCat) {
+        for(CatContainer category : finalCatList) {
+            if(!category.name.equals(mainCat))
+                continue;
+
+            for(SubCatContainer subCategory : category.subcategories) {
+                if(!subCategory.name.equals(subCat))
+                    continue;
+
+                if(subCategory.name.equals(subCat))
+                    return subCategory.id;
+            }
+        }
+
+        return -1; // Shouldn't ever hit -1; that's the assumption
     }
 }
