@@ -62,7 +62,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
         catch (SQLException e)
         {
-            System.out.println("SQL Excpetion: " + e.toString());
+            System.out.println("SQL Exception: " + e.toString());
         }
         catch (ClassNotFoundException ce)
         {
