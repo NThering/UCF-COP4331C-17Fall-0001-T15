@@ -5,6 +5,10 @@
  */
 package users;
 import java.util.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.sql.*;
 import org.mariadb.jdbc.Driver;
 //import com.mysql.jdbc.Driver;
