@@ -40,8 +40,6 @@ public class MyArticles extends AppCompatActivity {
     String fullpath; // Universal so I can call from the inner classes/methods
     EditText filePath; // Universal so I can call from the inner classes/methods
     DefaultCategories defaultCat = new DefaultCategories();
-    File testing;
-    Uri path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +125,15 @@ public class MyArticles extends AppCompatActivity {
         window.setFocusable(true);
         window.update();
 
-        // Listener for the browse button
+        /*
+        ////////////////////////////////////////////////
+        ////////////////////////////////////////////////
+                            NOAH
+        ////////////////////////////////////////////////
+        ////////////////////////////////////////////////
+         */
+
+        // Listener for the browse button -- opens the file picker
         browse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,31 +145,29 @@ public class MyArticles extends AppCompatActivity {
             }
         });
 
-        // Listener for the upload button
+        // Listener for the upload button -- EXPERIMENTING WITH THIS ONE!!!
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Will call the upload file method from networking I believe
                 //File source = new File(filePath.getText().toString());
-                ArticleInfo info = proccessing.PublicUsage.categorize(new File(fullpath), GetMainCategoryArray(), GetMainCategoryArraySize() );
+                //ArticleInfo info = proccessing.PublicUsage.categorize(new File(fullpath), GetMainCategoryArray(), GetMainCategoryArraySize() );
                 //Toast.makeText(getApplicationContext(), info.doiNumber, Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(), info.printName, Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(), info.author, Toast.LENGTH_SHORT).show();
                 if(new File("storage/emulated/0/Downloaded/fun.txt").isFile()) {
                     Toast.makeText(getApplicationContext(), "yes it is", Toast.LENGTH_SHORT).show();
-                  //  Toast.makeText(getApplicationContext(), new File(fullpath).getPath(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), new File(fullpath).getPath(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    // Method to set filepath once a file is picked
+    // Method to set filepath once a file is picked -- set globals to file path when file is picked
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null) { // Prevents crashing when back button is pressed
-            path = data.getData();
-
-            testing = new File(path.getPath().toString());
+            Uri path = data.getData();
 
             fullpath = Commons.getPath(path, getApplicationContext());
             filePath.setText(fullpath);
