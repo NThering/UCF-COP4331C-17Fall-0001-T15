@@ -126,6 +126,10 @@ public class Public {
     			oldFile.delete();
     			if((rs.getString("owner") == articleInfo.owner) || userPermissions == 1)
     			{
+    				if(articleInfo.uploadTime == null)
+    				{
+    					articleInfo.uploadTime = new Date();
+    				}
     				finalString = "update article set "
 							+ "printName=" + "\""+articleInfo.printName+"\""
 							+ ", mainID=" + articleInfo.mainCategoryID
