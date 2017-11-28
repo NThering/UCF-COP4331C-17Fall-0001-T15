@@ -11,7 +11,7 @@ public class ArticleManagerServer {
 		
 		if(args.length == 1)
 		{
-			if(args[0] == "test")
+			if(args[0].equals("test"))
 			{
 				System.out.println("Launching with command line parameter 'test'");
 				PublicTestDB dbTest = new PublicTestDB();
