@@ -234,6 +234,10 @@ public class Public {
     			returnedInfo.owner = rs.getString("owner");
     			returnedInfo.abstractText = rs.getString("abstractText");
     			returnedInfo.uploadTime = stringToDate(rs.getString("uploadDate"));
+    		} else
+    		{
+    			stmnt.close();
+    			return null;
     		}
     		
     		stmnt.close();
