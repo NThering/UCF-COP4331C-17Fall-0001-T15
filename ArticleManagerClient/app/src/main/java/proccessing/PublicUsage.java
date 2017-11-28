@@ -83,7 +83,7 @@ public class PublicUsage {
     public static File convertFromPDF( File inputFile, int fileType )
     {
         // Just linking Kelsey's system to her public class.
-        return (new FileConverter()).convertFromPDF( inputFile.getPath(), fileType);
+        return (new FileConverter()).convertFromPDF( inputFile, fileType);
     }
 
     /** Takes a file of a supported type and turns it into a pdf.  Returns null on error or unsupported filetype. */
