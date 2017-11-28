@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import database.Public;
 
 public class PublicTestDB {
-	ArrayList<ArticleInfo> testArticles;
-	ArrayList<File> testFiles;
+	private ArrayList<ArticleInfo> testArticles;
+	private ArrayList<File> testFiles;
 	
-	void publicTestDB()
+	public PublicTestDB()
 	{
 		testArticles = new ArrayList<ArticleInfo>();
 		testFiles = new ArrayList<File>();
