@@ -157,28 +157,7 @@ public class MyArticles extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Will call the upload file method from networking I believe
-               // String uri = Environment.getExternalStorageDirectory().toString();
-               // uri = uri + "/6.pdf";
-               // filePath.setText(uri);
-
-              //  File file = (getExternalFilesDir(null));
-
-              //  Toast.makeText(getApplicationContext(), file.toString(), Toast.LENGTH_LONG).show();
-
-               File meow = new File("/storage/emulated/0/Android/data/team15.articlemanagerclient/files" + File.separator + "101.pdf");
-
-              // getFilesFromDir(new File("/storage/emulated/0/Android/data/team15.articlemanagerclient/files"));
-
-             /*  if(meow.canRead())
-                    Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_SHORT).show();
-
-                if(meow.isFile())
-                    Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_SHORT).show();
-
-                if(meow.exists())
-                    Toast.makeText(getApplicationContext(), "3", Toast.LENGTH_SHORT).show(); */
-                //getFilesFromDir(file);
-                ArticleInfo info = proccessing.PublicUsage.categorize(meow, GetMainCategoryArray(), GetMainCategoryArraySize() );
+                ArticleInfo info = proccessing.PublicUsage.categorize(new File(filePath.getText().toString()), GetMainCategoryArray(), GetMainCategoryArraySize() );
                 Toast.makeText(getApplicationContext(), info.doiNumber, Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), info.printName, Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), info.author, Toast.LENGTH_SHORT).show();
@@ -186,7 +165,7 @@ public class MyArticles extends AppCompatActivity {
         });
     }
 
-    public void getFilesFromDir(File filesFromSD) {
+  /*  public void getFilesFromDir(File filesFromSD) {
         File[] listAllFiles = filesFromSD.listFiles();
 
         if (listAllFiles != null && listAllFiles.length > 0) {
@@ -199,7 +178,7 @@ public class MyArticles extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), currentFile.getName(), Toast.LENGTH_SHORT).show();
             }
         }
-    }
+    } */
 
     // Method to set filepath once a file is picked -- set globals to file path when file is picked
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
