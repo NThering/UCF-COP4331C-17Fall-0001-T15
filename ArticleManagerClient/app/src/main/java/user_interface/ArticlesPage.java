@@ -1,5 +1,6 @@
 package user_interface;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ public class ArticlesPage extends AppCompatActivity {
     Button downloadAllArticles, downloadUnderCategory;
     Integer mainId, subId;
     String data, message;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,13 @@ public class ArticlesPage extends AppCompatActivity {
         mainId = bundle.getInt("mainCatId");
         subId = bundle.getInt("subCatId");
 
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(ArticlesPage.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
+
         title = (TextView) findViewById(R.id.articleTextView);
         title.setText(message + " Articles");
 
@@ -45,7 +54,24 @@ public class ArticlesPage extends AppCompatActivity {
         lv = (ListView) findViewById(R.id.list);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, articles);
         lv.setAdapter(adapter);
-        //articleTitles = Public.getArticlesFromCategory(mainId, subId, false); NEEDS NETWORKING TO WORK
+
+      /*  new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    //articleTitles = Public.getArticlesFromCategory(mainId, subId, false); NEEDS NETWORKING TO WORK
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
+
         addCategories();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -56,7 +82,7 @@ public class ArticlesPage extends AppCompatActivity {
                 newActivity.putExtra("titleMessage", data);
                 newActivity.putExtra("mainCatId", mainId);
                 newActivity.putExtra("subCatId", subId);
-               startActivity(newActivity);
+                startActivity(newActivity);
             }
         });
 

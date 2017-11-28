@@ -1,6 +1,7 @@
 package user_interface;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -47,11 +48,19 @@ public class MyArticles extends AppCompatActivity {
     EditText filePath; // Universal so I can call from the inner classes/methods
     DefaultCategories defaultCat = new DefaultCategories();
     Uri path;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_articles);
+
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(MyArticles.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
 
         username = (TextView) findViewById(R.id.usernameTextView);
         userTitle = (TextView) findViewById(R.id.userTitleTextView);
@@ -99,8 +108,23 @@ public class MyArticles extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*  new Thread() {
+                    public void run() {
+                try {
+                    prog.show();
              //   int logSuccess = -1;
              //   logSuccess = Public.logout();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
 
              //   if(logSuccess == 0) {
                     Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
@@ -187,10 +211,23 @@ public class MyArticles extends AppCompatActivity {
                 File file = new File(filePath.getText().toString());
 
                 ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
-                /*
-                Public.uploadArticle(file, info);
-                 */
 
+                /*  new Thread() {
+                public void run() {
+                try {
+                    prog.show();
+             Public.uploadArticle(file, info);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
     }

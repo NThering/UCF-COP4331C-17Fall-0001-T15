@@ -1,7 +1,12 @@
 package user_interface;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -14,11 +19,14 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
 import am_utils.ArticleInfo;
+import am_utils.MainCategory;
 import in.gauriinfotech.commons.Commons;
+import proccessing.PublicUsage;
 import team15.articlemanagerclient.R;
 import am_utils.DefaultCategories;
 //import networking.Public;
@@ -30,12 +38,14 @@ public class ArticlePreview extends AppCompatActivity {
     TextView title, categories, authors, dateUploaded, uploader;
     Button download, viewButton, deleteButton, reupload;
     private static final int fileSelectCode = 42; // For filepicker, can be any number I believe
+    private static final int permissionRequestCode = 43;
     String fullpath, message; // Universal so I can call from the inner classes/methods
     EditText filePath; // Universal so I can call from the inner classes/methods
     Integer mainId, subId;
     DefaultCategories defaultCat = new DefaultCategories();
     ArrayList<ArticleInfo> articleInformation;
     int downloadFlag;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +69,13 @@ public class ArticlePreview extends AppCompatActivity {
         viewButton = (Button) findViewById(R.id.viewArticleButton);
         deleteButton = (Button) findViewById(R.id.deleteArticleButton);
         reupload = (Button) findViewById(R.id.reuploadArticleButton);
+
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(ArticlePreview.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
 
         // Hard code until I get real code
         title.setText(message);
@@ -85,8 +102,16 @@ public class ArticlePreview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Call download popup
-                downloadFlag = -1;
-                callDownloadPopup(v);
+                if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    requestPermission();
+                }
+                else {
+                    downloadFlag = -1;
+                    callDownloadPopup(v);
+                }
             }
         });
 
@@ -110,10 +135,41 @@ public class ArticlePreview extends AppCompatActivity {
         reupload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call upload popup
-                callUploadPopup(v);
+                if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    requestPermission();
+                }
+                else
+                    callUploadPopup(v);
             }
         });
+    }
+
+
+    public void requestPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat
+                    .requestPermissions(ArticlePreview.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, permissionRequestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case permissionRequestCode:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(getApplicationContext(), "granted", Toast.LENGTH_SHORT).show();
+
+                else
+                    Toast.makeText(getApplicationContext(), "nah bitch", Toast.LENGTH_SHORT).show();
+
+                break;
+
+            default: super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     // Download popup
@@ -148,27 +204,44 @@ public class ArticlePreview extends AppCompatActivity {
                     odtButton.setBackgroundResource(R.drawable.popupbutton);
                     txtButton.setBackgroundResource(R.drawable.popupbutton);
 
-                    /*int ID = getArticleID();
+                    int ID = getArticleID();
+                    File file;
+
+                                    /*  new Thread() {
+                public void run() {
+                try {
+                    prog.show();
+                    file = new File(Public.downloadArticle(ID));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
 
                     if(ID != -1) {
                         switch (downloadFlag) {
                             case 1:
-                                // FileConverter.convertFromPDF(Public.downloadArticle(ID), 3)
+                               // FileConverter.convertFromPDF(file, 3)
                                 break;
 
                             case 2:
-                                // FILE path = Public.downloadArticle(ID)
                                 break;
 
                             case 3:
-                                // FileConverter.convertFromPDF(Public.downloadArticle(ID), 2)
+                                // FileConverter.convertFromPDF(file, 2)
                                 break;
 
                             case 4:
-                                // FileConverter.convertFromPDF(Public.downloadArticle(ID), 1)
+                                // FileConverter.convertFromPDF(file, 1)
                                 break;
                         }
-                    } */
+                    }
                 }
             }
         });
@@ -251,11 +324,34 @@ public class ArticlePreview extends AppCompatActivity {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Will call the upload file method from networking I believe
-                // Also need to learn more about our server
+                // Categorize the file then upload it
+                File file = new File(filePath.getText().toString());
+
+                ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), ArticlePreview.this );
+
+                /*  new Thread() {
+                public void run() {
+                try {
+                    prog.show();
+             Public.uploadArticle(file, info);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
     }
+
+    public int GetMainCategoryArraySize() { return defaultCat.size(); }
+
+    public MainCategory[] GetMainCategoryArray() { return defaultCat.getDefaultCategories(); }
 
     // Method to set filepath once a file is picked
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

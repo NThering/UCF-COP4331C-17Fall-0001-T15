@@ -1,6 +1,10 @@
 package user_interface;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -11,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+
+import in.gauriinfotech.commons.Progress;
 import team15.articlemanagerclient.R;
 //import networking.Public;
 
@@ -18,6 +24,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
 
     Button loginButton, viewArticlesButton;
     Boolean logged;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +40,13 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         // Initialize buttons
         loginButton = (Button) findViewById(R.id.loginButton);
         viewArticlesButton = (Button) findViewById(R.id.viewArticlesButton);
+
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(TitleScreenLoggedOut.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
 
         // Call popup when login is clicked
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -74,25 +88,46 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         loginPopup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin")) {
+                if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin"))
                     loginSuccess();
-                }
 
-                else {
+                else
                     Toast.makeText(getApplicationContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
-                }
 
-                /*     String un = username.getText().toString();
-                String pw = password.getText().toString();
-                int logSuccess = -1;
+            /*
+            new Thread() {
+                    public void run() {
+                        try {
+                        prog.show();
+                            String un = username.getText().toString();
+                            String pw = password.getText().toString();
+                            int logSuccess = -1;
 
-                if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
-                    logSuccess = Public.login(un, pw);
+                            if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
+                                logSuccess = Public.login(un, pw);
 
-                if(logSuccess == 0) {
-                    Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
-                    loginSuccess();
-                } */
+                            if(logSuccess == 0) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                loginSuccess();
+                            }
+
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    prog.dismiss();
+                                }
+                            });
+                        } catch (final Exception e) {
+
+                        }
+                    }
+                }.start(); */
             }
         });
 
