@@ -1,0 +1,143 @@
+Classes:
+
+ArticleInfo:
+	unsigned int ArticleID: 0 if being uploaded, some integer value once the server has assigned an ID.
+	string DOINumber: DOI number of the article, if any.
+	string PrintName: The name that the article is displayed under, can be the same as other articles.
+	string Category: Category the article is assigned to
+	string Sub-Category: Sub-Category the article is assigned to
+	string Author: Authors of the article
+	string Owner: Account who uploaded the article
+	string Abstract: Text of the abstract section of the document, limited to 5000 characters.  "..." will replace the last 3 characters if the 5000 limit is exceeded.
+	Date UploadTime: Time the article was uploaded or last updated.
+	
+
+UserInfo:
+	string Username: Name the user uses to login, and also what is displayed to everyone else.  All Usernames must be unique.
+	unsigned int Permissions: Set of bitflags that determine what the user is permitted to do.
+
+
+Role Requirements:
+
+User Interface:
+	(Init is what should be done when the page first loads, UI elements are buttons and such the user can interact with.  Tasks to be performed will be displayed as a sub-list.)
+
+	Title Screen
+		Init (Display loading icon until all tasks completed)
+			Check for SessionID, Display approperate buttons
+		UI Elements
+			App Logo
+			Button: View Articles
+				Jump to "View Articles" window.
+			Button: Login (if not logged in)
+				Opens prompt with standard Username and Password field : Send entered info to networking, who will respond with a session ID if valid.  Resister attempts to create a new account, while login attempts to access an existing one.
+			Button: My Articles (if logged in)
+				Jump to "My Articles" for the logged in user.
+
+	View All Articles
+		Init (Display loading icon until all tasks completed)
+			Ask networking for a list of articles from the default category/sub category to display
+				The default category can be "All" and the list requested can be every single article in the database, but we'll need to consider how much we care about performance and if we want to design around limiting the amount of articles on the list at one time.
+		UI Elements:
+			Button List: Category Buttons
+				Ideally dynamically built from a stored list, this row of buttons provides a way to select which category you want to view.  Should take up one row, so they will probably have to scroll left/right off the screen to fit them all.
+			Button List: Sub Category Buttons
+				The buttons for each sub-category in the selected major category.  When a new category is selected this list will populate with the sub categories for that new category.  Should also take up one row.
+			Button List: Article Titles
+				Collumn of articles in the selected category that scrolls up/down.  Clicking one goes to that article's page.  Can implement some sort of procedural retreival from the server, but for the scale of our project it might be feasable to just download the entire list at once and scroll through that.
+			Button: Article .txt
+				Requests that the server, for each category, provide a "text file [that includes] the title of the articles,name of the authors and the abstract."  Exists only to satisfy assignment requirements.
+			Button: Category .txt
+				Requests that the server "provide a text file that contains the categories and only the name of the articles under that category".  Exists only to satisfy assignment requirements.
+
+	My Articles:
+		Init (Display loading icon until all tasks completed)
+			Ask networking for a list of articles the given user has uploaded, along with their user info.
+		UI Elements:
+			Username
+			Button: Upload Article
+				Provide method for file upload, which will then be sent to article proccessing.  Article proccessing will give the category and sub-category of the article.  This information will then be sent to Networking along with the article itself.
+			Button: Logout
+				Go back to title screen and abandon current session so a new one can be started.
+			Button List: Article Titles
+				Collumn of all articles the user has uploaded that scrolls up/down.  Clicking one goes to that article's page.
+		
+	
+	Article Page:
+		Init (Display loading icon until all tasks completed)
+			Ask Networking for relevant article information
+		UI Elements:
+			Article Title
+			Article Authors, Category, Sub-Category, Date of Upload/Edit, Owner
+			Button: View Article
+				Downloads article to temp location and then opens it in article viewer
+			Button: Download Article
+				Downloads article to specified location.
+			Button: Delete Article (If owner/admin)
+				Tells Networking to delete the article from the server.  Display loading icon until this task completes.
+			Button: Re-upload article (If owner/admin)
+				Performs the same function as the upload button, but lets networking know that this upload is meant to replace an existing one.  Display loading icon until this task completes.
+	Article Viewer:
+		Init (Display loading icon until all tasks completed)
+			Parse article for display
+		UI Elements:
+			Scroll Bar:
+				Scrolls the article up/down
+			Article:
+				The display of the article
+			
+
+
+Article Proccessing:
+	ArticleInfo CategorizeArticle( articleFile  ):
+		The only function that article proccessing needs to implement, it's the main purpose of the app and thus probably isn't as easy as it appears to be on the surface.  Takes a reference to an article and returns a filled out ArticleInfo object.  This includes extracting the Abstract of the paper, but not assigning an ArticleID, Owner, or UploadTime as these are determined elsewhere.
+
+
+
+Networking:
+	General:
+		Keeps track of logged in users and their permissions so they don't need to re-authenticate for every action.
+
+	int Login( String username, String password ):
+		Relays user info to the login system on the server, returning 0 on the client if the login was successful and an int corresponding to the type of error if it was not.
+	
+	int Register( String username, String password ):
+		Relays user info to the login system on the server, returning 0 on the client if the registration was successful and an int corresponding to the type of error if it was not.
+
+	List<ArticleInfo> GetArticlesFromCategory( int articleCategory, int subCategory, boolean IncludeAbstracts ):
+		Returns a list to the client of all ArticleInfos in a given category/sub-category.  If IncludeAbstracts is false, abstracts are left blank to save bandwidth.
+
+	int UploadArticle( articleFile, ArticleInfo articleInfo ):
+		Sends the article to the database for entry, returns 0 if successful and an int corresponding to the type of error if it was not.  If ArticleID in the supplied ArticleInfo is not 0 this upload is meant to replace an existing upload.
+
+	ArticleInfo GetArticleInfo( articleID ):
+		Gets information on the given article from the database.
+
+	ArticleInfo DownloadArticle( articleID ):
+		Downloads the given article from the database.
+
+	int GetPermissions():
+		Gets the permissions flags for the user, returning -1 if not logged in.
+		
+
+Database:
+	List<ArticleInfo> GetArticlesFromCategory( int articleCategory, int subCategory ):
+		Returns a list to the client of all articles in a given category/sub-category, this includes their ID number on the server.
+
+	int InsertArticle( articleFile, ArticleInfo articleInfo, articleID ):
+		Sends the article to the database for entry, returns 0 if successful and an int corresponding to the type of error if it was not.  If articleID is not 0 this upload is meant to repalce an existing upload.
+
+	ArticleInfo GetArticleInfo( articleID ):
+		Gets information on the given article from the database.
+
+	File DownloadArticle( articleID ):
+		Downloads the given article from the database.
+
+
+Login:
+	int Login( String username, String password ):
+		Checks the username and password against the stored password hashes on the database.  Returns -1 if login failed and an integer corresponding to that user's permissions if successful.
+	bool Register( String username, String password ):
+		Ensures that the username is unique and can be registered in the database.  Returns true if registration successful and false if not.
+	
+	

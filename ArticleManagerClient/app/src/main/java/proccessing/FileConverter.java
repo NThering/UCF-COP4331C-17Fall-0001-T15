@@ -333,7 +333,7 @@ public class FileConverter extends AppCompatActivity {
         String filename = inputFile.getName();
         String parentPath = inputFile.getParent();
 
-        return createNewFile(parentPath + getFileWithoutExt(filename) + supportedExtensions[filetype], result);
+        return createNewFile(parentPath + "/"+ getFileWithoutExt(filename) + supportedExtensions[filetype], result);
     }
 
 
@@ -384,8 +384,6 @@ public class FileConverter extends AppCompatActivity {
             File file = new File(root);
 
             file.createNewFile();
-
-
 
             FileOutputStream fOut = new FileOutputStream(file);
 
@@ -463,7 +461,7 @@ public class FileConverter extends AppCompatActivity {
             return null;
         }
 
-        Toast.makeText(getApplicationContext(),file.getAbsolutePath() + " created.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),file.getAbsolutePath() + " created.", Toast.LENGTH_LONG).show();
 
         return file;
     }

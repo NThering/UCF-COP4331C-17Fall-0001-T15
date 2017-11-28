@@ -240,6 +240,26 @@ public class UnitTests
     */
 
     @Test
+    public void testFileConversionFromPDF() throws Exception
+    {
+        FileConverter fileConverter = new FileConverter();
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+
+        fileConverter.convertFromPDF( new File(testFilePath), 1);
+        fileConverter.convertFromPDF( new File(testFilePath), 2);
+        fileConverter.convertFromPDF( new File(testFilePath), 3);
+    }
+
+    @Test
+    public void testFileConversionToPDF() throws Exception
+    {
+        FileConverter fileConverter = new FileConverter();
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Readme\\TestText.txt";
+
+        fileConverter.convertToPDF( new File(testFilePath));
+    }
+
+    @Test
     public void testCategorySortMetrics() throws Exception
     {
         // Prints out category sort results and statistics for manual review.
