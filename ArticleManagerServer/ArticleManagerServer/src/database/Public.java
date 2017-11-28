@@ -117,6 +117,11 @@ public class Public {
     	ResultSet rs;
     	File oldFile;
     	
+		if(articleInfo.uploadTime == null)
+		{
+			articleInfo.uploadTime = new Date();
+		}
+    	
     	try {
     		stmnt = con.createStatement();
     		rs = stmnt.executeQuery("select owner, filePath from article where id = " + articleInfo.getArticleID());
@@ -195,6 +200,9 @@ public class Public {
     				stmnt.close();
     				stmnt.executeUpdate("delete from article where id=" + articleID + ";");
     				return 0;
+    			} else
+    			{
+    				return 1; // User lacks permissions to delete article.
     			}
     		} else
     		{
@@ -231,6 +239,10 @@ public class Public {
     			returnedInfo.owner = rs.getString("owner");
     			returnedInfo.abstractText = rs.getString("abstractText");
     			returnedInfo.uploadTime = stringToDate(rs.getString("uploadDate"));
+    		} else
+    		{
+    			stmnt.close();
+    			return null;
     		}
     		
     		stmnt.close();

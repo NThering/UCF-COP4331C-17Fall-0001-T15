@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -120,6 +119,7 @@ public class Connection extends Thread {
 			e.printStackTrace();
 			return;
 		}
+		
 		while(consecFail <= failTolerance)
 		{
 			try {
@@ -229,6 +229,7 @@ public class Connection extends Thread {
 				break;
 			case 7:
 				tempFile = database.Public.downloadArticle(Integer.valueOf(arg1));
+				sendString(database.Public.getArticleInfo(Integer.valueOf(arg1)).printName + " " + tempFile.length());
 				sendFile(tempFile);
 				break;
 			case 8:

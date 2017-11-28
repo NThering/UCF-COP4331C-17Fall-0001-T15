@@ -5,6 +5,10 @@
  */
 package users;
 import java.util.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.sql.*;
 import org.mariadb.jdbc.Driver;
 //import com.mysql.jdbc.Driver;
@@ -26,7 +30,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
     public static Connection conn = null;
 
-    public static int login(String username, String password) throws NoSuchAlgorithmException, NoSuchProviderException
+    public static int login(String username, String password)
     {
         /**	Checks the username and password against the stored password hashes on the database.  Returns -1 if login failed and an integer corresponding to that user's permissions if successful. */
         /** Passwords must be stored securely ( NOT IN PLAINTEXT ) so that a data breach would not compromise them. */
@@ -58,17 +62,23 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
         catch (SQLException e)
         {
-            System.out.println("SQL Excpetion: " + e.toString());
+            System.out.println("SQL Exception: " + e.toString());
         }
         catch (ClassNotFoundException ce)
         {
             System.out.println("Class Not Found Exception: " + ce.toString());
-        }
+        } catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
         return -1;
     }
 
     /** Ensures that the username is unique and can be registered in the database, then registers it if so.  Returns true if registration successful and false if not. */
-    public static boolean register(String username, String password) throws NoSuchAlgorithmException, NoSuchProviderException
+    public static boolean register(String username, String password)
     {
         try
         {
@@ -106,13 +116,19 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
         catch (SQLException e)
         {
-            System.out.println("SQL Excpetion: " + e.toString());
+            System.out.println("SQL Exception: " + e.toString());
         }
 
         catch (ClassNotFoundException ce)
         {
             System.out.println("Class Not Found Exception: " + ce.toString());
-        }
+        } catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
         return true;
     }
 

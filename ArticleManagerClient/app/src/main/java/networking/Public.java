@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
+import android.content.Context;
 import static java.util.concurrent.TimeUnit.*;
 
 public class Public extends Thread {
@@ -23,23 +23,56 @@ public class Public extends Thread {
     // All calls to networking should probably be done in a seperate thread to prevent hangups!
 
     //socket to send/receive data
-    private Socket clientSocket = null;
-    private ObjectInputStream inputObject = null;
-    private ObjectOutputStream outputObject = null;
+    protected Socket clientSocket;
+    protected ObjectInputStream inputObject;
+    protected ObjectOutputStream outputObject;
 
-    private final String HOSTNAME = "odroid.now-dns.net";
-    private final int PORT = 1906;
+    protected final String HOSTNAME = "odroid.now-dns.net";
+    protected final int PORT = 1906;
 
     //keep connection established (2 to 5 sec heartbeat intervals)
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     //BufferedReader for retrieving data
-    private static BufferedReader reader = null;
+    protected static BufferedReader reader;
 
     //PrintWriter for sending data
-    private static PrintWriter writer = null;
+    protected static PrintWriter writer;
 
-    public static SessionManager session = null;
+    //shared preferences
+    try {
+        public static SessionManager session = new SessionManager(getActivity().getApplicationContext());
+    }
+    catch (Exception e) {
+        System.err.println(e.getMessage());
+    }
+    catch (NameNotFoundException e) {
+        System.err.println(e.getMessage());
+    }
+    catch (NotContextException e) {
+        System.err.println(e.getMessage());
+    }
+
+    //initialize socket, object streams and printwriter
+    try {
+        clientSocket = new Socket(HOSTNAME, PORT);
+        inputObject = new ObjectInputStream(clientSocket.getInputStream());
+        outputObject = new ObjectOutputStream(clientSocket.getOutputStream());
+
+        //writer = new PrintWriter(outputObject, true);
+        writer = new PrintWriter(clientSocket.getOutputStream(), true);
+
+        System.out.println("Connection successful");
+    }
+    catch (Exception e) {
+        System.err.println(e.getMessage());
+    }
+    catch (UnknownHostException e) {
+        System.err.println("Unknown host: " + HOSTNAME);
+    }
+    catch (IOException e) {
+        System.err.println("I/O connection failed: ");
+    }
 
     //heartbeat sends "0" to server every 3 secs, maintain connection
     public void setHeartbeat() {
@@ -58,34 +91,20 @@ public class Public extends Thread {
         }, 3600, TimeUnit.SECONDS);
     }
 
-    //initialize socket, object streams and printwriter
-    try {
-        clientSocket = new Socket(HOSTNAME, PORT);
-        inputObject = new ObjectInputStream(clientSocket.getInputStream());
-        outputObject = new ObjectOutputStream(clientSocket.getOutputStream());
-
-        writer = new PrintWriter(outputObject, true);
-
-        System.out.println("Connection successful");
-    }
-    catch (UnknownHostException e) {
-        System.err.println("Unknown host: " + HOSTNAME);
-    }
-    catch (IOException e) {
-        System.err.println("I/O connection failed");
-    }
-
     /** Relays user info to the login system on the server, returning 0 on the client if the login
      * was successful and an int corresponding to the type of error if it was not. */
     public static int login( String username, String password )
     {
         writer.println("1 " + username + " " + password);
+        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
         if (reader.readLine().equals("0")) {
             session.createSession(username, password);
+            reader.close();
             return 0;
         }
         else {
+            reader.close();
             return 1;
         }
     }
@@ -105,17 +124,21 @@ public class Public extends Thread {
     public static int register( String username, String password )
     {
         writer.println("3 " + username + " " + password);
+        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        return (reader.readLine.().equals("0")) ? 0 : 1;
+        private int result = (reader.readLine().equals("0")) ? 0 : 1;
+        reader.close();
+
+        return result;
     }
 
     /** Returns a list to the client of all ArticleInfos in a given category/sub-category.  If
      * IncludeAbstracts is false, abstracts are left blank to save bandwidth.*/
     public static ArrayList<ArticleInfo> getArticlesFromCategory( int mainCategoryID,
-          int subCategoryID, boolean IncludeAbstracts )
+                                                                  int subCategoryID, boolean IncludeAbstracts )
     {
         //prepare includeAbstacts for output
-        String bool = (IncludeAbstracts) ? "1" : "0";
+        private String bool = (IncludeAbstracts) ? "1" : "0";
 
         writer.println("4 " + bool);
         outputObject.writeObject(articleCategory);
@@ -129,66 +152,103 @@ public class Public extends Thread {
      * is not 0 this upload is meant to replace an existing upload. */
     public static int uploadArticle( File articleFile, ArticleInfo articleInfo )
     {
-        int fileSize = articleFile.length();
-        byte[] articleByteArray = new byte[fileSize];
+        private int fileSize = (int)articleFile.length();
+        private byte[] articleByteArray = new byte[fileSize];
 
-        writer.println("5 " + fileSize.toString());
+        writer.println("5 " + Integer.toString(fileSize));
         //send articleInfo
         outputObject.writeObject(articleInfo);
 
         try {
-            FileOutputStream fileOutStream = new FileOutputStream("");
-            BufferedOutputStream outStream = new BufferedOutputStream(fileOutStream);
+            FileInputStream fileInStream = new FileInputStream(articleFile);
+            BufferedInputStream inStream = new BufferedInputStream(fileInStream);
+            inStream.read(articleByteArray, 0, fileSize);
+
+            OutputStream outStream = clientSocket.getOutputStream();
             outStream.write(articleByteArray, 0, fileSize);
+            outStream.flush();
+            outStream.close();
 
             return 0;
         }
         catch (Exception e) {
+            System.err.println(e.getMessage());
+            return 1;
+        }
+        catch (FileNotFoundException e) {
             System.err.println("File not found");
             return 1;
         }
-
     }
 
     /** Gets information on the given article from the database. */
     public static ArticleInfo getArticleInfo( int articleID )
     {
-        writer.println("6 " + articleID.toString());
+        writer.println("6 " + Integer.toString(articleID));
 
-        articleInfo = inputObject().readObject();
-
-        return articleInfo;
+        return inputObject().readObject();
     }
 
     /** Downloads the given article from the database. */
     public static File downloadArticle( int articleID )
     {
-        writer.println("7 " + articleID.toString());
+        writer.println("7 " + Integer.toString(articleID));
+        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        //receive file size
-        int fileSize = Integer.parseInt(reader.readLine());
-        //byte array
-        byte[] articleByteArray = new byte[fileSize];
+        //receive file size and title of article
+        private String result = reader.readLine();
+        reader.close();
 
-        InputStream inStream = clientSocket.getInputStream();
+        //prepare results for use
+        private String[] resultArray = result.split(" ");
+        private int fileSize = Integer.parseInt(resultArray[0]);
+        private String articleTitle = resultArray[1];
+
+        //byte array for file data
+        private byte[] articleByteArray = new byte[fileSize];
 
         try {
+            File articleDL = new File(getCacheDir(), articleTitle);
+
+            InputStream inStream = clientSocket.getInputStream();
+            FileOutputStream fileOutStream = new FileOutputStream(articleDL);
+            BufferedOutputStream outStream = new BufferedOutputStream(fileOutStream);
+
             int bytesReadIn = inStream.read(articleByteArray, 0, fileSize);
+            outStream.write(articleByteArray, 0, bytesReadIn);
+            outStream.flush();
+            outStream.close();
+
+            return articleDL;
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+            return null;
         }
         catch (IOException e) {
             System.err.println("Article download failed");
+            return null;
         }
-
-        //receive article
-        return ;
+        catch (NullPointerException e) {
+            System.err.println(e.getMessage());
+            return null;
+        }
+        catch (PatternSyntaxException e) {
+            System.err.println(e.getMessage());
+            return null;
+        }
     }
 
     /** Gets the permissions flags for the user, returning -1 if not logged in. */
     public static int getPermissions()
     {
         writer.println("8");
+        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        return Integer.parseInt(reader.readLine());
+        private int permission = Integer.parseInt(reader.readLine());
+        reader.close();
+
+        return permission;
     }
 
     /** Abort any ongoing networking activity  Do not terminate the user's session, just cancel
