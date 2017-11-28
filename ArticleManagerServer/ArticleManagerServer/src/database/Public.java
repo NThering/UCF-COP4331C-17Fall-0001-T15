@@ -195,6 +195,9 @@ public class Public {
     				stmnt.close();
     				stmnt.executeUpdate("delete from article where id=" + articleID + ";");
     				return 0;
+    			} else
+    			{
+    				return 1; // User lacks permissions to delete article.
     			}
     		} else
     		{
