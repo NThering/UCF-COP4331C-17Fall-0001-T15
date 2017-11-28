@@ -144,9 +144,13 @@ public class PublicTestDB {
 		for(int i = 0; i < testArticles.size(); i++)
 		{
 			retrievedArticleInfo = database.Public.getArticleInfo(testArticles.get(i).getArticleID());
+			if(retrievedArticleInfo == null)
+			{
+				return -1; // Error, no article has been retrieved.
+			}
 			if(retrievedArticleInfo.printName != testArticles.get(i).printName)
 			{
-				return -1; // Error, the incorrect article has been retrieved.
+				return -2; // Error, the incorrect article has been retrieved.
 			}
 		}
 		

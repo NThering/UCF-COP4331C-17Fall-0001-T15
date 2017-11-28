@@ -117,6 +117,11 @@ public class Public {
     	ResultSet rs;
     	File oldFile;
     	
+		if(articleInfo.uploadTime == null)
+		{
+			articleInfo.uploadTime = new Date();
+		}
+    	
     	try {
     		stmnt = con.createStatement();
     		rs = stmnt.executeQuery("select owner, filePath from article where id = " + articleInfo.getArticleID());
@@ -126,10 +131,6 @@ public class Public {
     			oldFile.delete();
     			if((rs.getString("owner") == articleInfo.owner) || userPermissions == 1)
     			{
-    				if(articleInfo.uploadTime == null)
-    				{
-    					articleInfo.uploadTime = new Date();
-    				}
     				finalString = "update article set "
 							+ "printName=" + "\""+articleInfo.printName+"\""
 							+ ", mainID=" + articleInfo.mainCategoryID
