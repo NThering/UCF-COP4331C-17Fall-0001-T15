@@ -1,5 +1,6 @@
 package proccessing;
 
+import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
@@ -29,6 +30,7 @@ public class FileConverter extends AppCompatActivity {
 
     public FileConverter()
     {
+        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
         BufferedReader wordList = null;
         try
         {
@@ -45,7 +47,7 @@ public class FileConverter extends AppCompatActivity {
             return; // We've failed to build a useful word database.
         }
 
-        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
+        //englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
 
         try
         {
