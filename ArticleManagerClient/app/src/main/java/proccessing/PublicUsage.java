@@ -1,5 +1,7 @@
 package proccessing;
 
+import android.content.Context;
+
 import java.io.File;
 
 import am_utils.ArticleInfo;
@@ -12,12 +14,12 @@ public class PublicUsage {
      * Returns null on complete failure to parse article, Abstract
      * ONLY TAKES PDF FILES
      * */
-    public static ArticleInfo categorize(File uploadedFile, MainCategory[] mainCat, int numberOfCat)
+    public static ArticleInfo categorize(File uploadedFile, MainCategory[] mainCat, int numberOfCat, Context context)
     {
         ArticleInfo filledArticle = new ArticleInfo(0);
         filledArticle.printName = uploadedFile.getName().replace(".pdf", "");
 
-        FileConverter convert = new FileConverter();
+        FileConverter convert = new FileConverter(context);
 
         for(int z = 1; z < 5; z++){
             String data = convert.extractTextFromPDF(uploadedFile.getPath(), z);
@@ -34,7 +36,7 @@ public class PublicUsage {
 
                             filledArticle.setMainCategoryIndex(x);
                             filledArticle.setSubCategoryIndex(y);
-                            filledArticle = addExtraData(filledArticle, data);
+                            filledArticle = addExtraData(filledArticle, data, context);
 
                             return filledArticle;
                         }
@@ -46,9 +48,9 @@ public class PublicUsage {
         return filledArticle;
     }
 
-    private static ArticleInfo addExtraData(ArticleInfo articleInfo, String data)
+    private static ArticleInfo addExtraData(ArticleInfo articleInfo, String data, Context context)
     {
-        FileConverter convert = new FileConverter();
+        FileConverter convert = new FileConverter(context);
         articleInfo.setDoiNumber(convert.getDoiFromText(data));
         articleInfo.setAbstractText(convert.getAbstractFromText(data));
         articleInfo.setAuthor(convert.getAuthorFromText(data));
@@ -80,16 +82,16 @@ public class PublicUsage {
 
     }
     /** Takes a pdf file and turns it into a file of the designated type. Returns null on error. */
-    public static File convertFromPDF( File inputFile, int fileType )
+    public static File convertFromPDF( File inputFile, int fileType, Context context )
     {
         // Just linking Kelsey's system to her public class.
-        return (new FileConverter()).convertFromPDF( inputFile, fileType);
+        return (new FileConverter(context)).convertFromPDF( inputFile, fileType);
     }
 
     /** Takes a file of a supported type and turns it into a pdf.  Returns null on error or unsupported filetype. */
-    public static File convertToPDF( File inputFile )
+    public static File convertToPDF( File inputFile, Context context )
     {
         // Just linking Kelsey's system to her public class.
-        return (new FileConverter()).convertToPDF( inputFile );
+        return (new FileConverter(context)).convertToPDF( inputFile );
     }
 }

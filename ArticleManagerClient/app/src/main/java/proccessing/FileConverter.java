@@ -1,5 +1,6 @@
 package proccessing;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -22,24 +23,21 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 
 import am_utils.CUtils;
+import user_interface.MyArticles;
 
 
 public class FileConverter extends AppCompatActivity {
     public static String toast = "";
     HashSet<String> englishWordSet;
 
-    public FileConverter()
+    public FileConverter(Context context)
     {
-        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
+       // englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
         BufferedReader wordList = null;
         try
         {
-            // IAN PLEASE FIGURE OUT HOW TO OPEN THIS FILE ON ANDROID.
-            // From what I've read, "getAssets().open("english_words.txt") works but I can't test it with unit tests.
-            // If that doesn't work you might need to call it from a context but that needs to be created in the higher levels or something.
-
-            // To use unit tests, just link "english_words" to its location on your computer.
-            wordList = new BufferedReader(new FileReader("english_words.txt"));
+            InputStream is = context.getAssets().open("english_words.txt");
+            wordList = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         }
         catch(Exception e)
         {
@@ -47,7 +45,7 @@ public class FileConverter extends AppCompatActivity {
             return; // We've failed to build a useful word database.
         }
 
-        //englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
+        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
 
         try
         {
