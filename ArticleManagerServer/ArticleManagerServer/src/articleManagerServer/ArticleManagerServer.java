@@ -17,7 +17,7 @@ public class ArticleManagerServer {
 				System.out.println("Launching with command line parameter 'test'");
 				PublicTestDB dbTest = new PublicTestDB();
 				PublicTestUsers userTest = new PublicTestUsers();
-				//dbTest.runTest();
+				dbTest.runTest();
 				userTest.runTest();
 			}
 		}
