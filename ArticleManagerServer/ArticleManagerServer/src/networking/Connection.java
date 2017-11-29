@@ -30,6 +30,9 @@ public class Connection extends Thread {
 	private int permissionLevel;
 	private Object waitingLock = new Object();
 	
+	protected static final int OBJECTPORT = 1907;
+	protected static final int FILEPORT = 1908;
+	
 	Connection(int serverPort, int failTolerance)
 	{
 		port = serverPort;
@@ -76,29 +79,43 @@ public class Connection extends Thread {
 	
 	private void sendObject(Object outObj)
 	{
-		while(consecFail <= failTolerance)
+		try
 		{
-			try {
-				ObjectOutputStream sendStream = new ObjectOutputStream(clientSocket.getOutputStream());
+			ServerSocket objectServ = new ServerSocket(1907);
+			Socket objectSocket = objectServ.accept();
+			objectServ.close();
+			while(consecFail <= failTolerance)
+			{
+				ObjectOutputStream sendStream = new ObjectOutputStream(objectSocket.getOutputStream());
 				sendStream.writeObject(outObj);
-			} catch (IOException e) {
-				consecFail++;
 			}
+			consecFail = 0;
+			objectSocket.close();
+		} catch (IOException e1)
+		{
+			consecFail++;
 		}
 	}
 	
 	private Object receiveObject()
 	{
-		Object receiveObject;
+		Object receiveObject = null;
 		try {
-			ObjectInputStream receiveStream = new ObjectInputStream(clientSocket.getInputStream());
+			ServerSocket objectServ = new ServerSocket(1907);
+			Socket objectSocket = objectServ.accept();
+			objectServ.close();
+			ObjectInputStream receiveStream = new ObjectInputStream(objectSocket.getInputStream());
 			try {
-				receiveObject = receiveStream.readObject();
+				while(consecFail <= failTolerance)
+				{
+					receiveObject = receiveStream.readObject();
+				}
 			} catch (ClassNotFoundException e) {
 				System.err.println("Error reconstituting serialized object from stream.");
 				e.printStackTrace();
 				return null;
 			}
+			objectSocket.close();
 			return receiveObject;
 		} catch (IOException e) {
 			consecFail++;
@@ -124,11 +141,16 @@ public class Connection extends Thread {
 		{
 			try {
 				
+				ServerSocket fileServ = new ServerSocket(1908);
+				Socket fileSocket = fileServ.accept();
+				fileServ.close();
+				
 				inputStream.read(fileBytes, 0, fileBytes.length);
-				byteOutput = clientSocket.getOutputStream();
+				byteOutput = fileSocket.getOutputStream();
 				byteOutput.write(fileBytes, 0, fileBytes.length);
 				byteOutput.flush();
 				byteOutput.close();
+				fileSocket.close();
 				return;
 			} catch (IOException e) {
 				consecFail++;
@@ -148,14 +170,18 @@ public class Connection extends Thread {
 		String byteString = receiveString();
 		int byteCount = Integer.parseInt(byteString);
 		byte[] receivedBytes = new byte[byteCount];
-		File newFile = new File(new SimpleDateFormat("files/yyyyMMddHHmm.pdf").format(new Date()));
+		File newFile = new File(new SimpleDateFormat("files/yyyyMMdd_SSS.pdf").format(new Date()));
 		
 		while(consecFail <= failTolerance)
 		{
 			try {
+				ServerSocket fileServ = new ServerSocket(1908);
+				Socket fileSocket = fileServ.accept();
+				fileServ.close();
+				
 				FileOutputStream fos = new FileOutputStream(newFile);
 				BufferedOutputStream bos = new BufferedOutputStream(fos);
-				int bytesRead = clientSocket.getInputStream().read(receivedBytes, 0, receivedBytes.length);
+				int bytesRead = fileSocket.getInputStream().read(receivedBytes, 0, receivedBytes.length);
 				bos.write(receivedBytes,0 , bytesRead);
 				bos.close();
 				return newFile;
