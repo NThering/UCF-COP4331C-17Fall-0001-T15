@@ -96,10 +96,10 @@ public class Public
             for(ArticleInfo item2 : ls )
             {
                 bw.newLine();
-                bw.write(item.printName);
-                bw.write(item.DOINumber);
-                bw.write(item.author);
-                bw.write(item.abstractText);
+                bw.write(item2.printName);
+                bw.write(item2.DOINumber);
+                bw.write(item2.author);
+                bw.write(item2.abstractText);
 
             }
         }
