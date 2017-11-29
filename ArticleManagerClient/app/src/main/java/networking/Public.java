@@ -6,13 +6,42 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import am_utils.ArticleInfo;
+import am_utils.CUtils;
+
 import java.sql.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.PatternSyntaxException;
+
 import android.content.Context;
+import android.content.pm.PackageManager;
+
 import static java.util.concurrent.TimeUnit.*;
+
+class NetworkingHeartbeatManager extends Thread {
+
+    boolean connected = true;
+
+    @Override
+    public void run()
+    {
+        while( true )
+        {
+            // Don't send heartbeats -too- often!
+            try
+            {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e) {}
+
+            // Send our heartbeat!
+            if (connected)
+                Public.heartBeat();
+        }
+    }
+}
 
 public class Public extends Thread {
     /*    General Responsibilities:
@@ -22,145 +51,169 @@ public class Public extends Thread {
 
     // All calls to networking should probably be done in a seperate thread to prevent hangups!
 
-    //socket to send/receive data
-    protected Socket clientSocket;
-    protected ObjectInputStream inputObject;
-    protected ObjectOutputStream outputObject;
+    // Sign in details
+    protected static final String HOSTNAME = "odroid.now-dns.net";
+    protected static final int PORT = 1906;
 
-    protected final String HOSTNAME = "odroid.now-dns.net";
-    protected final int PORT = 1906;
+    // socket to send/receive data, MUST BE STARTED FIRST
+    protected static Socket clientSocket = getOurSocket();
 
-    //keep connection established (2 to 5 sec heartbeat intervals)
-    protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-    //BufferedReader for retrieving data
-    protected static BufferedReader reader;
+    // Streams for writing/receiving data.
+    protected static ObjectInputStream inputObject = getOurInputStream();
+    protected static ObjectOutputStream outputObject = getOurOutputStream();
 
     //PrintWriter for sending data
-    protected static PrintWriter writer;
+    protected static PrintWriter writer = getOurPrintWriter();
 
-    //shared preferences
-    try {
-        public static SessionManager session = new SessionManager(getActivity().getApplicationContext());
-    }
-    catch (Exception e) {
-        System.err.println(e.getMessage());
-    }
-    catch (NameNotFoundException e) {
-        System.err.println(e.getMessage());
-    }
-    catch (NotContextException e) {
-        System.err.println(e.getMessage());
-    }
+    //keep connection established (2 to 5 sec heartbeat intervals)
+    protected static final NetworkingHeartbeatManager heartbeater = getOurHeartbeater();
 
-    //initialize socket, object streams and printwriter
-    try {
-        clientSocket = new Socket(HOSTNAME, PORT);
-        inputObject = new ObjectInputStream(clientSocket.getInputStream());
-        outputObject = new ObjectOutputStream(clientSocket.getOutputStream());
+    //------------------------------------------------
+    // Initialization Functions
+    //------------------------------------------------
 
-        //writer = new PrintWriter(outputObject, true);
-        writer = new PrintWriter(clientSocket.getOutputStream(), true);
-
-        System.out.println("Connection successful");
-    }
-    catch (Exception e) {
-        System.err.println(e.getMessage());
-    }
-    catch (UnknownHostException e) {
-        System.err.println("Unknown host: " + HOSTNAME);
-    }
-    catch (IOException e) {
-        System.err.println("I/O connection failed: ");
-    }
-
-    //heartbeat sends "0" to server every 3 secs, maintain connection
-    public void setHeartbeat() {
-        final Runnable heartbeat = new Runnable() {
-            public void run() {
-                clientSocket.getOutputStream("0");
-            }
-        };
-        final ScheduledFuture beatHandler =
-                scheduler.scheduleAtFixedRate(heartbeat, 3, 3, TimeUnit.SECONDS);
-
-        scheduler.schedule(new Runnable() {
-            public void run() {
-                beatHandler.cancel(true);
-            }
-        }, 3600, TimeUnit.SECONDS);
-    }
-
-    /** Relays user info to the login system on the server, returning 0 on the client if the login
-     * was successful and an int corresponding to the type of error if it was not. */
-    public static int login( String username, String password )
+    private static Socket getOurSocket()
     {
-        writer.println("1 " + username + " " + password);
-        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        if (reader.readLine().equals("0")) {
-            session.createSession(username, password);
-            reader.close();
-            return 0;
+        try
+        {
+            return new Socket(HOSTNAME, PORT);
         }
-        else {
-            reader.close();
+        catch( Exception e )
+        {
+            CUtils.warning("Failed to create socket!!!");
+            CUtils.warning("Details: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static PrintWriter getOurPrintWriter()
+    {
+        try
+        {
+            return new PrintWriter(clientSocket.getOutputStream(), true);
+        }
+        catch( Exception e )
+        {
+            CUtils.warning("Failed to create print writer!!!");
+            CUtils.warning("Details: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static ObjectOutputStream getOurOutputStream()
+    {
+        try
+        {
+            return new ObjectOutputStream(clientSocket.getOutputStream());
+        }
+        catch( Exception e )
+        {
+            CUtils.warning("Failed to create output stream!!!");
+            CUtils.warning("Details: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static ObjectInputStream getOurInputStream()
+    {
+        try
+        {
+            return new ObjectInputStream(clientSocket.getInputStream());
+        }
+        catch( Exception e )
+        {
+            CUtils.warning("Failed to create input stream!!!");
+            CUtils.warning("Details: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static NetworkingHeartbeatManager getOurHeartbeater()
+    {
+        NetworkingHeartbeatManager newManager = new NetworkingHeartbeatManager();
+        newManager.start();
+
+        return newManager;
+    }
+
+    //------------------------------------------------
+    // Network transmit functions
+    //------------------------------------------------
+
+
+    public static void heartBeat()
+    {
+        sendSignal(0);
+    }
+
+    private static int sendSignal(int opCode)
+    {
+        return sendSignal(opCode, null, null);
+    }
+
+    private static int sendSignal(int opCode, String param1)
+    {
+        return sendSignal(opCode, param1, null);
+    }
+
+    // writer is a PrintWriter initalized with clientSocket.getOutputStream(), autoflush = true
+    private static int sendSignal(int opCode, String param1, String param2)
+    {
+        if (opCode < 0 || opCode > 10)
+        {
+            CUtils.warning("Opcode " + String.valueOf(opCode) + " outside of expected range!");
+            return 2;
+        }
+
+        String signal = String.valueOf(opCode);
+
+        if (param1 != null)
+        {
+            signal += " " + param1;
+
+            // No need to check second parameter if we don't have a first!
+            if (param2 != null)
+                signal += " " + param2;
+        }
+
+        try
+        {
+            writer.write(signal);
+            heartbeater.connected = true;
+        }
+        catch(Exception e)
+        {
+            CUtils.warning("Failed to send signal " + signal);
             return 1;
         }
-    }
 
-    /** Attempts to log out of the server, returning 0 on the client if the logout was successful
-     * and an int corresponding to the type of error if it was not. */
-    public static int logout( )
-    {
-        writer.println("2");
-
-        session.logoutSession();
         return 0;
     }
 
-    /** Relays user info to the login system on the server, returning 0 on the client if the
-     * registration was successful and an int corresponding to the type of error if it was not. */
-    public static int register( String username, String password )
+    private static int sendObject(Object object)
     {
-        writer.println("3 " + username + " " + password);
-        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        try
+        {
+            outputObject.writeObject(object);
+            heartbeater.connected = true;
+        }
+        catch(Exception e)
+        {
+            CUtils.warning("Failed to send object!");
+            return 1;
+        }
 
-        private int result = (reader.readLine().equals("0")) ? 0 : 1;
-        reader.close();
-
-        return result;
+        return 0;
     }
 
-    /** Returns a list to the client of all ArticleInfos in a given category/sub-category.  If
-     * IncludeAbstracts is false, abstracts are left blank to save bandwidth.*/
-    public static ArrayList<ArticleInfo> getArticlesFromCategory( int mainCategoryID,
-                                                                  int subCategoryID, boolean IncludeAbstracts )
+    private static int sendFile(File file)
     {
-        //prepare includeAbstacts for output
-        private String bool = (IncludeAbstracts) ? "1" : "0";
+        int fileSize = (int) file.length();
+        byte[] articleByteArray = new byte[fileSize];
 
-        writer.println("4 " + bool);
-        outputObject.writeObject(articleCategory);
-        outputObject.writeObject(subCategory);
-
-        return inputObject.readObject();
-    }
-
-    /** Sends the article to the database for entry, returns 0 if successful and an int
-     * corresponding to the type of error if it was not.  If ArticleID in the supplied ArticleInfo
-     * is not 0 this upload is meant to replace an existing upload. */
-    public static int uploadArticle( File articleFile, ArticleInfo articleInfo )
-    {
-        private int fileSize = (int)articleFile.length();
-        private byte[] articleByteArray = new byte[fileSize];
-
-        writer.println("5 " + Integer.toString(fileSize));
-        //send articleInfo
-        outputObject.writeObject(articleInfo);
-
-        try {
-            FileInputStream fileInStream = new FileInputStream(articleFile);
+        try
+        {
+            FileInputStream fileInStream = new FileInputStream(file);
             BufferedInputStream inStream = new BufferedInputStream(fileInStream);
             inStream.read(articleByteArray, 0, fileSize);
 
@@ -169,46 +222,64 @@ public class Public extends Thread {
             outStream.flush();
             outStream.close();
 
-            return 0;
+            heartbeater.connected = true;
         }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
+        catch (FileNotFoundException e)
+        {
+            CUtils.warning("File not found");
+            return 2;
+        }
+        catch (Exception e)
+        {
+            CUtils.warning(e.getMessage());
             return 1;
         }
-        catch (FileNotFoundException e) {
-            System.err.println("File not found");
-            return 1;
+
+        return 0;
+    }
+
+    //------------------------------------------------
+    // Network receive functions
+    //------------------------------------------------
+
+    private static String receiveString()
+    {
+        try
+        {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            String returnVal = reader.readLine();
+            reader.close();
+            return returnVal;
+        }
+        catch(Exception e)
+        {
+            CUtils.warning("Failed to receive string!!!");
+            return null;
         }
     }
 
-    /** Gets information on the given article from the database. */
-    public static ArticleInfo getArticleInfo( int articleID )
+    private static Object receiveObject()
     {
-        writer.println("6 " + Integer.toString(articleID));
-
-        return inputObject().readObject();
+        try
+        {
+            return inputObject.readObject();
+        }
+        catch(Exception e)
+        {
+            CUtils.warning("Failed to receive any objects!!!");
+            return null;
+        }
     }
 
-    /** Downloads the given article from the database. */
-    public static File downloadArticle( int articleID )
+    private static File receiveFile( String tempDir, int fileSize )
     {
-        writer.println("7 " + Integer.toString(articleID));
-        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        //receive file size and title of article
-        private String result = reader.readLine();
-        reader.close();
-
-        //prepare results for use
-        private String[] resultArray = result.split(" ");
-        private int fileSize = Integer.parseInt(resultArray[0]);
-        private String articleTitle = resultArray[1];
-
         //byte array for file data
-        private byte[] articleByteArray = new byte[fileSize];
+        byte[] articleByteArray = new byte[fileSize];
 
-        try {
-            File articleDL = new File(getCacheDir(), articleTitle);
+        try
+        {
+            File articleDL = new File(tempDir, "DownloadedArticle");
 
             InputStream inStream = clientSocket.getInputStream();
             FileOutputStream fileOutStream = new FileOutputStream(articleDL);
@@ -221,40 +292,150 @@ public class Public extends Thread {
 
             return articleDL;
         }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-            return null;
-        }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             System.err.println("Article download failed");
             return null;
         }
-        catch (NullPointerException e) {
+        catch (NullPointerException e)
+        {
             System.err.println(e.getMessage());
             return null;
         }
-        catch (PatternSyntaxException e) {
+        catch (PatternSyntaxException e)
+        {
+            System.err.println(e.getMessage());
+            return null;
+        }
+        catch (Exception e)
+        {
             System.err.println(e.getMessage());
             return null;
         }
     }
 
+    //------------------------------------------------
+    // Public Functions
+    //------------------------------------------------
+
+    /** Relays user info to the login system on the server, returning 0 on the client if the login
+     * was successful and an int corresponding to the type of error if it was not. */
+    public static int login( String username, String password )
+    {
+        sendSignal(1, username, password);
+
+        return Integer.parseInt(receiveString());
+    }
+
+    /** Attempts to log out of the server, returning 0 on the client if the logout was successful
+     * and an int corresponding to the type of error if it was not. */
+    public static int logout( )
+    {
+        sendSignal(2);
+        return 0;
+    }
+
+    /** Relays user info to the login system on the server, returning 0 on the client if the
+     * registration was successful and an int corresponding to the type of error if it was not. */
+    public static int register( String username, String password )
+    {
+        sendSignal(1, username, password);
+
+        return Integer.parseInt(receiveString());
+    }
+
+    /** Returns a list to the client of all ArticleInfos in a given category/sub-category.  If
+     * IncludeAbstracts is false, abstracts are left blank to save bandwidth.*/
+    public static ArrayList<ArticleInfo> getArticlesFromCategory( int mainCategoryID, int subCategoryID, boolean IncludeAbstracts )
+    {
+        sendSignal(4, String.valueOf(mainCategoryID), String.valueOf(subCategoryID));
+
+        return (ArrayList<ArticleInfo>)receiveObject();
+    }
+
+    /** Sends the article to the database for entry, returns 0 if successful and an int
+     * corresponding to the type of error if it was not.  If ArticleID in the supplied ArticleInfo
+     * is not 0 this upload is meant to replace an existing upload. */
+    public static int uploadArticle( File articleFile, ArticleInfo articleInfo )
+    {
+        int fileSize = (int) articleFile.length();
+        int errorValue = 0;
+
+        errorValue += sendSignal(5, Integer.toString(fileSize));
+        errorValue += sendObject(articleInfo);
+        errorValue += sendFile(articleFile);
+
+        // Will only return 0 if no errors were encountered.
+        return errorValue;
+    }
+
+    /** Gets information on the given article from the database. */
+    public static ArticleInfo getArticleInfo( int articleID )
+    {
+        sendSignal(6, Integer.toString(articleID));
+        return (ArticleInfo)receiveObject();
+    }
+
+    /** Downloads the given article from the database. */
+    public static File downloadArticle( int articleID, String tempDirectory )
+    {
+        sendSignal(7, Integer.toString(articleID));
+
+        //receive file size of article
+        int fileSize = Integer.parseInt(receiveString());
+
+        File downloadedFile = receiveFile( tempDirectory, fileSize );
+
+        ArticleInfo downloadedInfo = (ArticleInfo)receiveObject();
+
+        // Rename our temp file to its final name.
+        downloadedFile.renameTo( new File(tempDirectory,downloadedInfo.printName) );
+
+        return downloadedFile;
+    }
+
     /** Gets the permissions flags for the user, returning -1 if not logged in. */
     public static int getPermissions()
     {
-        writer.println("8");
-        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        private int permission = Integer.parseInt(reader.readLine());
-        reader.close();
-
-        return permission;
+        sendSignal(8);
+        return  Integer.parseInt(receiveString());
     }
 
     /** Abort any ongoing networking activity  Do not terminate the user's session, just cancel
      * whatever transfers were taking place in case the user hits the back button or something. */
     public static void abortActiveConnections()
     {
+        heartbeater.connected = false;
+    }
 
+    // I forgot to include these originally so only bother with them if they are easy and you have time.
+
+    /**
+     * Deletes the article with the specified ID, returning 0 if successful and an integer corresponding to the type
+     * of error if it was not.  Users can only delete articles that they have made.
+     */
+    public static int deleteArticle( int articleID )
+    {
+        sendSignal(9, String.valueOf(articleID));
+
+        return 0;
+    }
+
+    /**
+     * Returns the username we are currently logged in under.  Returns null if not logged in.
+     */
+    public static String getUsername()
+    {
+        sendSignal(10);
+
+        return receiveString();
+    }
+
+    /**
+     * Returns a list of all articles uploaded by the current user.  Returns null if user has not uploaded anything.
+     */
+    public static ArrayList<ArticleInfo> getAllArticlesOfCurrentUser()
+    {
+        return null;
     }
 }

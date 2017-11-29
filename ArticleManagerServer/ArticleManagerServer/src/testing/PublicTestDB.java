@@ -27,7 +27,7 @@ public class PublicTestDB {
 		insertFile = new File("articles/Computer Science.pdf");
 		testFiles.add(insertFile);
 		
-		insertArticle = new ArticleInfo(1);
+		insertArticle = new ArticleInfo(0);
 		insertArticle.doiNumber = "021302/00002";
 		insertArticle.printName = "Solar Panel Efficiency";
 		insertArticle.mainCategoryID = 0;
@@ -38,7 +38,7 @@ public class PublicTestDB {
 		insertArticle.uploadTime = null;
 		testArticles.add(insertArticle);
 		
-		insertArticle = new ArticleInfo(2);
+		insertArticle = new ArticleInfo(1);
 		insertArticle.doiNumber = "232425/12387";
 		insertArticle.printName = "Advances in nanomaterials research";
 		insertArticle.mainCategoryID = 0;
@@ -49,7 +49,7 @@ public class PublicTestDB {
 		insertArticle.uploadTime = null;
 		testArticles.add(insertArticle);
 		
-		insertArticle = new ArticleInfo(3);
+		insertArticle = new ArticleInfo(2);
 		insertArticle.doiNumber = "3483/00012";
 		insertArticle.printName = "Sustaining biospheres";
 		insertArticle.mainCategoryID = 2;
@@ -60,7 +60,7 @@ public class PublicTestDB {
 		insertArticle.uploadTime = null;
 		testArticles.add(insertArticle);
 		
-		insertArticle = new ArticleInfo(4);
+		insertArticle = new ArticleInfo(3);
 		insertArticle.doiNumber = "21398192/12321";
 		insertArticle.printName = "Enhancing automobile efficiency";
 		insertArticle.mainCategoryID = 2;
@@ -71,7 +71,7 @@ public class PublicTestDB {
 		insertArticle.uploadTime = null;
 		testArticles.add(insertArticle);
 		
-		insertArticle = new ArticleInfo(5);
+		insertArticle = new ArticleInfo(4);
 		insertArticle.doiNumber = "2130278/21312";
 		insertArticle.printName = "CS Algorithms";
 		insertArticle.mainCategoryID = 4;
@@ -132,7 +132,6 @@ public class PublicTestDB {
 	{
 		for(int i = 0; i < testArticles.size(); i++)
 		{
-			System.out.println("Inserting article at index " + i);
 			database.Public.insertArticle(testFiles.get(i), testArticles.get(i), 1);
 		}
 		
@@ -149,7 +148,7 @@ public class PublicTestDB {
 			{
 				return -1; // Error, no article has been retrieved.
 			}
-			if(!retrievedArticleInfo.printName.equals(testArticles.get(i).printName))
+			if(retrievedArticleInfo.printName != testArticles.get(i).printName)
 			{
 				return -2; // Error, the incorrect article has been retrieved.
 			}

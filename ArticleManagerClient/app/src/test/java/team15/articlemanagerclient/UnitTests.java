@@ -17,6 +17,7 @@ import proccessing.FileConverter;
 import proccessing.PublicUsage;
 
 import networking.Public;
+import list_builder.Public.*;
 
 import static org.junit.Assert.*;
 
@@ -177,7 +178,7 @@ public class UnitTests
     @Test
     public void testDict() throws Exception
     {
-        FileConverter testConverter = new proccessing.FileConverter();
+        FileConverter testConverter = new proccessing.FileConverter(null);
 
         assertTrue(testConverter.isWord("my"));
         assertTrue(testConverter.isWord("Testing"));
@@ -244,7 +245,7 @@ public class UnitTests
     @Test
     public void testFileConversionFromPDF() throws Exception
     {
-        FileConverter fileConverter = new FileConverter();
+        FileConverter fileConverter = new FileConverter(null);
         String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
 
         fileConverter.convertFromPDF( new File(testFilePath), 1);
@@ -255,7 +256,7 @@ public class UnitTests
     @Test
     public void testFileConversionToPDF() throws Exception
     {
-        FileConverter fileConverter = new FileConverter();
+        FileConverter fileConverter = new FileConverter(null);
         String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Readme\\TestText.txt";
 
         fileConverter.convertToPDF( new File(testFilePath));
@@ -287,7 +288,7 @@ public class UnitTests
 
             CUtils.msg("Parsing " + files[i].getName() + "!");
 
-            ArticleInfo info = proccessing.PublicUsage.categorize( files[i], TestUtils.GetMainCategoryArray(), TestUtils.GetMainCategoryArraySize() );
+            ArticleInfo info = proccessing.PublicUsage.categorize( files[i], TestUtils.GetMainCategoryArray(), TestUtils.GetMainCategoryArraySize(), null );
 
             // Article ID MUST be 0 on fresh upload.
             assertNotNull(info);
@@ -340,25 +341,11 @@ public class UnitTests
     }
 
     @Test
-    public void testNetworkingUploadDownload() throws Exception
+    public void testNetverking() throws Exception
     {
-        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
-
-        ArticleInfo testInfo = new ArticleInfo(0);
-
-        testInfo.printName = "Test Article!";
-        testInfo.author = "Noah";
-        testInfo.doiNumber = "EEEEEEEEE";
-        testInfo.mainCategoryID = 10;
-        testInfo.subCategoryID = 12;
-        testInfo.abstractText = "This is a very abstract article let me tell you.";
-
-        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
-
-        File downloadedFile = networking.Public.downloadArticle(uploadedID);
-
-        CUtils.msg( "Downloaded file to " + downloadedFile.getAbsolutePath());
+            networking.Public.getArticleInfo(0);
     }
+
 
     @Test
     public void testNetworkingUploadGetCategoryList() throws Exception
@@ -374,7 +361,7 @@ public class UnitTests
         testInfo.subCategoryID = 12;
         testInfo.abstractText = "This is a very abstract article let me tell you.";
 
-        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+        assertEquals(networking.Public.uploadArticle(new File(testFilePath), testInfo), 0);
 
         ArrayList<ArticleInfo> categoryInfos = networking.Public.getArticlesFromCategory(10, 12, true);
 
@@ -384,7 +371,7 @@ public class UnitTests
 
         for ( ArticleInfo info : categoryInfos )
         {
-            if ( info.getArticleID() == uploadedID )
+            if ( info.printName.compareTo(testInfo.printName) == 0 )
             {
                 desiredInfo = info;
                 break;
@@ -410,7 +397,7 @@ public class UnitTests
         testInfo.subCategoryID = 12;
         testInfo.abstractText = "This is a very abstract article let me tell you.";
 
-        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+        assertEquals(networking.Public.uploadArticle(new File(testFilePath), testInfo), 0);
 
         ArrayList<ArticleInfo> categoryInfos = networking.Public.getArticlesFromCategory(10, 12, false);
 
@@ -420,7 +407,7 @@ public class UnitTests
 
         for ( ArticleInfo info : categoryInfos )
         {
-            if ( info.getArticleID() == uploadedID )
+            if ( info.printName.compareTo(testInfo.printName) == 0 )
             {
                 desiredInfo = info;
                 break;
@@ -433,9 +420,10 @@ public class UnitTests
     }
 
     @Test
-    public void testNetworkingUploadGetInfo() throws Exception
+    public void testNetworkingUploadDownload() throws Exception
     {
         String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+        String testFileDir = "F:\\Desktop";
 
         ArticleInfo testInfo = new ArticleInfo(0);
 
@@ -446,11 +434,26 @@ public class UnitTests
         testInfo.subCategoryID = 12;
         testInfo.abstractText = "This is a very abstract article let me tell you.";
 
-        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+        assertEquals(networking.Public.uploadArticle(new File(testFilePath), testInfo), 0);
 
-        ArticleInfo downloadedInfo = networking.Public.getArticleInfo(uploadedID);
+        ArrayList<ArticleInfo> categoryInfos = networking.Public.getArticlesFromCategory(10, 12, false);
 
-        assertTrue("DOWNLOADED INFO DOES NOT MATCH UPLOADED INFO!", compareArticleInfos(testInfo, downloadedInfo, "Original Info is:", "Downloaded Info is:"));
+        assertNotEquals("DID NOT EXTRACT ANY ARTICLE INFOS FOR CATEGORY WHEN THERE SHOULD BE AT LEAST ONE!", categoryInfos.size(), 0);
+
+        ArticleInfo desiredInfo = null;
+
+        for ( ArticleInfo info : categoryInfos )
+        {
+            if ( info.printName.compareTo(testInfo.printName) == 0 )
+            {
+                desiredInfo = info;
+                break;
+            }
+        }
+
+        File downloadedFile = networking.Public.downloadArticle(desiredInfo.getArticleID(), testFileDir);
+
+        CUtils.msg( "Downloaded file to " + downloadedFile.getAbsolutePath());
     }
 
     boolean compareArticleInfos( ArticleInfo info1, ArticleInfo info2, String msg1, String msg2 )
@@ -531,5 +534,15 @@ public class UnitTests
 
         // 0 = logged in user who is not an admin.
         assertEquals("WRONG PERMISSIONS AFTER LOGGING IN!", networking.Public.getPermissions(), 0);
+    }
+
+    @Test
+    public void testListBuilder() throws Exception
+    {
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers";
+
+        list_builder.Public.BuildDatabaseOverview(testFilePath);
+
+        list_builder.Public.BuildDetailedCategoryListing(testFilePath, 10);
     }
 }
