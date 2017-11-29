@@ -164,13 +164,10 @@ public class Connection extends Thread {
 		}
 	}
 	
-	private File receiveFile() // writes file to disk and returns file location as File object.
+	private File receiveFile(int byteCount) // writes file to disk and returns file location as File object.
 	{
-		
-		String byteString = receiveString();
-		int byteCount = Integer.parseInt(byteString);
 		byte[] receivedBytes = new byte[byteCount];
-		File newFile = new File(new SimpleDateFormat("files/yyyyMMdd_SSS.pdf").format(new Date()));
+		File newFile = new File("articles/" + new SimpleDateFormat("yyyyMMdd_SSS").format(new Date()) + ".pdf");
 		
 		while(consecFail <= failTolerance)
 		{
@@ -179,9 +176,10 @@ public class Connection extends Thread {
 				Socket fileSocket = fileServ.accept();
 				fileServ.close();
 				
-				FileOutputStream fos = new FileOutputStream(newFile);
+				FileOutputStream fos = new FileOutputStream(newFile.getPath());
 				BufferedOutputStream bos = new BufferedOutputStream(fos);
 				int bytesRead = fileSocket.getInputStream().read(receivedBytes, 0, receivedBytes.length);
+				System.out.println("Successfully received file bytes.");
 				bos.write(receivedBytes,0 , bytesRead);
 				bos.close();
 				return newFile;
@@ -249,14 +247,46 @@ public class Connection extends Thread {
 				sendObject(returnedArticles);
 				break;
 			case 5:
-				tempFile = receiveFile();
 				tempArticleInfo = (ArticleInfo)receiveObject();
+				System.out.println("Received article info object from client.");
+				tempFile = receiveFile(Integer.parseInt(arg1));
+				System.out.println("Received file from client.");
 				database.Public.insertArticle(tempFile, tempArticleInfo, permissionLevel);
+				System.out.println("Article info data inserted into database.");
 				break;
 			case 6:
+				/*
 				tempArticleInfo = database.Public.getArticleInfo(Integer.valueOf(arg1));
 				sendObject(tempArticleInfo);
 				break;
+				*/
+				
+				if ( arg1.compareTo("25") == 0 )
+                {
+                    tempArticleInfo = new ArticleInfo(3, 95, 55);
+
+                    tempArticleInfo.printName = "TestArticleTitle";
+                    tempArticleInfo.abstractText = "TestArticleAbstract";
+                    tempArticleInfo.author = "TestArticleAuthors";
+                    tempArticleInfo.doiNumber = "TestArticleDOI";
+                    tempArticleInfo.owner = "Nobody";
+
+                    sendObject(tempArticleInfo);
+                }
+                else
+                {
+                    tempArticleInfo = new ArticleInfo(4, 20, 50);
+
+                    tempArticleInfo.printName = "TestArticleTitle2";
+                    tempArticleInfo.abstractText = "TestArticleAbstract2";
+                    tempArticleInfo.author = "TestArticleAuthors2";
+                    tempArticleInfo.doiNumber = "TestArticleDOI2";
+                    tempArticleInfo.owner = "Noah2";
+
+                    sendObject(tempArticleInfo);
+                }
+				break;
+				
 			case 7:
 				tempFile = database.Public.downloadArticle(Integer.valueOf(arg1));
 				sendString(database.Public.getArticleInfo(Integer.valueOf(arg1)).printName + " " + tempFile.length());

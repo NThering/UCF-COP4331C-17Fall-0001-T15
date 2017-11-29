@@ -34,6 +34,10 @@ private static String driver = "org.mariadb.jdbc.Driver";
     {
         /**	Checks the username and password against the stored password hashes on the database.  Returns -1 if login failed and an integer corresponding to that user's permissions if successful. */
         /** Passwords must be stored securely ( NOT IN PLAINTEXT ) so that a data breach would not compromise them. */
+    	
+    	return 0;
+    	
+    	/*
         try
         {
             Class.forName(driver);
@@ -72,7 +76,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
 			e.printStackTrace();
 			System.exit(-1);
 		}
-        return -1;
+        return -1;*/
     }
 
     /** Ensures that the username is unique and can be registered in the database, then registers it if so.  Returns true if registration successful and false if not. */
