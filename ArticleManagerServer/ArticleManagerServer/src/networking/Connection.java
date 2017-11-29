@@ -168,24 +168,36 @@ public class Connection extends Thread {
 		byte[] receivedBytes = new byte[byteCount];
 		File newFile = new File("articles/" + new SimpleDateFormat("yyyyMMdd_SSS").format(new Date()) + ".pdf");
 		
-		while(consecFail <= failTolerance)
+		try 
 		{
-			try {
-				ServerSocket fileServ = new ServerSocket(1908);
-				Socket fileSocket = fileServ.accept();
-				fileServ.close();
+			ServerSocket fileServ = new ServerSocket(1908);
+			Socket fileSocket = fileServ.accept();
+			fileServ.close();
 				
-				FileOutputStream fos = new FileOutputStream(newFile.getPath());
-				BufferedOutputStream bos = new BufferedOutputStream(fos);
-				int bytesRead = fileSocket.getInputStream().read(receivedBytes, 0, receivedBytes.length);
-				System.out.println("Successfully received file bytes.");
-				bos.write(receivedBytes,0 , bytesRead);
-				bos.close();
-				return newFile;
-			} catch (IOException e) {
-				consecFail++;
-			}
+			FileOutputStream fos = new FileOutputStream(newFile.getPath());
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+                                
+                        int count = 0;
+                        while ((count = fileSocket.getInputStream().read(receivedBytes)) > 0)
+                        {
+                        	fos.write(receivedBytes, 0, count);
+                        }
+
+                        //outStream.write(articleByteArray, 0, fileSize);
+                        CUtils.debugMsg("Wrote file to buffer, time to close stream...");
+                        fileSocket.getInputStream().close();
+                        fos.close();
+                                
+			return newFile;
+		} 
+		catch (IOException e) 
+		{
+			consecFail++;
+                        CUtils.warning("Failed to do some file write thing.");
+                        CUtils.warning(e.getMessage());
+                        e.printStackTrace();
 		}
+
 		
 		return null;
 	}
