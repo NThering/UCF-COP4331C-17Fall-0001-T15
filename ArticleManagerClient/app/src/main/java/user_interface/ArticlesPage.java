@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import team15.articlemanagerclient.R;
 import am_utils.ArticleInfo;
 //import networking.Public;
+import list_builder.Public;
 
 public class ArticlesPage extends AppCompatActivity {
 
@@ -94,6 +95,22 @@ public class ArticlesPage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Downloads ALL THE THINGS!!!!!
+                /*  new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    Public.BuildDatabaseOverview;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
 
@@ -102,6 +119,22 @@ public class ArticlesPage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Downloads the articles under this subcategory
+                /*  new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    Public.BuildDetailedCategoryListing(); // FIX PARAMS AFTER NOAH DOES
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
     }
