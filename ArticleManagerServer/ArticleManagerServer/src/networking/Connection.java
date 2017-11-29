@@ -126,34 +126,39 @@ public class Connection extends Thread {
 	{
 		byte[] fileBytes = new byte[(int)fp.length()];
 		OutputStream byteOutput;
-		BufferedInputStream inputStream;
+		FileInputStream inputStream;
 		
-		try {
-		inputStream = new BufferedInputStream(new FileInputStream(fp));
-		} catch(FileNotFoundException e)
+		try 
+                {
+                    inputStream = new FileInputStream(fp);
+		} 
+                catch(FileNotFoundException e)
 		{
 			e.printStackTrace();
 			return;
 		}
 		
-		while(consecFail <= failTolerance)
-		{
-			try {
+		try 
+                {	
+                    ServerSocket fileServ = new ServerSocket(1908);
+                    Socket fileSocket = fileServ.accept();
+                    fileServ.close();
 				
-				ServerSocket fileServ = new ServerSocket(1908);
-				Socket fileSocket = fileServ.accept();
-				fileServ.close();
-				
-				inputStream.read(fileBytes, 0, fileBytes.length);
-				byteOutput = fileSocket.getOutputStream();
-				byteOutput.write(fileBytes, 0, fileBytes.length);
-				byteOutput.flush();
-				byteOutput.close();
-				fileSocket.close();
-				return;
-			} catch (IOException e) {
-				consecFail++;
-			}
+                    int count = 0;
+                    while ((count = inputStream.read(fileBytes)) > 0)
+                    {
+                        fileSocket.getOutputStream().write(fileBytes, 0, count);
+                    }
+                                
+                    fileSocket.getOutputStream().close();
+                    inputStream.close();
+                                
+                    fileSocket.close();
+                    return;
+		} 
+                catch (IOException e) 
+                {
+			consecFail++;
 		}
 		try {
 			inputStream.close();
@@ -187,6 +192,7 @@ public class Connection extends Thread {
                         CUtils.debugMsg("Wrote file to buffer, time to close stream...");
                         fileSocket.getInputStream().close();
                         fos.close();
+			fileSocket.close();
                                 
 			return newFile;
 		} 
