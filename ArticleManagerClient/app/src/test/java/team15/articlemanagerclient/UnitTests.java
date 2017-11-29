@@ -341,6 +341,13 @@ public class UnitTests
     }
 
     @Test
+    public void testNetverking() throws Exception
+    {
+            networking.Public.getArticleInfo(0);
+    }
+
+
+    @Test
     public void testNetworkingUploadGetCategoryList() throws Exception
     {
         String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
@@ -416,6 +423,7 @@ public class UnitTests
     public void testNetworkingUploadDownload() throws Exception
     {
         String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+        String testFileDir = "F:\\Desktop";
 
         ArticleInfo testInfo = new ArticleInfo(0);
 
@@ -443,7 +451,7 @@ public class UnitTests
             }
         }
 
-        File downloadedFile = networking.Public.downloadArticle(desiredInfo.getArticleID());
+        File downloadedFile = networking.Public.downloadArticle(desiredInfo.getArticleID(), testFileDir);
 
         CUtils.msg( "Downloaded file to " + downloadedFile.getAbsolutePath());
     }
