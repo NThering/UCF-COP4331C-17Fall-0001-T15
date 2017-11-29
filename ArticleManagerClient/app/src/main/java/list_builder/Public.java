@@ -2,11 +2,13 @@ package list_builder;
 
 import java.util.*;
 import java.io.*;
+
+import am_utils.ArticleInfo;
 import am_utils.DefaultCategories; //import am_utils package
 import am_utils.MainCategory;
 import am_utils.SubCategory;
 import am_utils.CUtils;
-import networking.Public; //import networking package
+import networking.Public.*; //import networking package
 
 /**
  * Created by NThering and belmaz on 11/22/2017.
@@ -37,35 +39,66 @@ public class Public
 
 
     private static BufferedReader br = null;
-    private static BufferedWriter bw = null;
 
-    ArrayList<ArticleInfo> infoList = networking.Public.getArticlesFromCategory(mainCategoryID, int subCategoryID, true);
-    public static File BuildDatabaseOverview() throws IOException
+    public static File BuildDatabaseOverview( String targetDirectory )
     {
-        
-
         DefaultCategories dCat = new DefaultCategories();
-        MainCategory mCat[] = new dCat.getDefaultCategories();
-        File file = new File("categoryList.txt");
-        bw = new BufferedWriter(new FileWriter("categoryList.txt", true));
+        MainCategory mCat[] = dCat.getDefaultCategories();
+        File file = new File(targetDirectory + "/categoryList.txt");
 
-        ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(mainCategoryID, int subCategoryID, true);
-        for(int i = 0; i < def.size(); i++)
+        BufferedWriter bw;
+
+        try
         {
-            bw.write(mCat[i]);
-            for(int j = 0; j < mCat[i].size(); j++)
-            {
-                bw.newLine();
-                bw.write(mCat[i].children()[j]);
+            bw = new BufferedWriter(new FileWriter(file, false));
+        }
+        catch (Exception e)
+        {
+            CUtils.warning("Failed to create buffered writer!!!");
+            return null; // Can't win now.
+        }
 
-                for(ArticleInfo item : ls)
-                {
+        try
+        {
+            for (int i = 0; i < dCat.size(); i++)
+            {
+                if (mCat[i] == null) // This can happen because this system requires retired category entries to be replaced by null to preserve ids.
+                    continue;
+
+                bw.write(mCat[i].printName());
+                bw.newLine();
+
+                for (int j = 0; j < mCat[i].size(); j++) {
+                    if (mCat[i].children()[j] == null)
+                        continue;
+
+
+                    bw.write("\t" + mCat[i].children()[j].printName());
                     bw.newLine();
-                    bw.write(item.printName);
+
+                    ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(i, j, false);
+                    for (ArticleInfo item : ls)
+                    {
+                        bw.write("\t\t" + item.printName);
+                        bw.newLine();
+                    }
                 }
             }
         }
+        catch (Exception e)
+        {
+            CUtils.warning("Encountered error when writing out file!!!");
+            return null; // Ragequit
+        }
 
+        try
+        {
+            bw.close();
+        }
+        catch (Exception e)
+        {
+            CUtils.warning("Could not save file!");
+        }
 
         return file;
     }
@@ -84,26 +117,66 @@ public class Public
      * Use networking.Public.getArticlesFromCategory( mainCategoryID, int subCategoryID, true )
      */
 
-    public static File BuildDetailedCategoryListing() throws IOException
+    public static File BuildDetailedCategoryListing( String targetDirectory, int targetCategory )
     {
-        File file = new File("detailedCategoryList.txt");
-        bw = new BufferedWriter(new FileWriter("detailedCategoryList.txt", true));
+        DefaultCategories dCat = new DefaultCategories();
+        MainCategory mCat[] = dCat.getDefaultCategories();
 
-        ArrayList<ArticleInfo> ls = netoworking.Public.getArticlesFromCategory(mainCategoryID, int subCategoryID, true);
-        for(ArticleInfo item : ls)
+        if ( mCat[targetCategory] == null ) // This can happen because this system requires retired category entries to be replaced by null to preserve ids.
+            return null;
+
+        File file = new File(targetDirectory + "/" + mCat[targetCategory].printName().replace(" ","") + "ArticleList.txt");
+
+        BufferedWriter bw;
+
+        try
         {
-            bw.write(item.printName);
-            for(ArticleInfo item2 : ls )
-            {
-                bw.newLine();
-                bw.write(item.printName);
-                bw.write(item.DOINumber);
-                bw.write(item.author);
-                bw.write(item.abstractText);
-
-            }
+            bw = new BufferedWriter(new FileWriter(file, false));
+        }
+        catch (Exception e)
+        {
+            CUtils.warning("Failed to create buffered writer!!!");
+            return null; // Can't win now.
         }
 
+        try
+        {
+            bw.write(mCat[targetCategory].printName());
+            bw.newLine();
+            for (int j = 0; j < mCat[targetCategory].size(); j++)
+            {
+                if (mCat[targetCategory].children()[j] == null)
+                    continue;
+
+                bw.write("\t" + mCat[targetCategory].children()[j].printName());
+                bw.newLine();
+
+                ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(targetCategory, j, true);
+                for (ArticleInfo item : ls)
+                {
+                    bw.write("\t\t" + item.printName);
+                    bw.newLine();
+                    bw.write("\t\t\t" + item.author);
+                    bw.newLine();
+                    bw.write("\t\t\t" + item.abstractText);
+                    bw.newLine();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            CUtils.warning("Encountered error when writing out file!!!");
+            return null; // Ragequit
+        }
+
+        try
+        {
+            bw.close();
+        }
+        catch (Exception e)
+        {
+            CUtils.warning("Could not save file!");
+        }
 
         return file;
     }

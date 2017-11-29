@@ -1,8 +1,12 @@
 package networking;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+
 import java.util.*;
 
-public class SessionManager extends Context implements SharedPreferences{
+public class SessionManager extends Context implements SharedPreferences {
 
     private static final String SHARED_PREF_ID = "shared_pref";
     private static final String LOGGED_IN = "is_logged_in";
