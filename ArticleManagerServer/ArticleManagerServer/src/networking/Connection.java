@@ -103,13 +103,10 @@ public class Connection extends Thread {
 		try {
 			ServerSocket objectServ = new ServerSocket(1907);
 			Socket objectSocket = objectServ.accept();
-			objectServ.close();
+                        objectServ.close();
 			ObjectInputStream receiveStream = new ObjectInputStream(objectSocket.getInputStream());
 			try {
-				while(consecFail <= failTolerance)
-				{
-					receiveObject = receiveStream.readObject();
-				}
+                                receiveObject = receiveStream.readObject();
 			} catch (ClassNotFoundException e) {
 				System.err.println("Error reconstituting serialized object from stream.");
 				e.printStackTrace();
@@ -119,6 +116,8 @@ public class Connection extends Thread {
 			return receiveObject;
 		} catch (IOException e) {
 			consecFail++;
+                        System.err.println("FAILED TO DO SOME SOCKET THING.");
+			e.printStackTrace();
 		}
 		return null;
 	}
