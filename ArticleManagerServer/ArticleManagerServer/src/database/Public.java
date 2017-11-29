@@ -197,8 +197,8 @@ public class Public {
     			{
     				deleteFile = new File(rs.getString("filePath"));
     				deleteFile.delete();
-    				stmnt.close();
     				stmnt.executeUpdate("delete from article where id=" + articleID + ";");
+    				stmnt.close();
     				return 0;
     			} else
     			{
