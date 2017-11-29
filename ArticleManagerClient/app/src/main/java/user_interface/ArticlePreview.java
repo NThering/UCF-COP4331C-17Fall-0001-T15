@@ -35,7 +35,7 @@ import proccessing.FileConverter;
 public class ArticlePreview extends AppCompatActivity {
 
     // UI variables
-    TextView title, categories, authors, dateUploaded, uploader;
+    TextView title, categories, authors, dateUploaded, uploader, abstractInfo;
     Button download, viewButton, deleteButton, reupload;
     private static final int fileSelectCode = 42; // For filepicker, can be any number I believe
     private static final int permissionRequestCode = 43;
@@ -65,6 +65,7 @@ public class ArticlePreview extends AppCompatActivity {
         authors = (TextView) findViewById(R.id.authorsTextView);
         dateUploaded = (TextView) findViewById(R.id.dateUploadedTextView);
         uploader = (TextView) findViewById(R.id.uploaderTextView);
+        abstractInfo = (TextView) findViewById(R.id.abstractTextView);
         download = (Button) findViewById(R.id.downloadArticleButton);
         viewButton = (Button) findViewById(R.id.viewArticleButton);
         deleteButton = (Button) findViewById(R.id.deleteArticleButton);
@@ -84,6 +85,7 @@ public class ArticlePreview extends AppCompatActivity {
         //authors.setText(getAuthorName());
         //dateUploaded.setText("Date Uploaded: " + getUploadDate().format(date));
         //uploader.setText("Uploaded by: " + getUploaderName());
+        //abstractInfo.setText(getAbstract())
 
         // If you uploaded the article, get access to these two buttons
         /*if(getUploaderName().equals(INSERT USER NAME HERE)) {
@@ -412,5 +414,14 @@ public class ArticlePreview extends AppCompatActivity {
         }
 
         return -1;
+    }
+
+    public String getAbstract() {
+        for(ArticleInfo listyList : articleInformation) { //WON'T WORK WITHOUT NETWORKING
+            if (listyList.printName.equals(message))
+                return listyList.abstractText;
+        }
+
+        return "";
     }
 }
