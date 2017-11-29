@@ -1,9 +1,14 @@
 package user_interface;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -25,7 +30,6 @@ import java.util.ArrayList;
 import am_utils.ArticleInfo;
 import am_utils.MainCategory;
 import in.gauriinfotech.commons.Commons;
-import proccessing.FileConverter;
 import team15.articlemanagerclient.R;
 //import networking.Public;
 import proccessing.PublicUsage;
@@ -39,15 +43,24 @@ public class MyArticles extends AppCompatActivity {
     TextView username, userTitle;
     Button upload, logout;
     private static final int fileSelectCode = 42; // For filepicker, can be any number I believe
+    private static final int permissionRequestCode = 43;
     String fullpath; // Universal so I can call from the inner classes/methods
     EditText filePath; // Universal so I can call from the inner classes/methods
     DefaultCategories defaultCat = new DefaultCategories();
     Uri path;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_articles);
+
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(MyArticles.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
 
         username = (TextView) findViewById(R.id.usernameTextView);
         userTitle = (TextView) findViewById(R.id.userTitleTextView);
@@ -80,7 +93,14 @@ public class MyArticles extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callPopup(v);
+                if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                    requestPermission();
+                }
+                else
+                    callPopup(v);
             }
         });
 
@@ -88,8 +108,23 @@ public class MyArticles extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*  new Thread() {
+                    public void run() {
+                try {
+                    prog.show();
              //   int logSuccess = -1;
              //   logSuccess = Public.logout();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
 
              //   if(logSuccess == 0) {
                     Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
@@ -100,6 +135,30 @@ public class MyArticles extends AppCompatActivity {
              //   }
             }
         });
+    }
+
+    public void requestPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat
+                    .requestPermissions(MyArticles.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, permissionRequestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case permissionRequestCode:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(getApplicationContext(), "granted", Toast.LENGTH_SHORT).show();
+
+                else
+                    Toast.makeText(getApplicationContext(), "nah bitch", Toast.LENGTH_SHORT).show();
+
+                break;
+
+            default: super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     // Hard coded categories
@@ -132,14 +191,6 @@ public class MyArticles extends AppCompatActivity {
         window.setFocusable(true);
         window.update();
 
-        /*
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-                            NOAH
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-         */
-
         // Listener for the browse button -- opens the file picker
         browse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,33 +203,34 @@ public class MyArticles extends AppCompatActivity {
             }
         });
 
-        // Listener for the upload button -- EXPERIMENTING WITH THIS ONE!!!
+        // Listener for the upload button
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Will call the upload file method from networking I believe
-                ArticleInfo info = proccessing.PublicUsage.categorize(new File(filePath.getText().toString()), GetMainCategoryArray(), GetMainCategoryArraySize() );
-                Toast.makeText(getApplicationContext(), info.doiNumber, Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), info.printName, Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), info.author, Toast.LENGTH_SHORT).show();
+                // Categorize the file then upload it
+                File file = new File(filePath.getText().toString());
+
+                ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
+
+                /*  new Thread() {
+                public void run() {
+                try {
+                    prog.show();
+             Public.uploadArticle(file, info);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
     }
-
-  /*  public void getFilesFromDir(File filesFromSD) {
-        File[] listAllFiles = filesFromSD.listFiles();
-
-        if (listAllFiles != null && listAllFiles.length > 0) {
-            for (File currentFile : listAllFiles) {
-                    // File absolute path
-                   // Log.e("File path", currentFile.getAbsolutePath());
-                    // File Name
-                   // Log.e("File path", currentFile.getName());
-                if (currentFile.getName().endsWith(".pdf"))
-                    Toast.makeText(getApplicationContext(), currentFile.getName(), Toast.LENGTH_SHORT).show();
-            }
-        }
-    } */
 
     // Method to set filepath once a file is picked -- set globals to file path when file is picked
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

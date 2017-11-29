@@ -16,6 +16,8 @@ import am_utils.SubCategory;
 import proccessing.FileConverter;
 import proccessing.PublicUsage;
 
+import networking.Public;
+
 import static org.junit.Assert.*;
 
 /**
@@ -240,6 +242,26 @@ public class UnitTests
     */
 
     @Test
+    public void testFileConversionFromPDF() throws Exception
+    {
+        FileConverter fileConverter = new FileConverter();
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+
+        fileConverter.convertFromPDF( new File(testFilePath), 1);
+        fileConverter.convertFromPDF( new File(testFilePath), 2);
+        fileConverter.convertFromPDF( new File(testFilePath), 3);
+    }
+
+    @Test
+    public void testFileConversionToPDF() throws Exception
+    {
+        FileConverter fileConverter = new FileConverter();
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Readme\\TestText.txt";
+
+        fileConverter.convertToPDF( new File(testFilePath));
+    }
+
+    @Test
     public void testCategorySortMetrics() throws Exception
     {
         // Prints out category sort results and statistics for manual review.
@@ -315,5 +337,199 @@ public class UnitTests
         
         // TC201, [NO VALUE] entries must be less than 25% of the metadata entries.
         assertFalse("ONLY" + String.valueOf(1 - ((float)failFieldCount)/totalFieldCount) + "METADATA ENTRIES FILLED.  Need 0.75 or more.", ((float)failFieldCount)/totalFieldCount > 0.25);
+    }
+
+    @Test
+    public void testNetworkingUploadDownload() throws Exception
+    {
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+
+        ArticleInfo testInfo = new ArticleInfo(0);
+
+        testInfo.printName = "Test Article!";
+        testInfo.author = "Noah";
+        testInfo.doiNumber = "EEEEEEEEE";
+        testInfo.mainCategoryID = 10;
+        testInfo.subCategoryID = 12;
+        testInfo.abstractText = "This is a very abstract article let me tell you.";
+
+        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+
+        File downloadedFile = networking.Public.downloadArticle(uploadedID);
+
+        CUtils.msg( "Downloaded file to " + downloadedFile.getAbsolutePath());
+    }
+
+    @Test
+    public void testNetworkingUploadGetCategoryList() throws Exception
+    {
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+
+        ArticleInfo testInfo = new ArticleInfo(0);
+
+        testInfo.printName = "Test Article!";
+        testInfo.author = "Noah";
+        testInfo.doiNumber = "EEEEEEEEE";
+        testInfo.mainCategoryID = 10;
+        testInfo.subCategoryID = 12;
+        testInfo.abstractText = "This is a very abstract article let me tell you.";
+
+        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+
+        ArrayList<ArticleInfo> categoryInfos = networking.Public.getArticlesFromCategory(10, 12, true);
+
+        assertNotEquals("DID NOT EXTRACT ANY ARTICLE INFOS FOR CATEGORY WHEN THERE SHOULD BE AT LEAST ONE!", categoryInfos.size(), 0);
+
+        ArticleInfo desiredInfo = null;
+
+        for ( ArticleInfo info : categoryInfos )
+        {
+            if ( info.getArticleID() == uploadedID )
+            {
+                desiredInfo = info;
+                break;
+            }
+        }
+
+        assertNotNull( "DID NOT FIND UPLOADED ARTICLE IN RETURNED CATEGORY LISTING", desiredInfo);
+
+        assertTrue("DOWNLOADED INFO DOES NOT MATCH UPLOADED INFO!", compareArticleInfos(testInfo, desiredInfo, "Original Info is:", "Downloaded Info is:"));
+    }
+
+    @Test
+    public void testNetworkingNotGivingAbstractWhenNotAsked() throws Exception
+    {
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+
+        ArticleInfo testInfo = new ArticleInfo(0);
+
+        testInfo.printName = "Test Article!";
+        testInfo.author = "Noah";
+        testInfo.doiNumber = "EEEEEEEEE";
+        testInfo.mainCategoryID = 10;
+        testInfo.subCategoryID = 12;
+        testInfo.abstractText = "This is a very abstract article let me tell you.";
+
+        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+
+        ArrayList<ArticleInfo> categoryInfos = networking.Public.getArticlesFromCategory(10, 12, false);
+
+        assertNotEquals("DID NOT EXTRACT ANY ARTICLE INFOS FOR CATEGORY WHEN THERE SHOULD BE AT LEAST ONE!", categoryInfos.size(), 0);
+
+        ArticleInfo desiredInfo = null;
+
+        for ( ArticleInfo info : categoryInfos )
+        {
+            if ( info.getArticleID() == uploadedID )
+            {
+                desiredInfo = info;
+                break;
+            }
+        }
+
+        assertNotNull( "DID NOT FIND UPLOADED ARTICLE IN RETURNED CATEGORY LISTING", desiredInfo);
+
+        assertNull( "DOWNLOADED INFO STILL HAS ABSTRACT EVEN THOUGH NOT REQUESTED!", desiredInfo.abstractText );
+    }
+
+    @Test
+    public void testNetworkingUploadGetInfo() throws Exception
+    {
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+
+        ArticleInfo testInfo = new ArticleInfo(0);
+
+        testInfo.printName = "Test Article!";
+        testInfo.author = "Noah";
+        testInfo.doiNumber = "EEEEEEEEE";
+        testInfo.mainCategoryID = 10;
+        testInfo.subCategoryID = 12;
+        testInfo.abstractText = "This is a very abstract article let me tell you.";
+
+        int uploadedID = networking.Public.uploadArticle(new File(testFilePath), testInfo);
+
+        ArticleInfo downloadedInfo = networking.Public.getArticleInfo(uploadedID);
+
+        assertTrue("DOWNLOADED INFO DOES NOT MATCH UPLOADED INFO!", compareArticleInfos(testInfo, downloadedInfo, "Original Info is:", "Downloaded Info is:"));
+    }
+
+    boolean compareArticleInfos( ArticleInfo info1, ArticleInfo info2, String msg1, String msg2 )
+    {
+        String[] fieldNames = {"Name", "Authors",
+                "DOI Number", "Main Category ID",
+                "Sub Category ID", "Main Category Name",
+                "Sub Category Name", "Abstract Text"};
+
+        String[] fieldValues1 = { info1.printName, info1.author,
+                info1.doiNumber, String.valueOf(info1.mainCategoryID),
+                String.valueOf(info1.subCategoryID), TestUtils.MainCategoryNameFromId(info1.mainCategoryID),
+                TestUtils.SubCategoryNameFromIds(info1.mainCategoryID, info1.subCategoryID), info1.abstractText};
+
+        String[] fieldValues2 = { info2.printName, info2.author,
+                info2.doiNumber, String.valueOf(info2.mainCategoryID),
+                String.valueOf(info2.subCategoryID), TestUtils.MainCategoryNameFromId(info2.mainCategoryID),
+                TestUtils.SubCategoryNameFromIds(info2.mainCategoryID, info2.subCategoryID), info2.abstractText};
+
+        if (msg1 != null)
+        {
+            CUtils.msg(msg1);
+            for (int g = 0; g < fieldNames.length; g++)
+                CUtils.msg("\t" + fieldNames[g] + " " + (fieldValues1[g] != null ? fieldValues1[g] : "[NO VALUE]"));
+        }
+
+        if (msg2 != null)
+        {
+            CUtils.msg(msg2);
+            for (int g = 0; g < fieldNames.length; g++)
+                CUtils.msg("\t" + fieldNames[g] + " " + (fieldValues2[g] != null ? fieldValues2[g] : "[NO VALUE]"));
+        }
+
+        for ( int g = 0; g < fieldNames.length; g++ )
+        {
+            if (fieldValues1[g].compareTo(fieldValues2[g]) != 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    @Test
+    public void testNetworkingRegister() throws Exception
+    {
+        networking.Public.register( "ThisIsAUsername", "ThisIsAPassword" );
+
+        assertNotEquals("SUCCESSFULLY REGISTERED SAME USER A SECOND TIME!",networking.Public.register( "ThisIsAUsername", "ThisIsAPassword" ), 0);
+    }
+
+    @Test
+    public void testNetworkingRegisterLogin() throws Exception
+    {
+        networking.Public.register("ThisIsAUsername", "ThisIsAPassword");
+
+        assertNotEquals("SUCCESSFULLY REGISTERED SAME USER A SECOND TIME!", networking.Public.register("ThisIsAUsername", "ThisIsAPassword"), 0);
+
+        assertNotEquals("LOGGED IN AS NON-EXISTANT USER!", networking.Public.login( "ThisIsNOTAUsername", "ThisIsAPassword" ), 0);
+        assertNotEquals("LOGGED IN WITH WRONG PASSWORD!", networking.Public.login( "ThisIsAUsername", "ThisIsNotAPassword" ), 0);
+
+        assertEquals("FAILED TO LOG IN WITH CORRECT USERNAME AND PASSWORD!", networking.Public.login( "ThisIsAUsername", "ThisIsAPassword" ), 0);
+    }
+
+    @Test
+    public void testNetworkingRegisterLoginPermissions() throws Exception
+    {
+        // -1 = user who is not logged in.
+        assertEquals("WRONG PERMISSIONS BEFORE LOGGING IN!", networking.Public.getPermissions(), -1);
+
+        networking.Public.register("ThisIsAUsername", "ThisIsAPassword");
+
+        assertNotEquals("SUCCESSFULLY REGISTERED SAME USER A SECOND TIME!", networking.Public.register("ThisIsAUsername", "ThisIsAPassword"), 0);
+
+        assertNotEquals("LOGGED IN AS NON-EXISTANT USER!", networking.Public.login( "ThisIsNOTAUsername", "ThisIsAPassword" ), 0);
+        assertNotEquals("LOGGED IN WITH WRONG PASSWORD!", networking.Public.login( "ThisIsAUsername", "ThisIsNotAPassword" ), 0);
+
+        assertEquals("FAILED TO LOG IN WITH CORRECT USERNAME AND PASSWORD!", networking.Public.login( "ThisIsAUsername", "ThisIsAPassword" ), 0);
+
+        // 0 = logged in user who is not an admin.
+        assertEquals("WRONG PERMISSIONS AFTER LOGGING IN!", networking.Public.getPermissions(), 0);
     }
 }

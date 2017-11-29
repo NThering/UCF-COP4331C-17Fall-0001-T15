@@ -39,16 +39,17 @@ public class Public
     private static BufferedReader br = null;
     private static BufferedWriter bw = null;
 
+    ArrayList<ArticleInfo> infoList = networking.Public.getArticlesFromCategory(mainCategoryID, int subCategoryID, true);
     public static File BuildDatabaseOverview() throws IOException
     {
-
-        List<Object> listyList = new ArrayList<>();
+        
 
         DefaultCategories dCat = new DefaultCategories();
         MainCategory mCat[] = new dCat.getDefaultCategories();
         File file = new File("categoryList.txt");
         bw = new BufferedWriter(new FileWriter("categoryList.txt", true));
 
+        ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(mainCategoryID, int subCategoryID, true);
         for(int i = 0; i < def.size(); i++)
         {
             bw.write(mCat[i]);
@@ -56,6 +57,12 @@ public class Public
             {
                 bw.newLine();
                 bw.write(mCat[i].children()[j]);
+
+                for(ArticleInfo item : ls)
+                {
+                    bw.newLine();
+                    bw.write(item.printName);
+                }
             }
         }
 
@@ -82,14 +89,17 @@ public class Public
         File file = new File("detailedCategoryList.txt");
         bw = new BufferedWriter(new FileWriter("detailedCategoryList.txt", true));
 
-
-        for(int i = 0; i< ls.size(); i++)
+        ArrayList<ArticleInfo> ls = netoworking.Public.getArticlesFromCategory(mainCategoryID, int subCategoryID, true);
+        for(ArticleInfo item : ls)
         {
-            //ArrayList<ArticleInfo> ls = Public.getArticlesFromCategory();
-
-            bw.write(Public.getArticlesFromCategory(i));
-            for(int j = 0; j<Public.getArticlesFromCategory().size(); j++)
+            bw.write(item.printName);
+            for(ArticleInfo item2 : ls )
             {
+                bw.newLine();
+                bw.write(item2.printName);
+                bw.write(item2.DOINumber);
+                bw.write(item2.author);
+                bw.write(item2.abstractText);
 
             }
         }

@@ -1,5 +1,6 @@
 package user_interface;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
+
+import am_utils.SubCategory;
 import team15.articlemanagerclient.R;
 
 public class SubCategories extends AppCompatActivity {
@@ -24,6 +27,7 @@ public class SubCategories extends AppCompatActivity {
     String data, message;
     Button downloadAllArticles, downloadUnderCategory;
     Integer mainId, subId;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,13 @@ public class SubCategories extends AppCompatActivity {
         assert bundle != null;
         message = bundle.getString("message");
         finalCatList = (ArrayList<CatContainer>) bundle.getSerializable("final_cat_list");
+
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(SubCategories.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
 
         title = (TextView) findViewById(R.id.subTextView);
         title.setText(message + " Sub Categories");
@@ -67,6 +78,22 @@ public class SubCategories extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Downloads ALL THE THINGS!!!!!
+                /*  new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    Public.BuildDatabaseOverview();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
 
@@ -75,6 +102,22 @@ public class SubCategories extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Downloads the articles under this category
+                /*  new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    Public.BuildDetailedCategoryListing(); // FIX PARAMS AFTER NOAH DOES
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start(); */
             }
         });
     }

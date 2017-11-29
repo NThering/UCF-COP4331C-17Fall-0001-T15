@@ -1,5 +1,6 @@
 package proccessing;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -22,24 +23,21 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 
 import am_utils.CUtils;
+import user_interface.MyArticles;
 
 
 public class FileConverter extends AppCompatActivity {
     public static String toast = "";
     HashSet<String> englishWordSet;
 
-    public FileConverter()
+    public FileConverter(Context context)
     {
-        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
+       // englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
         BufferedReader wordList = null;
         try
         {
-            // IAN PLEASE FIGURE OUT HOW TO OPEN THIS FILE ON ANDROID.
-            // From what I've read, "getAssets().open("english_words.txt") works but I can't test it with unit tests.
-            // If that doesn't work you might need to call it from a context but that needs to be created in the higher levels or something.
-
-            // To use unit tests, just link "english_words" to its location on your computer.
-            wordList = new BufferedReader(new FileReader("english_words.txt"));
+            InputStream is = context.getAssets().open("english_words.txt");
+            wordList = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         }
         catch(Exception e)
         {
@@ -47,7 +45,7 @@ public class FileConverter extends AppCompatActivity {
             return; // We've failed to build a useful word database.
         }
 
-        //englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
+        englishWordSet = new HashSet<String>(400000); // Yes the dictionary is that big.
 
         try
         {
@@ -105,7 +103,6 @@ public class FileConverter extends AppCompatActivity {
 
     public String getAuthorFromText( String inputText )
     {
-        String authors = "";
         String[] lines =  inputText.split("\n");
 
         if ( lines.length > 50 )
@@ -227,37 +224,36 @@ public class FileConverter extends AppCompatActivity {
         return text;
     }
 
-    public File convertToPDF(File inputFile ){
-
-        if(!inputFile.exists()){
+    public File convertToPDF( File inputFile )
+    {
+        if(!inputFile.exists())
             return null;
-        }
 
         String ext = getFileExt(inputFile.getName());
-        if(ext.contains( "pdf")){
+
+        if(ext.contains( "pdf"))
             return inputFile;
-        }
-        else if(ext.contains("txt")){
 
-            String content = readFile(inputFile.getName());
-            File pdf = createPDFFromString(content, inputFile.getName());
-            return pdf;
-        }
-        else if(ext.contains("odt")){
-            String content = readFile(inputFile.getName());
-            File pdf = createPDFFromString(content, inputFile.getName());
-            return pdf;
-        }
-        else if(ext.contains("html")){
-            String content = readFile(inputFile.getName());
-            File pdf = createPDFFromString(content, inputFile.getName());
-            return pdf;
+        String[] supportedExtensions = {"txt", "odt", "html"};
 
+        // Find if we support this file extension or not.
+        boolean isSupported = false;
+        for ( String extension : supportedExtensions )
+        {
+            if(ext.contains( extension ))
+            {
+                isSupported = true;
+                break;
+            }
         }
-        else{
+
+        if (isSupported)
+        {
+            String content = readFile( inputFile );
+            return createPDFFromString( content, inputFile );
+        }
+        else
             return null;
-        }
-
     }
 
 
@@ -300,7 +296,7 @@ public class FileConverter extends AppCompatActivity {
     3 = convert to .html
     default converts to .txt
     */
-    public File convertFromPDF(String filename, int filetype)
+    public File convertFromPDF( File inputFile, int filetype)
     {
         String result = " ";
         String nextline = "";
@@ -309,7 +305,7 @@ public class FileConverter extends AppCompatActivity {
             result += nextline;
             toast = nextline;
             try {
-                nextline = extractTextFromPDF(filename, x);
+                nextline = extractTextFromPDF(inputFile.getPath(), x);
             }
             catch (Exception e){
 
@@ -319,7 +315,7 @@ public class FileConverter extends AppCompatActivity {
         }
 
 
-        toast = getFileWithoutExt(filename) + ".txt";
+        toast = getFileWithoutExt(inputFile.getName()) + ".txt";
 
         // List of our supported extensions, the index of the array being the ID.
         // Add more extensions at will to the end of the array!
@@ -332,17 +328,16 @@ public class FileConverter extends AppCompatActivity {
             return null;
         }
 
-        return createNewFile(getFileWithoutExt(filename) + supportedExtensions[filetype], result);
+        String filename = inputFile.getName();
+        String parentPath = inputFile.getParent();
+
+        return createNewFile(parentPath + "/"+ getFileWithoutExt(filename) + supportedExtensions[filetype], result);
     }
 
 
-    public String readFile(String filename){
-
-
-        File dir = createNewDirectory("Article Manager");
-        String root = dir.getAbsolutePath() + "/" +filename;
-
-        File sdcard = new File(root);
+    public String readFile( File inputFile )
+    {
+        File sdcard = inputFile;
 
         //ConvertToPDF(sdcard);
         StringBuilder text = new StringBuilder();
@@ -365,10 +360,20 @@ public class FileConverter extends AppCompatActivity {
         return result;
     }
 
-    public File createPDFFromString(String data, String filename) {
-        File dir = createNewDirectory("Article Manager");
+    public File createPDFFromString( String data, File inputFile ) {
+        //File dir = createNewDirectory("Article Manager");
 
-        if(filename.contains(".")){
+        String filename = inputFile.getName();
+        String parentPath = inputFile.getParent();
+        File dir;
+
+        if (parentPath == null)
+            dir = new File("/");
+        else
+            dir = new File(parentPath);
+
+        if( filename.contains(".") )
+        {
             filename = filename.substring(0, filename.indexOf("."));
         }
         String root = dir.getAbsolutePath() + "/" +filename+ ".pdf";
@@ -377,8 +382,6 @@ public class FileConverter extends AppCompatActivity {
             File file = new File(root);
 
             file.createNewFile();
-
-
 
             FileOutputStream fOut = new FileOutputStream(file);
 
@@ -441,15 +444,9 @@ public class FileConverter extends AppCompatActivity {
         return dir;
     }
 
-    public File createNewFile(String name, String data){
-        // get the path to sdcard
-        File sdcard = Environment.getExternalStorageDirectory();
-
-        // to this path add a new directory path
-        File dir = createNewDirectory("Article Manager");
-
+    public File createNewFile(String path, String data){
         // create the file in which we will write the contents
-        File file = new File(dir, name);
+        File file = new File(path);
 
 
         try {
@@ -462,7 +459,7 @@ public class FileConverter extends AppCompatActivity {
             return null;
         }
 
-        Toast.makeText(getApplicationContext(),file.getAbsolutePath() + " created.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),file.getAbsolutePath() + " created.", Toast.LENGTH_LONG).show();
 
         return file;
     }
