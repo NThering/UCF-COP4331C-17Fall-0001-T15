@@ -117,7 +117,7 @@ public class Public
      * Use networking.Public.getArticlesFromCategory( mainCategoryID, int subCategoryID, true )
      */
 
-    public static File BuildDetailedCategoryListing( String targetDirectory, int targetCategory )
+    public static File BuildDetailedCategoryListing( String targetDirectory, int targetCategory ) 
     {
         DefaultCategories dCat = new DefaultCategories();
         MainCategory mCat[] = dCat.getDefaultCategories();
