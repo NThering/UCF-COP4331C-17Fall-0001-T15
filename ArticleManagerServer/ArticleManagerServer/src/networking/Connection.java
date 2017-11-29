@@ -195,6 +195,10 @@ public class Connection extends Thread {
 	
 	private void parse(String input)
 	{
+		if(input == null)
+		{
+			return;
+		}
 		String[] substrings = input.split(" ");
 		String opString;
 		String arg1 = "";
@@ -216,7 +220,7 @@ public class Connection extends Thread {
 		}
 		
 		//Try to keep networking sends here and remember to update consecFail as necessary.
-		switch(opcode) { //TODO: Add functionality for opcodes here, sending execution off to proper subsystems/modules if necessary.
+		switch(opcode) { 
 			case 0:
 				consecFail = 0;
 				break;
