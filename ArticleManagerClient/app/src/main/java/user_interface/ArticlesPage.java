@@ -2,6 +2,7 @@ package user_interface;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.io.File;
 import java.util.ArrayList;
 import team15.articlemanagerclient.R;
 import am_utils.ArticleInfo;
@@ -56,11 +59,11 @@ public class ArticlesPage extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, articles);
         lv.setAdapter(adapter);
 
-      /*  new Thread() {
+        new Thread() {
             public void run() {
                 try {
                     prog.show();
-                    //articleTitles = Public.getArticlesFromCategory(mainId, subId, false); NEEDS NETWORKING TO WORK
+                    articleTitles = networking.Public.getArticlesFromCategory(mainId, subId, false);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -71,7 +74,7 @@ public class ArticlesPage extends AppCompatActivity {
 
                 }
             }
-        }.start(); */
+        }.start();
 
         addCategories();
 
@@ -94,23 +97,23 @@ public class ArticlesPage extends AppCompatActivity {
         downloadAllArticles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Downloads ALL THE THINGS!!!!!
-                /*  new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    Public.BuildDatabaseOverview;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+            // Downloads ALL THE THINGS!!!!!
+            new Thread() {
+                public void run() {
+                    try {
+                        prog.show();
+                        File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                    } catch(final Exception e) {
 
+                    }
                 }
-            }
-        }.start(); */
+            }.start();
             }
         });
 
@@ -118,42 +121,31 @@ public class ArticlesPage extends AppCompatActivity {
         downloadUnderCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Downloads the articles under this subcategory
-                /*  new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    Public.BuildDetailedCategoryListing(); // FIX PARAMS AFTER NOAH DOES
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+            // Downloads the articles under this subcategory
+            new Thread() {
+                public void run() {
+                    try {
+                        prog.show();
+                        File file = list_builder.Public.BuildDetailedCategoryListing(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), mainId);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                    } catch(final Exception e) {
 
+                    }
                 }
-            }
-        }.start(); */
+            }.start();
             }
         });
     }
 
     // Testing method until I can pull categories from database
     public void addCategories() {
-       /* for(ArticleInfo listyList : articleTitles) { WON'T WORK WITHOUT NETWORKING
+        for(ArticleInfo listyList : articleTitles) {
             articles.add(listyList.printName);
-        } */
-
-        articles.add("Dog");
-        articles.add("Cat");
-        articles.add("Cow");
-        articles.add("Pig");
-        articles.add("Chicken");
-        articles.add("Creeper");
-        articles.add("Spider");
-        articles.add("Animal");
-        articles.add("Default");
-        adapter.notifyDataSetChanged();
+        }
     }
 }

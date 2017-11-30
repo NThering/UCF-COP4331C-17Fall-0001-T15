@@ -31,7 +31,7 @@ import am_utils.ArticleInfo;
 import am_utils.MainCategory;
 import in.gauriinfotech.commons.Commons;
 import team15.articlemanagerclient.R;
-//import networking.Public;
+import networking.Public;
 import proccessing.PublicUsage;
 import am_utils.DefaultCategories;
 
@@ -65,9 +65,8 @@ public class MyArticles extends AppCompatActivity {
         username = (TextView) findViewById(R.id.usernameTextView);
         userTitle = (TextView) findViewById(R.id.userTitleTextView);
 
-        // Hard code until I can pull from database
+        // Hard code until I can pull from database -- DEAL WITH THIS IAN
         username.setText("Ian");
-        userTitle.setText("Da God");
 
         lv = (ListView) findViewById(R.id.list);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, subcategories);
@@ -106,33 +105,37 @@ public class MyArticles extends AppCompatActivity {
 
         // Logout
         logout.setOnClickListener(new View.OnClickListener() {
+            int log = -1;
+
             @Override
             public void onClick(View v) {
-                /*  new Thread() {
+                new Thread() {
                     public void run() {
-                try {
-                    prog.show();
-             //   int logSuccess = -1;
-             //   logSuccess = Public.logout();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
+                        try {
+                        prog.show();
+                        log = Public.logout();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                        } catch(final Exception e) {
+
                         }
-                    });
-                } catch(final Exception e) {
+                    }
+                }.start();
 
-                }
-            }
-        }.start(); */
-
-             //   if(logSuccess == 0) {
+                if(log == 0) { // Might remove some of this when Networking is up TBD
                     Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     SharedPreferences preference = getSharedPreferences("loggedIn", MODE_PRIVATE);
                     preference.edit().remove("logged").commit();
                     startActivity(intent);
-             //   }
+                }
+
+                else
+                    Toast.makeText(getApplicationContext(), "Failed to log out", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -148,20 +151,13 @@ public class MyArticles extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case permissionRequestCode:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    Toast.makeText(getApplicationContext(), "granted", Toast.LENGTH_SHORT).show();
-
-                else
-                    Toast.makeText(getApplicationContext(), "nah bitch", Toast.LENGTH_SHORT).show();
-
                 break;
 
             default: super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
-    // Hard coded categories
+    // Hard coded categories -- CHANGE WHEN NETWORKING IS UP
     public void addCategories() {
         subcategories.add("The");
         subcategories.add("memes");
@@ -207,27 +203,27 @@ public class MyArticles extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Categorize the file then upload it
-                File file = new File(filePath.getText().toString());
+                // Categorize the file then upload it -- TEST THESE
+                final File file = new File(filePath.getText().toString());
 
-                ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
+                final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
 
-                /*  new Thread() {
-                public void run() {
-                try {
-                    prog.show();
-             Public.uploadArticle(file, info);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+                new Thread() {
+                    public void run() {
+                        try {
+                            prog.show();
+                            Public.uploadArticle(file, info);
+                            runOnUiThread(new Runnable() {
+                            @Override
+                                public void run() {
+                                    prog.dismiss();
+                                }
+                            });
+                        } catch(final Exception e) {
 
-                }
-            }
-        }.start(); */
+                            }
+                    }
+                }.start();
             }
         });
     }

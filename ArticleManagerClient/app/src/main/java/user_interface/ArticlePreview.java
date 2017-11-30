@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -46,6 +47,7 @@ public class ArticlePreview extends AppCompatActivity {
     ArrayList<ArticleInfo> articleInformation;
     int downloadFlag;
     ProgressDialog prog;
+    File file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,11 +83,11 @@ public class ArticlePreview extends AppCompatActivity {
         // Hard code until I get real code
         title.setText(message);
         categories.setText(getMainCategoryName(mainId) + ", " + getSubCategoryName(mainId, subId));
-        //articleInformation = Public.getArticlesFromCategory(mainId, subId, false); NEEDS NETWORKING TO WORK
-        //authors.setText(getAuthorName());
+        articleInformation = networking.Public.getArticlesFromCategory(mainId, subId, false);
+        authors.setText(getAuthorName());
         //dateUploaded.setText("Date Uploaded: " + getUploadDate().format(date));
         //uploader.setText("Uploaded by: " + getUploaderName());
-        //abstractInfo.setText(getAbstract())
+        abstractInfo.setText(getAbstract());
 
         // If you uploaded the article, get access to these two buttons
         /*if(getUploaderName().equals(INSERT USER NAME HERE)) {
@@ -114,14 +116,6 @@ public class ArticlePreview extends AppCompatActivity {
                     downloadFlag = -1;
                     callDownloadPopup(v);
                 }
-            }
-        });
-
-        // Listener to call article view
-        viewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // View button
             }
         });
 
@@ -196,6 +190,8 @@ public class ArticlePreview extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FileConverter convert = new FileConverter(ArticlePreview.this);
+
                 if(downloadFlag != 1 && downloadFlag != 2 && downloadFlag != 3 && downloadFlag != 4)
                     Toast.makeText(getApplicationContext(), "Select a file type", Toast.LENGTH_SHORT).show();
 
@@ -206,41 +202,40 @@ public class ArticlePreview extends AppCompatActivity {
                     odtButton.setBackgroundResource(R.drawable.popupbutton);
                     txtButton.setBackgroundResource(R.drawable.popupbutton);
 
-                    int ID = getArticleID();
-                    File file;
+                    final int ID = getArticleID();
 
-                                    /*  new Thread() {
-                public void run() {
-                try {
-                    prog.show();
-                    file = new File(Public.downloadArticle(ID));
-                    runOnUiThread(new Runnable() {
-                        @Override
+                    new Thread() {
                         public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+                            try {
+                                prog.show();
+                                file = networking.Public.downloadArticle(ID, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        prog.dismiss();
+                                    }
+                                });
+                            } catch(final Exception e) {
 
-                }
-            }
-        }.start(); */
+                            }
+                        }
+                    }.start();
 
                     if(ID != -1) {
                         switch (downloadFlag) {
                             case 1:
-                               // FileConverter.convertFromPDF(file, 3)
+                               convert.convertFromPDF(file, 3);
                                 break;
 
                             case 2:
                                 break;
 
                             case 3:
-                                // FileConverter.convertFromPDF(file, 2)
+                                convert.convertFromPDF(file, 2);
                                 break;
 
                             case 4:
-                                // FileConverter.convertFromPDF(file, 1)
+                                convert.convertFromPDF(file, 1);
                                 break;
                         }
                     }
@@ -326,27 +321,27 @@ public class ArticlePreview extends AppCompatActivity {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Categorize the file then upload it
-                File file = new File(filePath.getText().toString());
+            // Categorize the file then upload it
+            final File file = new File(filePath.getText().toString());
 
-                ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), ArticlePreview.this );
+            final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), ArticlePreview.this );
 
-                /*  new Thread() {
+            new Thread() {
                 public void run() {
-                try {
-                    prog.show();
-             Public.uploadArticle(file, info);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+                    try {
+                        prog.show();
+                        networking.Public.uploadArticle(file, info);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                    } catch(final Exception e) {
 
+                    }
                 }
-            }
-        }.start(); */
+            }.start();
             }
         });
     }

@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import in.gauriinfotech.commons.Progress;
 import team15.articlemanagerclient.R;
-//import networking.Public;
+import networking.Public;
 
 public class TitleScreenLoggedOut extends AppCompatActivity {
 
@@ -88,46 +88,38 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         loginPopup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin"))
-                    loginSuccess();
-
-                else
-                    Toast.makeText(getApplicationContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
-
-            /*
             new Thread() {
-                    public void run() {
-                        try {
-                        prog.show();
-                            String un = username.getText().toString();
-                            String pw = password.getText().toString();
-                            int logSuccess = -1;
+                public void run() {
+                    try {
+                    prog.show();
+                        String un = username.getText().toString();
+                        String pw = password.getText().toString();
+                        int logSuccess = -1;
 
-                            if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
-                                logSuccess = Public.login(un, pw);
+                        if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
+                            logSuccess = Public.login(un, pw);
 
-                            if(logSuccess == 0) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                loginSuccess();
-                            }
-
-
+                        if(logSuccess == 0) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    prog.dismiss();
+                                    Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                        } catch (final Exception e) {
+                            loginSuccess();
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                    } catch (final Exception e) {
 
                         }
-                    }
-                }.start(); */
+                }
+            }.start();
             }
         });
 
@@ -135,7 +127,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-           /*     String un = username.getText().toString();
+                String un = username.getText().toString();
                 String pw = password.getText().toString();
                 int regSuccess = -1;
                 int logSuccess = -1;
@@ -148,7 +140,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                     logSuccess = Public.login(un, pw);
                     if(logSuccess == 0)
                         loginSuccess();
-                } */
+                }
             }
         });
     }
