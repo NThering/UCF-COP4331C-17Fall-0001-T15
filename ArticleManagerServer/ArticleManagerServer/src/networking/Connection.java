@@ -245,6 +245,9 @@ public class Connection extends Thread {
 				if(permissionLevel == -1)
 				{
 					sendString("-1");
+				} else
+				{
+					sendString("0");
 				}
 				break;
 			case 2:
