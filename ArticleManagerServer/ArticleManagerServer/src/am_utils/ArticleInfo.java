@@ -7,7 +7,10 @@ import java.util.Date;
  * @author NThering
  */
 
-public class ArticleInfo {
+public class ArticleInfo implements java.io.Serializable {
+
+    private static final long serialVersionUID = 3985753306929785362L;
+
     /**
      * The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable.
      * Used in identifying the article for all critical article functions.
@@ -135,24 +138,13 @@ public class ArticleInfo {
     
     public void setMainCategoryIndex( int mainID )
     {
-        if ( articleID == -1 ) {
+       
             this.mainCategoryID = mainID;
-        }
-
-        else{
-
-        }
 
     }
     public void setSubCategoryIndex( int subID )
     {
-        if ( articleID == -1 ) {
             this.subCategoryID = subID;
-        }
-
-        else{
-
-        }
 
     }
     // author of article
@@ -172,4 +164,5 @@ public class ArticleInfo {
     /** Gets the unique internal ID of the article.  No two articles can ever share the same ArticleID, as this way they can share the same print name and still be uniquely addressable. */
     public int getMainArticleID() { return mainCategoryID; }
     public int getSubArticleID() { return subCategoryID; }
+    
 }

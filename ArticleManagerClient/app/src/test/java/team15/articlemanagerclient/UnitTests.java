@@ -343,9 +343,53 @@ public class UnitTests
     @Test
     public void testNetverking() throws Exception
     {
-            networking.Public.getArticleInfo(0);
+        ArticleInfo testInfo = networking.Public.getArticleInfo(0);
+
+        if (testInfo == null)
+            return;
+
+
+        CUtils.msg( String.valueOf(testInfo.subCategoryID) );
+        CUtils.msg( String.valueOf(testInfo.mainCategoryID) );
+        CUtils.msg( String.valueOf(testInfo.author) );
+        CUtils.msg( String.valueOf(testInfo.printName) );
+        CUtils.msg( String.valueOf(testInfo.doiNumber) );
+        CUtils.msg( String.valueOf(testInfo.abstractText) );
+
+        ArticleInfo testInfo2 = networking.Public.getArticleInfo(25);
+
+        CUtils.msg( String.valueOf(testInfo2.subCategoryID) );
+        CUtils.msg( String.valueOf(testInfo2.mainCategoryID) );
+        CUtils.msg( String.valueOf(testInfo2.author) );
+        CUtils.msg( String.valueOf(testInfo2.printName) );
+        CUtils.msg( String.valueOf(testInfo2.doiNumber) );
+        CUtils.msg( String.valueOf(testInfo2.abstractText) );
+
+        CUtils.msg( String.valueOf(networking.Public.register("2", "NotAPassword1")) );
+        CUtils.msg( String.valueOf(networking.Public.register("3", "NotAPassword2")) );
+        CUtils.msg( String.valueOf(networking.Public.register("399", "NotAPassword398")) );
     }
 
+    @Test
+    public void testSimpleUpload() throws Exception
+    {
+        String testFilePath = "T:\\Projects\\OOP\\ProjectCode\\UCF-COP4331C-17Fall-0001-T15\\ArticleManagerClient\\app\\src\\test\\java\\team15\\articlemanagerclient\\Article Manager Papers\\Optimised Round Robin CPU Scheduling Algorithm.pdf";
+        String testFileDir = "F:\\Desktop";
+
+        ArticleInfo testInfo = new ArticleInfo(0);
+
+        testInfo.printName = "Test Article!";
+        testInfo.author = "Noah";
+        testInfo.doiNumber = "EEEEEEEEE";
+        testInfo.mainCategoryID = 10;
+        testInfo.subCategoryID = 12;
+        testInfo.abstractText = "This is a very abstract article let me tell you.";
+
+        assertEquals(networking.Public.uploadArticle(new File(testFilePath), testInfo), 0);
+
+        //File downloadedFile = networking.Public.downloadArticle(0, testFileDir);
+        //CUtils.msg( "Downloaded file to " + downloadedFile.getAbsolutePath());
+    }
 
     @Test
     public void testNetworkingUploadGetCategoryList() throws Exception
@@ -544,5 +588,14 @@ public class UnitTests
         list_builder.Public.BuildDatabaseOverview(testFilePath);
 
         list_builder.Public.BuildDetailedCategoryListing(testFilePath, 10);
+    }
+
+    @Test
+    public void testGetUserArticles() throws Exception
+    {
+        ArrayList<ArticleInfo> allMyInfo = networking.Public.getAllArticlesOfCurrentUser();
+
+        for ( ArticleInfo info : allMyInfo )
+            compareArticleInfos( info, info, "Info:", null );
     }
 }

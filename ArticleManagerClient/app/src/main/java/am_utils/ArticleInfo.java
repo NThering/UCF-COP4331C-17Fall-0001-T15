@@ -7,7 +7,10 @@ import java.util.Date;
  * @author NThering
  */
 
-public class ArticleInfo {
+public class ArticleInfo implements java.io.Serializable {
+
+    private static final long serialVersionUID = 3985753306929785362L;
+
     /**
      * The unique internal ID of the article.  No two articles must ever share the same ID, as this way they can share the same print name and still be uniquely addressable.
      * Used in identifying the article for all critical article functions.
