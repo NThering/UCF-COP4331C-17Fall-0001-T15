@@ -116,7 +116,7 @@ public class Public {
     	ArticleInfo newArt = null;
 		try {
 			queryStatement = con.createStatement();
-			rs = queryStatement.executeQuery("select * from article where owner=" + "\"" + username + "\"");
+			rs = queryStatement.executeQuery("select * from article");
 			
 			
 			while(rs.next())
