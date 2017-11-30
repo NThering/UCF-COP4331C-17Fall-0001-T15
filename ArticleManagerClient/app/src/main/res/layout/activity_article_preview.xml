@@ -94,9 +94,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:orientation="horizontal"
-            android:weightSum="2">
+            android:weightSum="3">
 
             <Button
                 android:id="@+id/downloadArticleButton"
@@ -111,28 +111,6 @@
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
-
-            <Button
-                android:id="@+id/viewArticleButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/roundedbuttonblack"
-                android:text="View"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="1"
-            android:weightSum="2">
 
             <Button
                 android:id="@+id/deleteArticleButton"
@@ -161,6 +139,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:textSize="15sp"/>
+
         </LinearLayout>
 
     </LinearLayout>

@@ -37,7 +37,7 @@ public class ArticlePreview extends AppCompatActivity {
 
     // UI variables
     TextView title, categories, authors, dateUploaded, uploader, abstractInfo;
-    Button download, viewButton, deleteButton, reupload;
+    Button download, deleteButton, reupload;
     private static final int fileSelectCode = 42; // For filepicker, can be any number I believe
     private static final int permissionRequestCode = 43;
     String fullpath, message; // Universal so I can call from the inner classes/methods
@@ -69,7 +69,6 @@ public class ArticlePreview extends AppCompatActivity {
         uploader = (TextView) findViewById(R.id.uploaderTextView);
         abstractInfo = (TextView) findViewById(R.id.abstractTextView);
         download = (Button) findViewById(R.id.downloadArticleButton);
-        viewButton = (Button) findViewById(R.id.viewArticleButton);
         deleteButton = (Button) findViewById(R.id.deleteArticleButton);
         reupload = (Button) findViewById(R.id.reuploadArticleButton);
 
@@ -86,11 +85,11 @@ public class ArticlePreview extends AppCompatActivity {
         articleInformation = networking.Public.getArticlesFromCategory(mainId, subId, false);
         authors.setText(getAuthorName());
         //dateUploaded.setText("Date Uploaded: " + getUploadDate().format(date));
-        //uploader.setText("Uploaded by: " + getUploaderName());
+        uploader.setText("Uploaded by: " + getUploaderName());
         abstractInfo.setText(getAbstract());
 
         // If you uploaded the article, get access to these two buttons
-        /*if(getUploaderName().equals(INSERT USER NAME HERE)) {
+        if(networking.Public.getUsername().equals(uploader.getText())) {
             deleteButton.setVisibility(View.VISIBLE);
             reupload.setVisibility(View.VISIBLE);
         }
@@ -99,7 +98,7 @@ public class ArticlePreview extends AppCompatActivity {
         else {
             deleteButton.setVisibility(View.INVISIBLE);
             reupload.setVisibility(View.INVISIBLE);
-        } */
+        }
 
         // Listener for the download button
         download.setOnClickListener(new View.OnClickListener() {
