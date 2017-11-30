@@ -30,6 +30,7 @@ public class Connection extends Thread {
 	private int consecFail;
 	private int permissionLevel;
 	private Object waitingLock = new Object();
+	String username;
 	
 	protected static final int OBJECTPORT = 1907;
 	protected static final int FILEPORT = 1908;
@@ -247,6 +248,7 @@ public class Connection extends Thread {
 					sendString("-1");
 				} else
 				{
+					username = arg1;
 					sendString("0");
 				}
 				break;
@@ -315,6 +317,10 @@ public class Connection extends Thread {
 				break;
 			case 8:
 				sendString(Integer.toString(permissionLevel));
+				break;
+			case 9:
+				returnedArticles = database.Public.getArticlesFromUser(username);
+				sendObject(returnedArticles);
 				break;
 		}
 		
