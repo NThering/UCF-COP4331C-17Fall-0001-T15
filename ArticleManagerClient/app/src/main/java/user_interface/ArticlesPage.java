@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class ArticlesPage extends AppCompatActivity {
     // UI Variables
     ListView lv;
     ArrayList<String> articles = new ArrayList<>();
-    ArrayList<ArticleInfo> articleTitles;
+    ArrayList<ArticleInfo> articleTitles = new ArrayList<>();
     ArrayAdapter<String> adapter;
     TextView title;
     Button downloadAllArticles, downloadUnderCategory;
@@ -72,9 +73,15 @@ public class ArticlesPage extends AppCompatActivity {
                         }
                     });
                 } catch(final Exception e) {
-
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
+
         }.start();
 
         addCategories();

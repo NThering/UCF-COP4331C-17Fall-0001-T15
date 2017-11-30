@@ -26,6 +26,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
     Boolean logged;
     ProgressDialog prog;
     String userName;
+    String unLog, pwLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         logged = getSharedPreferences("loggedIn", MODE_PRIVATE).getBoolean("logged", false);
         userName = getSharedPreferences("oname", MODE_PRIVATE).getString("onamewa", "");
 
-        if(logged) // If true, instant login -- CHANGE LOGIC WHEN WE HAVE MORE THAN ONE USER! THIS IS FOR TESTING
+        if(logged) // If true, instant login
             loginSuccess(userName);
 
         // Initialize buttons
@@ -63,6 +64,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent newActivity = new Intent(TitleScreenLoggedOut.this, AllArticles.class);
+                newActivity.putExtra("uName", "guest");
                 startActivity(newActivity);
             }
         });
@@ -90,16 +92,16 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         loginPopup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            unLog = username.getText().toString();
+            pwLog = password.getText().toString();
             new Thread() {
                 public void run() {
                     try {
                     prog.show();
-                        String un = username.getText().toString();
-                        String pw = password.getText().toString();
                         int logSuccess = -1;
 
-                        if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
-                            logSuccess = Public.login(un, pw);
+                        if(unLog != null && !unLog.isEmpty() && pwLog != null && !pwLog.isEmpty())
+                            logSuccess = Public.login(unLog, pwLog);
 
                         if(logSuccess == 0) {
                             runOnUiThread(new Runnable() {
@@ -108,7 +110,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            loginSuccess(un);
+                            loginSuccess(unLog);
                         }
 
                         runOnUiThread(new Runnable() {
@@ -118,8 +120,13 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                             }
                         });
                     } catch (final Exception e) {
-
-                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
             }.start();
             }
@@ -129,20 +136,48 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String un = username.getText().toString();
-                String pw = password.getText().toString();
-                int regSuccess = -1;
-                int logSuccess = -1;
+                unLog = username.getText().toString();
+                pwLog = password.getText().toString();
 
-                if(un != null && !un.isEmpty() && pw != null && !pw.isEmpty())
-                    regSuccess = Public.register(un, pw);
+                new Thread() {
+                    public void run() {
+                        try {
+                            prog.show();
+                            int regSuccess = -1;
+                            int logSuccess = -1;
 
-                if(regSuccess == 0) {
-                    Toast.makeText(getApplicationContext(), "Register successful, logging in...", Toast.LENGTH_SHORT).show();
-                    logSuccess = Public.login(un, pw);
-                    if(logSuccess == 0)
-                        loginSuccess(un);
-                }
+                            if(unLog != null && !unLog.isEmpty() && pwLog != null && !pwLog.isEmpty())
+                                regSuccess = Public.register(unLog, pwLog);
+
+                            if(regSuccess == 0) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Register successful, logging in...", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                logSuccess = Public.login(unLog, pwLog);
+
+                                if(logSuccess == 0)
+                                    loginSuccess(unLog);
+                            }
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    prog.dismiss();
+                                }
+                            });
+                        } catch (final Exception e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }.start();
             }
         });
     }

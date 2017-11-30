@@ -40,7 +40,7 @@ public class MyArticles extends AppCompatActivity {
     ListView lv;
     ArrayList<String> subcategories = new ArrayList<>();
     ArrayList<ArticleInfo> subList = new ArrayList<>();
-    ArrayList<ArticleInfo> ls;
+    ArrayList<ArticleInfo> ls = new ArrayList<>();
     ArrayAdapter<String> adapter;
     TextView username, userTitle;
     Button upload, logout;
@@ -71,8 +71,6 @@ public class MyArticles extends AppCompatActivity {
         prog.setCanceledOnTouchOutside(false);
 
         username = (TextView) findViewById(R.id.usernameTextView);
-        userTitle = (TextView) findViewById(R.id.userTitleTextView);
-
         username.setText(userName);
 
         lv = (ListView) findViewById(R.id.list);
@@ -118,7 +116,7 @@ public class MyArticles extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                new Thread() {
+               new Thread() {
                     public void run() {
                         try {
                         prog.show();
@@ -168,13 +166,13 @@ public class MyArticles extends AppCompatActivity {
         }
     }
 
+
     // Handles the articles
     public void addCategories() {
         DefaultCategories dCat = new DefaultCategories();
         MainCategory mCat[] = dCat.getDefaultCategories();
 
-        for (int i = 0; i < dCat.size(); i++)
-        {
+        for (int i = 0; i < dCat.size(); i++) {
             if (mCat[i] == null)
                 continue;
 
@@ -197,14 +195,19 @@ public class MyArticles extends AppCompatActivity {
                                 }
                             });
                         } catch(final Exception e) {
-
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            });
                         }
                     }
                 }.start();
 
 
-                for (ArticleInfo item : ls)
-                {
+                for (ArticleInfo item : ls) {
                     if(item.owner.equals(userName)) {
                         subcategories.add(item.printName);
                         subList.add(item);

@@ -104,10 +104,17 @@ public class AllArticles extends AppCompatActivity {
                                 }
                             });
                         } catch(final Exception e) {
-
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }
                 }.start();
+
+                Toast.makeText(getApplicationContext(), "Yes", Toast.LENGTH_SHORT).show();
             }
         });
     }
