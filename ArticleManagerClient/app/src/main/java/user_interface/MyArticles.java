@@ -40,6 +40,7 @@ public class MyArticles extends AppCompatActivity {
     ListView lv;
     ArrayList<String> subcategories = new ArrayList<>();
     ArrayList<ArticleInfo> subList = new ArrayList<>();
+    ArrayList<ArticleInfo> ls;
     ArrayAdapter<String> adapter;
     TextView username, userTitle;
     Button upload, logout;
@@ -51,6 +52,7 @@ public class MyArticles extends AppCompatActivity {
     Uri path;
     ProgressDialog prog;
     String userName, data;
+    int globI, globJ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,8 +181,28 @@ public class MyArticles extends AppCompatActivity {
             for (int j = 0; j < mCat[i].size(); j++) {
                 if (mCat[i].children()[j] == null)
                     continue;
-                // PUT IN THREAD!!
-                ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(i, j, false);
+
+                globI = i;
+                globJ = j;
+
+                new Thread() {
+                    public void run() {
+                        try {
+                            prog.show();
+                            ls = networking.Public.getArticlesFromCategory(globI, globJ, false);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    prog.dismiss();
+                                }
+                            });
+                        } catch(final Exception e) {
+
+                        }
+                    }
+                }.start();
+
+
                 for (ArticleInfo item : ls)
                 {
                     if(item.owner.equals(userName)) {
@@ -232,13 +254,16 @@ public class MyArticles extends AppCompatActivity {
                 // Categorize the file then upload it -- TEST THESE
                 final File file = new File(filePath.getText().toString());
 
-                final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
+                final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this);
 
                 new Thread() {
                     public void run() {
                         try {
                             prog.show();
                             Public.uploadArticle(file, info);
+                            subcategories.add(info.printName);
+                            subList.add(info);
+                            adapter.notifyDataSetChanged();
                             runOnUiThread(new Runnable() {
                             @Override
                                 public void run() {
