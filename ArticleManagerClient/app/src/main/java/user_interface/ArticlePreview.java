@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +53,9 @@ public class ArticlePreview extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_preview);
 
@@ -85,13 +89,13 @@ public class ArticlePreview extends AppCompatActivity {
         title.setText(message);
         categories.setText(getMainCategoryName(mainId) + ", " + getSubCategoryName(mainId, subId));
         articleInformation = networking.Public.getArticlesFromCategory(mainId, subId, false);
-        authors.setText(getAuthorName());
+        authors.setText("Author(s): " + getAuthorName());
         //dateUploaded.setText("Date Uploaded: " + getUploadDate().format(date));
-        uploader.setText("Uploaded by: " + getUploaderName());
+        uploader.setText("Uploaded by: " + userName);
         abstractInfo.setText(getAbstract());
 
         // If you uploaded the article, get access to these two buttons
-        if(userName.equals(uploader.getText())) {
+        if(uploader.getText().equals("Uploaded by: " + userName)) {
             deleteButton.setVisibility(View.VISIBLE);
             reupload.setVisibility(View.VISIBLE);
         }
@@ -353,7 +357,7 @@ public class ArticlePreview extends AppCompatActivity {
                 return listyList.author;
         }
 
-        return "";
+        return "Not Found";
     }
 
     public Date getUploadDate() {
@@ -389,6 +393,6 @@ public class ArticlePreview extends AppCompatActivity {
                 return listyList.abstractText;
         }
 
-        return "";
+        return "Not Found";
     }
 }

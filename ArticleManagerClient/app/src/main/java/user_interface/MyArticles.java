@@ -2,11 +2,14 @@ package user_interface;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import am_utils.ArticleInfo;
@@ -52,10 +56,12 @@ public class MyArticles extends AppCompatActivity {
     Uri path;
     ProgressDialog prog;
     String userName, data;
-    int globI, globJ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_articles);
 
@@ -169,28 +175,10 @@ public class MyArticles extends AppCompatActivity {
 
     // Handles the articles
     public void addCategories() {
-        DefaultCategories dCat = new DefaultCategories();
-        MainCategory mCat[] = dCat.getDefaultCategories();
+        ls = networking.Public.getAllArticlesOfCurrentUser();
 
-        for (int i = 0; i < dCat.size(); i++) {
-            if (mCat[i] == null)
-                continue;
-
-            for (int j = 0; j < mCat[i].size(); j++) {
-                if (mCat[i].children()[j] == null)
-                    continue;
-
-                ls = networking.Public.getArticlesFromCategory(i, j, false);
-
-                for (ArticleInfo item : ls) {
-                    if(item.owner.equals(userName)) {
-                        subcategories.add(item.printName);
-                        subList.add(item);
-                    }
-
-                }
-            }
-        }
+        for(ArticleInfo info : ls)
+            subcategories.add(info.printName);
 
         adapter.notifyDataSetChanged();
     }
@@ -229,14 +217,15 @@ public class MyArticles extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Categorize the file then upload it -- TEST THESE
+                // Categorize the file then upload it
                 File file = new File(filePath.getText().toString());
 
                 ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this);
-
                 Public.uploadArticle(file, info);
+
+
                 subcategories.add(info.printName);
-                subList.add(info);
+                ls.add(info);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -274,5 +263,4 @@ public class MyArticles extends AppCompatActivity {
 
         return -1;
     }
-
 }

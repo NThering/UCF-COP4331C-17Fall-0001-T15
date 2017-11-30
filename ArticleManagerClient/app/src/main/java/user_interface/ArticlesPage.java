@@ -3,6 +3,7 @@ package user_interface;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -35,6 +36,9 @@ public class ArticlesPage extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_page);
 
@@ -118,7 +122,6 @@ public class ArticlesPage extends AppCompatActivity {
         });
     }
 
-    // Testing method until I can pull categories from database
     public void addCategories() {
         for(ArticleInfo listyList : articleTitles) {
             articles.add(listyList.printName);
