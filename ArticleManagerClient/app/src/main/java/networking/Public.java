@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.*;
 class NetworkingHeartbeatManager extends Thread {
 
     boolean connected = true;
+    boolean beating = true;
 
     @Override
     public void run()
@@ -37,7 +38,7 @@ class NetworkingHeartbeatManager extends Thread {
             catch (InterruptedException e) {}
 
             // Send our heartbeat!
-            if (connected)
+            if (connected && beating)
             {
                 CUtils.msg("Sending heartbeat!");
                 Public.heartBeat();
@@ -46,7 +47,7 @@ class NetworkingHeartbeatManager extends Thread {
     }
 }
 
-public class Public extends Thread {
+public class Public{
     /*    General Responsibilities:
     *     Keep track of logged in users and their permissions so they don't need to re-authenticate
     *     for every action.
@@ -81,6 +82,7 @@ public class Public extends Thread {
         {
             CUtils.warning("Failed to create socket!!!");
             CUtils.warning("Details: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -114,11 +116,14 @@ public class Public extends Thread {
     }
 
     // writer is a PrintWriter initalized with clientSocket.getOutputStream(), autoflush = true
-    private static int sendSignal(int opCode, String param1, String param2)
+    private synchronized static int sendSignal(int opCode, String param1, String param2)
     {
-        if (opCode < 0 || opCode > 10)
+        heartbeater.beating = false;
+
+        if (opCode < 0 || opCode > 9)
         {
             CUtils.warning("Opcode " + String.valueOf(opCode) + " outside of expected range!");
+            heartbeater.beating = true;
             return 2;
         }
 
@@ -132,6 +137,7 @@ public class Public extends Thread {
         {
             CUtils.warning("Failed to create print writer!!!");
             CUtils.warning("Details: " + e.getMessage());
+            heartbeater.beating = true;
             return 2;
         }
 
@@ -156,14 +162,19 @@ public class Public extends Thread {
         catch(Exception e)
         {
             CUtils.warning("Failed to send signal " + signal);
+            heartbeater.beating = true;
             return 1;
         }
+
+        heartbeater.beating = true;
 
         return 0;
     }
 
-    private static int sendObject(Object object)
+    private synchronized static int sendObject(Object object)
     {
+        heartbeater.beating = false;
+
         ObjectOutputStream outputObjectStream;
         Socket clientSocket;
 
@@ -175,6 +186,7 @@ public class Public extends Thread {
         {
             CUtils.warning("Failed to create object output stream socket!!!");
             CUtils.warning("Details: " + e.getMessage());
+            heartbeater.beating = true;
             return 3;
         }
 
@@ -186,6 +198,7 @@ public class Public extends Thread {
         {
             CUtils.warning("Failed to create object output stream!!!");
             CUtils.warning("Details: " + e.getMessage());
+            heartbeater.beating = true;
             return 2;
         }
 
@@ -198,14 +211,20 @@ public class Public extends Thread {
         catch(Exception e)
         {
             CUtils.warning("Failed to send object!");
+            heartbeater.beating = true;
             return 1;
         }
+
+
+        heartbeater.beating = true;
 
         return 0;
     }
 
-    private static int sendFile(File file)
+    private synchronized static int sendFile(File file)
     {
+        heartbeater.beating = false;
+
         int fileSize = (int) file.length();
         byte[] articleByteArray = new byte[fileSize];
 
@@ -219,6 +238,7 @@ public class Public extends Thread {
         {
             CUtils.warning("Failed to create file output stream socket!!!");
             CUtils.warning("Details: " + e.getMessage());
+            heartbeater.beating = true;
             return 3;
         }
 
@@ -250,15 +270,18 @@ public class Public extends Thread {
             CUtils.debugMsg("Closed!");
 
             heartbeater.connected = true;
+            heartbeater.beating = true;
         }
         catch (FileNotFoundException e)
         {
             CUtils.warning("File not found");
+            heartbeater.beating = true;
             return 2;
         }
         catch (Exception e)
         {
             CUtils.warning(e.getMessage());
+            heartbeater.beating = true;
             return 1;
         }
 
@@ -269,7 +292,7 @@ public class Public extends Thread {
     // Network receive functions
     //------------------------------------------------
 
-    private static String receiveString()
+    private synchronized static String receiveString()
     {
         try
         {
@@ -287,12 +310,14 @@ public class Public extends Thread {
         }
     }
 
-    private static Object receiveObject()
+    private synchronized static Object receiveObject()
     {
         try
         {
             ObjectInputStream inputObject = null;
             Socket clientSocket;
+
+            Thread.sleep(500);
 
             try
             {
@@ -330,7 +355,7 @@ public class Public extends Thread {
         }
     }
 
-    private static File receiveFile( String tempDir, int fileSize )
+    private synchronized static File receiveFile( String tempDir, int fileSize )
     {
         //byte array for file data
         byte[] articleByteArray = new byte[fileSize];
@@ -338,6 +363,8 @@ public class Public extends Thread {
 
         try
         {
+            Thread.sleep(500);
+
             clientSocket = new Socket(HOSTNAME, FILEPORT);
         }
         catch(Exception e)
