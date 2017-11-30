@@ -36,12 +36,25 @@ public class FileConverter extends AppCompatActivity {
         BufferedReader wordList = null;
         try
         {
-            InputStream is = context.getAssets().open("english_words.txt");
-            wordList = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            if (context != null)
+            {
+                InputStream is = context.getAssets().open("english_words.txt");
+                wordList = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            }
+            else
+            {
+                // FOR UNIT TESTING, BE SURE TO UPDATE FOR YOUR LOCAL MACHINE!!!
+                wordList = new BufferedReader(new FileReader("LOCAL PATH TO english_words.txt"));
+            }
         }
         catch(Exception e)
         {
             CUtils.warning("FAILED TO LOCATE ENGLISH_WORDS.TXT!!!\n\n" + e.getMessage());
+            if (context != null)
+            {
+                CUtils.warning("THE PATH TO english_words.txt IN FILECONVERTER:47 MIGHT NEED TO BE UPDATED!");
+            }
+            
             return; // We've failed to build a useful word database.
         }
 
