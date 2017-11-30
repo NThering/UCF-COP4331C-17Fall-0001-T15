@@ -162,8 +162,10 @@ public class MyArticles extends AppCompatActivity {
     public void addCategories() {
         ls = networking.Public.getAllArticlesOfCurrentUser();
 
-        for(ArticleInfo info : ls)
+        for(ArticleInfo info : ls) {
             subcategories.add(info.printName);
+            subList.add(info);
+        }
 
         adapter.notifyDataSetChanged();
     }
@@ -207,7 +209,6 @@ public class MyArticles extends AppCompatActivity {
 
                 ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this);
                 Public.uploadArticle(file, info);
-
 
                 subcategories.add(info.printName);
                 ls.add(info);
