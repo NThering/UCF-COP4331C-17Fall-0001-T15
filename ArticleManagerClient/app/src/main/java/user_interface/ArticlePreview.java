@@ -95,7 +95,7 @@ public class ArticlePreview extends AppCompatActivity {
         abstractInfo.setText(getAbstract());
 
         // If you uploaded the article, get access to these two buttons
-        if(uploader.getText().equals("Uploaded by: " + userName)) {
+        if(uploader.getText().equals("Uploaded by: " + userName) && !userName.equals("guest")) {
             deleteButton.setVisibility(View.VISIBLE);
             reupload.setVisibility(View.VISIBLE);
         }
