@@ -92,29 +92,9 @@ public class AllArticles extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Download EVERYTHING!!!!!!!
-                new Thread() {
-                    public void run() {
-                        try {
-                            prog.show();
-                            File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    prog.dismiss();
-                                }
-                            });
-                        } catch(final Exception e) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }.start();
 
-                Toast.makeText(getApplicationContext(), "Yes", Toast.LENGTH_SHORT).show();
+                File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+
             }
         });
     }

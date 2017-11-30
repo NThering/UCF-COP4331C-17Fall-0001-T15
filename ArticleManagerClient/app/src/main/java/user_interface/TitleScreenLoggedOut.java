@@ -112,45 +112,19 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                 unLog = username.getText().toString();
                 pwLog = password.getText().toString();
 
-                new Thread() {
-                    public void run() {
-                        try {
-                            prog.show();
-                            int regSuccess = -1;
-                            int logSuccess = -1;
+                int regSuccess = -1;
+                int logSuccess = -1;
 
-                            if(unLog != null && !unLog.isEmpty() && pwLog != null && !pwLog.isEmpty())
-                                regSuccess = Public.register(unLog, pwLog);
+                if(unLog != null && !unLog.isEmpty() && pwLog != null && !pwLog.isEmpty())
+                    regSuccess = Public.register(unLog, pwLog);
 
-                            if(regSuccess == 0) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(getApplicationContext(), "Register successful, logging in...", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                logSuccess = Public.login(unLog, pwLog);
+                if(regSuccess == 0) {
+                    Toast.makeText(getApplicationContext(), "Register successful, logging in...", Toast.LENGTH_SHORT).show();
+                    logSuccess = Public.login(unLog, pwLog);
 
-                                if(logSuccess == 0)
-                                    loginSuccess(unLog);
-                            }
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    prog.dismiss();
-                                }
-                            });
-                        } catch (final Exception e) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }.start();
+                    if(logSuccess == 0)
+                        loginSuccess(unLog);
+                }
             }
         });
     }

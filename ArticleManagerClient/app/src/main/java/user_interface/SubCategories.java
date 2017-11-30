@@ -84,22 +84,9 @@ public class SubCategories extends AppCompatActivity {
             @Override
             public void onClick(View v) {
             // Downloads ALL THE THINGS!!!!!
-            new Thread() {
-                public void run() {
-                    try {
-                        prog.show();
-                        File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                prog.dismiss();
-                            }
-                        });
-                    } catch(final Exception e) {
 
-                    }
-                }
-            }.start();
+            File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+
             }
         });
 
@@ -108,22 +95,9 @@ public class SubCategories extends AppCompatActivity {
             @Override
             public void onClick(View v) {
             // Downloads the articles under this category
-            new Thread() {
-                public void run() {
-                    try {
-                        prog.show();
-                        File file = list_builder.Public.BuildDetailedCategoryListing(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), mainId);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                prog.dismiss();
-                            }
-                        });
-                    } catch(final Exception e) {
 
-                    }
-                }
-            }.start();
+            File file = list_builder.Public.BuildDetailedCategoryListing(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), mainId);
+
             }
         });
     }

@@ -180,32 +180,7 @@ public class MyArticles extends AppCompatActivity {
                 if (mCat[i].children()[j] == null)
                     continue;
 
-                globI = i;
-                globJ = j;
-
-                new Thread() {
-                    public void run() {
-                        try {
-                            prog.show();
-                            ls = networking.Public.getArticlesFromCategory(globI, globJ, false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    prog.dismiss();
-                                }
-                            });
-                        } catch(final Exception e) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                            });
-                        }
-                    }
-                }.start();
-
+                ls = networking.Public.getArticlesFromCategory(i, j, false);
 
                 for (ArticleInfo item : ls) {
                     if(item.owner.equals(userName)) {
@@ -255,29 +230,14 @@ public class MyArticles extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Categorize the file then upload it -- TEST THESE
-                final File file = new File(filePath.getText().toString());
+                File file = new File(filePath.getText().toString());
 
-                final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this);
+                ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this);
 
-                new Thread() {
-                    public void run() {
-                        try {
-                            prog.show();
-                            Public.uploadArticle(file, info);
-                            subcategories.add(info.printName);
-                            subList.add(info);
-                            adapter.notifyDataSetChanged();
-                            runOnUiThread(new Runnable() {
-                            @Override
-                                public void run() {
-                                    prog.dismiss();
-                                }
-                            });
-                        } catch(final Exception e) {
-
-                            }
-                    }
-                }.start();
+                Public.uploadArticle(file, info);
+                subcategories.add(info.printName);
+                subList.add(info);
+                adapter.notifyDataSetChanged();
             }
         });
     }

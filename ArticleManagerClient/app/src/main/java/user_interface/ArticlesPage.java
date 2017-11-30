@@ -61,28 +61,8 @@ public class ArticlesPage extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, articles);
         lv.setAdapter(adapter);
 
-        new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    articleTitles = networking.Public.getArticlesFromCategory(mainId, subId, false);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
+        articleTitles = networking.Public.getArticlesFromCategory(mainId, subId, false);
 
-        }.start();
 
         addCategories();
 
@@ -107,22 +87,9 @@ public class ArticlesPage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
             // Downloads ALL THE THINGS!!!!!
-            new Thread() {
-                public void run() {
-                    try {
-                        prog.show();
-                        File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                prog.dismiss();
-                            }
-                        });
-                    } catch(final Exception e) {
 
-                    }
-                }
-            }.start();
+            File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+
             }
         });
 

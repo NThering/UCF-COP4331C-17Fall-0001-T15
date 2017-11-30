@@ -203,24 +203,10 @@ public class ArticlePreview extends AppCompatActivity {
                     odtButton.setBackgroundResource(R.drawable.popupbutton);
                     txtButton.setBackgroundResource(R.drawable.popupbutton);
 
-                    final int ID = getArticleID();
+                    int ID = getArticleID();
 
-                    new Thread() {
-                        public void run() {
-                            try {
-                                prog.show();
-                                file = networking.Public.downloadArticle(ID, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        prog.dismiss();
-                                    }
-                                });
-                            } catch(final Exception e) {
+                    file = networking.Public.downloadArticle(ID, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
 
-                            }
-                        }
-                    }.start();
 
                     if(ID != -1) {
                         switch (downloadFlag) {
@@ -323,26 +309,11 @@ public class ArticlePreview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
             // Categorize the file then upload it
-            final File file = new File(filePath.getText().toString());
+            File file = new File(filePath.getText().toString());
 
-            final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), ArticlePreview.this );
+            ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), ArticlePreview.this );
 
-            new Thread() {
-                public void run() {
-                    try {
-                        prog.show();
-                        networking.Public.uploadArticle(file, info);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                prog.dismiss();
-                            }
-                        });
-                    } catch(final Exception e) {
-
-                    }
-                }
-            }.start();
+            networking.Public.uploadArticle(file, info);
             }
         });
     }
