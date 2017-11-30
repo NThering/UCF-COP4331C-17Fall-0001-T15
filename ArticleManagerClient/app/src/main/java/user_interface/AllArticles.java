@@ -1,6 +1,8 @@
 package user_interface;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,8 +12,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import networking.Public;
 import team15.articlemanagerclient.R;
 import am_utils.ArticleInfo;
 import am_utils.CUtils;
@@ -41,11 +46,24 @@ public class AllArticles extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     String data;
     Button downloadAllArticles;
+    ProgressDialog prog;
+    String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_articles);
+
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        userName = bundle.getString("uName");
+
+        // Initialize ProgressDialog
+        prog = new ProgressDialog(AllArticles.this);
+        prog.setMessage("loading");
+        prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prog.setCancelable(false);
+        prog.setCanceledOnTouchOutside(false);
 
         // Dynamic list view
         lv = (ListView) findViewById(R.id.list);
@@ -62,6 +80,7 @@ public class AllArticles extends AppCompatActivity {
                 Intent newActivity = new Intent(AllArticles.this, SubCategories.class);
                 newActivity.putExtra("message", data);
                 newActivity.putExtra("final_cat_list", finalCatList);
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });
@@ -73,6 +92,22 @@ public class AllArticles extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Download EVERYTHING!!!!!!!
+                new Thread() {
+                    public void run() {
+                        try {
+                            prog.show();
+                            File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    prog.dismiss();
+                                }
+                            });
+                        } catch(final Exception e) {
+
+                        }
+                    }
+                }.start();
             }
         });
     }

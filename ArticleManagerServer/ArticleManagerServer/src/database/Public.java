@@ -106,6 +106,39 @@ public class Public {
 		}
         return null;
     }
+    
+    public static ArrayList<ArticleInfo> getArticlesFromUser(String username)
+    {	
+    	Connection con = getDBConnection();
+    	java.sql.Statement queryStatement;
+    	ResultSet rs;
+    	ArrayList<ArticleInfo> articles = new ArrayList<ArticleInfo>();
+    	ArticleInfo newArt = null;
+		try {
+			queryStatement = con.createStatement();
+			rs = queryStatement.executeQuery("select * from article");
+			
+			
+			while(rs.next())
+			{
+				newArt = new ArticleInfo(rs.getInt("id"));
+				newArt.doiNumber = rs.getString("doiNumber");
+				newArt.printName = rs.getString("printName");
+				newArt.mainCategoryID = rs.getInt("mainID");
+				newArt.subCategoryID = rs.getInt("subID");
+				newArt.author = rs.getString("author");
+				newArt.owner = rs.getString("owner");
+				newArt.abstractText = rs.getString("abstractText");
+				newArt.uploadTime = stringToDate(rs.getString("uploadDate"));
+				
+				articles.add(newArt);
+			}
+			return articles;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return null;
+    }
         
     /** Sends the article to the database for entry, returns 0 if successful and an int corresponding to the type of error if it was not.  If articleID is not 0 this upload is meant to replace an existing upload. 
      if ArticleID matches an articleID already in the database, replace it if the uploader is the owner of that article or is an admin.  Refuse to insert the new article if not.*/

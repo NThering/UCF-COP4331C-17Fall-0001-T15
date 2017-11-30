@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import am_utils.CUtils;
 
 import am_utils.ArticleInfo;
 
@@ -29,6 +30,10 @@ public class Connection extends Thread {
 	private int consecFail;
 	private int permissionLevel;
 	private Object waitingLock = new Object();
+	String username;
+	
+	protected static final int OBJECTPORT = 1907;
+	protected static final int FILEPORT = 1908;
 	
 	Connection(int serverPort, int failTolerance)
 	{
@@ -76,32 +81,45 @@ public class Connection extends Thread {
 	
 	private void sendObject(Object outObj)
 	{
-		while(consecFail <= failTolerance)
+		try
 		{
-			try {
-				ObjectOutputStream sendStream = new ObjectOutputStream(clientSocket.getOutputStream());
+			ServerSocket objectServ = new ServerSocket(1907);
+			Socket objectSocket = objectServ.accept();
+			objectServ.close();
+			while(consecFail <= failTolerance)
+			{
+				ObjectOutputStream sendStream = new ObjectOutputStream(objectSocket.getOutputStream());
 				sendStream.writeObject(outObj);
-			} catch (IOException e) {
-				consecFail++;
 			}
+			consecFail = 0;
+			objectSocket.close();
+		} catch (IOException e1)
+		{
+			consecFail++;
 		}
 	}
 	
 	private Object receiveObject()
 	{
-		Object receiveObject;
+		Object receiveObject = null;
 		try {
-			ObjectInputStream receiveStream = new ObjectInputStream(clientSocket.getInputStream());
+			ServerSocket objectServ = new ServerSocket(1907);
+			Socket objectSocket = objectServ.accept();
+                        objectServ.close();
+			ObjectInputStream receiveStream = new ObjectInputStream(objectSocket.getInputStream());
 			try {
-				receiveObject = receiveStream.readObject();
+                                receiveObject = receiveStream.readObject();
 			} catch (ClassNotFoundException e) {
 				System.err.println("Error reconstituting serialized object from stream.");
 				e.printStackTrace();
 				return null;
 			}
+			objectSocket.close();
 			return receiveObject;
 		} catch (IOException e) {
 			consecFail++;
+                        System.err.println("FAILED TO DO SOME SOCKET THING.");
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -110,29 +128,39 @@ public class Connection extends Thread {
 	{
 		byte[] fileBytes = new byte[(int)fp.length()];
 		OutputStream byteOutput;
-		BufferedInputStream inputStream;
+		FileInputStream inputStream;
 		
-		try {
-		inputStream = new BufferedInputStream(new FileInputStream(fp));
-		} catch(FileNotFoundException e)
+		try 
+                {
+                    inputStream = new FileInputStream(fp);
+		} 
+                catch(FileNotFoundException e)
 		{
 			e.printStackTrace();
 			return;
 		}
 		
-		while(consecFail <= failTolerance)
-		{
-			try {
+		try 
+                {	
+                    ServerSocket fileServ = new ServerSocket(1908);
+                    Socket fileSocket = fileServ.accept();
+                    fileServ.close();
 				
-				inputStream.read(fileBytes, 0, fileBytes.length);
-				byteOutput = clientSocket.getOutputStream();
-				byteOutput.write(fileBytes, 0, fileBytes.length);
-				byteOutput.flush();
-				byteOutput.close();
-				return;
-			} catch (IOException e) {
-				consecFail++;
-			}
+                    int count = 0;
+                    while ((count = inputStream.read(fileBytes)) > 0)
+                    {
+                        fileSocket.getOutputStream().write(fileBytes, 0, count);
+                    }
+                                
+                    fileSocket.getOutputStream().close();
+                    inputStream.close();
+                                
+                    fileSocket.close();
+                    return;
+		} 
+                catch (IOException e) 
+                {
+			consecFail++;
 		}
 		try {
 			inputStream.close();
@@ -142,33 +170,52 @@ public class Connection extends Thread {
 		}
 	}
 	
-	private File receiveFile() // writes file to disk and returns file location as File object.
+	private File receiveFile(int byteCount) // writes file to disk and returns file location as File object.
 	{
-		
-		String byteString = receiveString();
-		int byteCount = Integer.parseInt(byteString);
 		byte[] receivedBytes = new byte[byteCount];
-		File newFile = new File(new SimpleDateFormat("files/yyyyMMddHHmm.pdf").format(new Date()));
+		File newFile = new File("articles/" + new SimpleDateFormat("yyyyMMdd_SSS").format(new Date()) + ".pdf");
 		
-		while(consecFail <= failTolerance)
+		try 
 		{
-			try {
-				FileOutputStream fos = new FileOutputStream(newFile);
-				BufferedOutputStream bos = new BufferedOutputStream(fos);
-				int bytesRead = clientSocket.getInputStream().read(receivedBytes, 0, receivedBytes.length);
-				bos.write(receivedBytes,0 , bytesRead);
-				bos.close();
-				return newFile;
-			} catch (IOException e) {
-				consecFail++;
-			}
+			ServerSocket fileServ = new ServerSocket(1908);
+			Socket fileSocket = fileServ.accept();
+			fileServ.close();
+				
+			FileOutputStream fos = new FileOutputStream(newFile.getPath());
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+                                
+                        int count = 0;
+                        while ((count = fileSocket.getInputStream().read(receivedBytes)) > 0)
+                        {
+                        	fos.write(receivedBytes, 0, count);
+                        }
+
+                        //outStream.write(articleByteArray, 0, fileSize);
+                        CUtils.debugMsg("Wrote file to buffer, time to close stream...");
+                        fileSocket.getInputStream().close();
+                        fos.close();
+			fileSocket.close();
+                                
+			return newFile;
+		} 
+		catch (IOException e) 
+		{
+			consecFail++;
+                        CUtils.warning("Failed to do some file write thing.");
+                        CUtils.warning(e.getMessage());
+                        e.printStackTrace();
 		}
+
 		
 		return null;
 	}
 	
 	private void parse(String input)
 	{
+		if(input == null)
+		{
+			return;
+		}
 		String[] substrings = input.split(" ");
 		String opString;
 		String arg1 = "";
@@ -190,7 +237,7 @@ public class Connection extends Thread {
 		}
 		
 		//Try to keep networking sends here and remember to update consecFail as necessary.
-		switch(opcode) { //TODO: Add functionality for opcodes here, sending execution off to proper subsystems/modules if necessary.
+		switch(opcode) { 
 			case 0:
 				consecFail = 0;
 				break;
@@ -199,6 +246,10 @@ public class Connection extends Thread {
 				if(permissionLevel == -1)
 				{
 					sendString("-1");
+				} else
+				{
+					username = arg1;
+					sendString("0");
 				}
 				break;
 			case 2:
@@ -219,14 +270,46 @@ public class Connection extends Thread {
 				sendObject(returnedArticles);
 				break;
 			case 5:
-				tempFile = receiveFile();
 				tempArticleInfo = (ArticleInfo)receiveObject();
+				System.out.println("Received article info object from client.");
+				tempFile = receiveFile(Integer.parseInt(arg1));
+				System.out.println("Received file from client.");
 				database.Public.insertArticle(tempFile, tempArticleInfo, permissionLevel);
+				System.out.println("Article info data inserted into database.");
 				break;
 			case 6:
+				/*
 				tempArticleInfo = database.Public.getArticleInfo(Integer.valueOf(arg1));
 				sendObject(tempArticleInfo);
 				break;
+				*/
+				
+				if ( arg1.compareTo("25") == 0 )
+                {
+                    tempArticleInfo = new ArticleInfo(3, 95, 55);
+
+                    tempArticleInfo.printName = "TestArticleTitle";
+                    tempArticleInfo.abstractText = "TestArticleAbstract";
+                    tempArticleInfo.author = "TestArticleAuthors";
+                    tempArticleInfo.doiNumber = "TestArticleDOI";
+                    tempArticleInfo.owner = "Nobody";
+
+                    sendObject(tempArticleInfo);
+                }
+                else
+                {
+                    tempArticleInfo = new ArticleInfo(4, 20, 50);
+
+                    tempArticleInfo.printName = "TestArticleTitle2";
+                    tempArticleInfo.abstractText = "TestArticleAbstract2";
+                    tempArticleInfo.author = "TestArticleAuthors2";
+                    tempArticleInfo.doiNumber = "TestArticleDOI2";
+                    tempArticleInfo.owner = "Noah2";
+
+                    sendObject(tempArticleInfo);
+                }
+				break;
+				
 			case 7:
 				tempFile = database.Public.downloadArticle(Integer.valueOf(arg1));
 				sendString(database.Public.getArticleInfo(Integer.valueOf(arg1)).printName + " " + tempFile.length());
@@ -234,6 +317,10 @@ public class Connection extends Thread {
 				break;
 			case 8:
 				sendString(Integer.toString(permissionLevel));
+				break;
+			case 9:
+				returnedArticles = database.Public.getArticlesFromUser(username);
+				sendObject(returnedArticles);
 				break;
 		}
 		

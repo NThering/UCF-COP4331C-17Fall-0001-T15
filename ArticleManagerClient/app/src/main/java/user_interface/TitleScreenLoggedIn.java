@@ -9,10 +9,16 @@ import team15.articlemanagerclient.R;
 
 public class TitleScreenLoggedIn extends AppCompatActivity {
 
+    String userName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_title_screen_logged_in);
+
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        userName = bundle.getString("uName");
 
         Button myArticlesButton = (Button) findViewById(R.id.myArticlesButton);
         Button viewArticlesButton = (Button) findViewById(R.id.viewArticlesButtonLogged);
@@ -22,6 +28,7 @@ public class TitleScreenLoggedIn extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent newActivity2 = new Intent(TitleScreenLoggedIn.this, MyArticles.class);
+                newActivity2.putExtra("uName", userName);
                 startActivity(newActivity2);
             }
         });
@@ -31,6 +38,7 @@ public class TitleScreenLoggedIn extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent newActivity = new Intent(TitleScreenLoggedIn.this, AllArticles.class);
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });

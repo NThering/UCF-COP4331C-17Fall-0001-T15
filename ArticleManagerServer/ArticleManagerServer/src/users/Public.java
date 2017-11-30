@@ -34,17 +34,18 @@ private static String driver = "org.mariadb.jdbc.Driver";
     {
         /**	Checks the username and password against the stored password hashes on the database.  Returns -1 if login failed and an integer corresponding to that user's permissions if successful. */
         /** Passwords must be stored securely ( NOT IN PLAINTEXT ) so that a data breach would not compromise them. */
+    	
+    	return 0;
+    	
+    	/*
         try
         {
             Class.forName(driver);
             Connection connection = DriverManager.getConnection(URL, USER, PASS);
 
-            PreparedStatement statement = connection.prepareStatement("SELECT 'username', 'password' FROM users WHERE 'username' = ? " +
-                    "AND 'password' = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT 'name', 'password' FROM users WHERE 'name' = ?");
             ResultSet r1 = statement.executeQuery();
             statement.setString(1, username);
-            statement.setString(2, password);
-            String usernameCounter;
             byte[] salty = salt();
             if(r1.next())
             {
@@ -57,6 +58,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
 
             else{
                 System.out.println("Invalid Login");
+                return -1;
             }
         }
 
@@ -74,7 +76,7 @@ private static String driver = "org.mariadb.jdbc.Driver";
 			e.printStackTrace();
 			System.exit(-1);
 		}
-        return -1;
+        return -1;*/
     }
 
     /** Ensures that the username is unique and can be registered in the database, then registers it if so.  Returns true if registration successful and false if not. */
@@ -85,38 +87,34 @@ private static String driver = "org.mariadb.jdbc.Driver";
             Class.forName("org.mariadb.jdbc.Driver");
             Connection connection = DriverManager.getConnection(URL, USER, PASS);
 
-            PreparedStatement st = connection.prepareStatement("select * from users order by username desc");
-            PreparedStatement st2 = connection.prepareStatement("INSERT INTO users (username) VALUES (?)");
+            PreparedStatement st = connection.prepareStatement("select * from users where name= \"" + username + "\"");
+            PreparedStatement st2;
             ResultSet r1 = st.executeQuery();
-            Statement s = connection.createStatement();
             String usernameCounter;
             byte[] salty = salt();
             if(r1.next())
             {
-                usernameCounter = r1.getString("username");
+                usernameCounter = r1.getString("name");
                 if(usernameCounter.equals(username))
                 {
                     System.out.println("Username already exists");
                     return false;
                 }
+            } else{
 
-                else{
-
-                    //add username to the database.
-                    System.out.println("Username is available!");
-                    st2.executeQuery();
-                }
+                //add username to the database.
+            	String secure = securePassword(password, salty);
+                System.out.println("Username is available!");
+                st2 = connection.prepareStatement("insert into users values (" + "\""+ username + "\"" + ", " + "\""+ secure +"\"" + ", " + "0 ," + "NULL" + ")");
+                st2.executeQuery();
             }
-
-            String secure = securePassword(password, salty);
-
-            s.executeUpdate("INSERT INTO 'users'(passwords) VALUES (secure)");
-
+            
         }
 
         catch (SQLException e)
         {
             System.out.println("SQL Exception: " + e.toString());
+            return false;
         }
 
         catch (ClassNotFoundException ce)

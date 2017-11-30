@@ -2,6 +2,7 @@ package articleManagerServer;
 
 import networking.ConnectionHandler;
 import testing.PublicTestDB;
+import testing.PublicTestUsers;
 
 public class ArticleManagerServer {
 	public static void main(String[] args)
@@ -15,7 +16,9 @@ public class ArticleManagerServer {
 			{
 				System.out.println("Launching with command line parameter 'test'");
 				PublicTestDB dbTest = new PublicTestDB();
+				PublicTestUsers userTest = new PublicTestUsers();
 				dbTest.runTest();
+				userTest.runTest();
 			}
 		}
 		

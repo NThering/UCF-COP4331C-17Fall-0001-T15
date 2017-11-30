@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:background="#745924"
         android:orientation="vertical"
-        android:layout_weight=".1">
+        android:layout_weight=".3">
 
         <TextView
             android:id="@+id/usernameTextView"
@@ -25,23 +25,13 @@
             android:textSize="20sp"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
-
-        <TextView
-            android:id="@+id/userTitleTextView"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
     </LinearLayout>
 
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5.8">
+        android:layout_weight="5.6">
     </ListView>
 
     <LinearLayout

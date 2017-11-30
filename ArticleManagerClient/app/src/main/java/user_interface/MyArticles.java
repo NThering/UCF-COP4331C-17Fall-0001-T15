@@ -31,7 +31,7 @@ import am_utils.ArticleInfo;
 import am_utils.MainCategory;
 import in.gauriinfotech.commons.Commons;
 import team15.articlemanagerclient.R;
-//import networking.Public;
+import networking.Public;
 import proccessing.PublicUsage;
 import am_utils.DefaultCategories;
 
@@ -39,6 +39,7 @@ public class MyArticles extends AppCompatActivity {
 
     ListView lv;
     ArrayList<String> subcategories = new ArrayList<>();
+    ArrayList<ArticleInfo> subList = new ArrayList<>();
     ArrayAdapter<String> adapter;
     TextView username, userTitle;
     Button upload, logout;
@@ -49,11 +50,16 @@ public class MyArticles extends AppCompatActivity {
     DefaultCategories defaultCat = new DefaultCategories();
     Uri path;
     ProgressDialog prog;
+    String userName, data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_articles);
+
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        userName = bundle.getString("uName");
 
         // Initialize ProgressDialog
         prog = new ProgressDialog(MyArticles.this);
@@ -65,23 +71,23 @@ public class MyArticles extends AppCompatActivity {
         username = (TextView) findViewById(R.id.usernameTextView);
         userTitle = (TextView) findViewById(R.id.userTitleTextView);
 
-        // Hard code until I can pull from database
-        username.setText("Ian");
-        userTitle.setText("Da God");
+        username.setText(userName);
 
         lv = (ListView) findViewById(R.id.list);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, subcategories);
         lv.setAdapter(adapter);
+
         addCategories();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String data = (String)parent.getItemAtPosition(position);
+                data = (String)parent.getItemAtPosition(position);
                 Intent newActivity = new Intent(MyArticles.this, ArticlePreview.class);
                 newActivity.putExtra("messageSub", data);
-                newActivity.putExtra("mainCatId", 1); // CHANGE 1 WHEN WE TRACK USERNAME
-                newActivity.putExtra("subCatId", 1); // CHANGE 1 WHEN WE TRACK USERNAME
+                newActivity.putExtra("mainCatId", getMainId());
+                newActivity.putExtra("subCatId", getSubId());
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });
@@ -106,33 +112,39 @@ public class MyArticles extends AppCompatActivity {
 
         // Logout
         logout.setOnClickListener(new View.OnClickListener() {
+            int log = -1;
+
             @Override
             public void onClick(View v) {
-                /*  new Thread() {
+                new Thread() {
                     public void run() {
-                try {
-                    prog.show();
-             //   int logSuccess = -1;
-             //   logSuccess = Public.logout();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
+                        try {
+                        prog.show();
+                        log = Public.logout();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                        } catch(final Exception e) {
+
                         }
-                    });
-                } catch(final Exception e) {
+                    }
+                }.start();
 
-                }
-            }
-        }.start(); */
-
-             //   if(logSuccess == 0) {
+                if(log == 0) { // Might remove some of this when Networking is up TBD
                     Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     SharedPreferences preference = getSharedPreferences("loggedIn", MODE_PRIVATE);
                     preference.edit().remove("logged").commit();
+                    SharedPreferences preference2 = getSharedPreferences("oname", MODE_PRIVATE);
+                    preference2.edit().remove("onamewa").commit();
                     startActivity(intent);
-             //   }
+                }
+
+                else
+                    Toast.makeText(getApplicationContext(), "Failed to log out", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -148,28 +160,38 @@ public class MyArticles extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case permissionRequestCode:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    Toast.makeText(getApplicationContext(), "granted", Toast.LENGTH_SHORT).show();
-
-                else
-                    Toast.makeText(getApplicationContext(), "nah bitch", Toast.LENGTH_SHORT).show();
-
                 break;
 
             default: super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
-    // Hard coded categories
+    // Handles the articles
     public void addCategories() {
-        subcategories.add("The");
-        subcategories.add("memes");
-        subcategories.add("are");
-        subcategories.add("too");
-        subcategories.add("spicy");
-        subcategories.add("for");
-        subcategories.add("this");
+        DefaultCategories dCat = new DefaultCategories();
+        MainCategory mCat[] = dCat.getDefaultCategories();
+
+        for (int i = 0; i < dCat.size(); i++)
+        {
+            if (mCat[i] == null)
+                continue;
+
+            for (int j = 0; j < mCat[i].size(); j++) {
+                if (mCat[i].children()[j] == null)
+                    continue;
+                // PUT IN THREAD!!
+                ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(i, j, false);
+                for (ArticleInfo item : ls)
+                {
+                    if(item.owner.equals(userName)) {
+                        subcategories.add(item.printName);
+                        subList.add(item);
+                    }
+
+                }
+            }
+        }
+
         adapter.notifyDataSetChanged();
     }
 
@@ -207,27 +229,27 @@ public class MyArticles extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Categorize the file then upload it
-                File file = new File(filePath.getText().toString());
+                // Categorize the file then upload it -- TEST THESE
+                final File file = new File(filePath.getText().toString());
 
-                ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
+                final ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), MyArticles.this );
 
-                /*  new Thread() {
-                public void run() {
-                try {
-                    prog.show();
-             Public.uploadArticle(file, info);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+                new Thread() {
+                    public void run() {
+                        try {
+                            prog.show();
+                            Public.uploadArticle(file, info);
+                            runOnUiThread(new Runnable() {
+                            @Override
+                                public void run() {
+                                    prog.dismiss();
+                                }
+                            });
+                        } catch(final Exception e) {
 
-                }
-            }
-        }.start(); */
+                            }
+                    }
+                }.start();
             }
         });
     }
@@ -246,5 +268,23 @@ public class MyArticles extends AppCompatActivity {
     public int GetMainCategoryArraySize() { return defaultCat.size(); }
 
     public MainCategory[] GetMainCategoryArray() { return defaultCat.getDefaultCategories(); }
+
+    public int getMainId() {
+        for (ArticleInfo item : subList) {
+            if(item.printName.equals(data))
+                return item.mainCategoryID;
+        }
+
+        return -1;
+    }
+
+    public int getSubId() {
+        for (ArticleInfo item : subList) {
+            if(item.printName.equals(data))
+                return item.subCategoryID;
+        }
+
+        return -1;
+    }
 
 }

@@ -2,6 +2,7 @@ package user_interface;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,10 +12,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
 import java.util.ArrayList;
 
 import am_utils.SubCategory;
 import team15.articlemanagerclient.R;
+import networking.Public;
 
 public class SubCategories extends AppCompatActivity {
 
@@ -24,7 +28,7 @@ public class SubCategories extends AppCompatActivity {
     ArrayList<CatContainer> finalCatList;
     ArrayAdapter<String> adapter;
     TextView title;
-    String data, message;
+    String data, message, userName;
     Button downloadAllArticles, downloadUnderCategory;
     Integer mainId, subId;
     ProgressDialog prog;
@@ -38,6 +42,7 @@ public class SubCategories extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         message = bundle.getString("message");
+        userName = bundle.getString("uName");
         finalCatList = (ArrayList<CatContainer>) bundle.getSerializable("final_cat_list");
 
         // Initialize ProgressDialog
@@ -49,6 +54,7 @@ public class SubCategories extends AppCompatActivity {
 
         title = (TextView) findViewById(R.id.subTextView);
         title.setText(message + " Sub Categories");
+        mainId = getMainId(message);
 
         // Dynamic list
         lv = (ListView) findViewById(R.id.list);
@@ -60,12 +66,12 @@ public class SubCategories extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 data = (String)parent.getItemAtPosition(position);
-                mainId = getMainId(message);
                 subId = getSubId(message, data);
                 Intent newActivity = new Intent(SubCategories.this, ArticlesPage.class);
                 newActivity.putExtra("messageSub", data);
                 newActivity.putExtra("mainCatId", mainId);
                 newActivity.putExtra("subCatId", subId);
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });
@@ -77,23 +83,23 @@ public class SubCategories extends AppCompatActivity {
         downloadAllArticles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Downloads ALL THE THINGS!!!!!
-                /*  new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    Public.BuildDatabaseOverview();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+            // Downloads ALL THE THINGS!!!!!
+            new Thread() {
+                public void run() {
+                    try {
+                        prog.show();
+                        File file = list_builder.Public.BuildDatabaseOverview(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                    } catch(final Exception e) {
 
+                    }
                 }
-            }
-        }.start(); */
+            }.start();
             }
         });
 
@@ -101,23 +107,23 @@ public class SubCategories extends AppCompatActivity {
         downloadUnderCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Downloads the articles under this category
-                /*  new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    Public.BuildDetailedCategoryListing(); // FIX PARAMS AFTER NOAH DOES
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
+            // Downloads the articles under this category
+            new Thread() {
+                public void run() {
+                    try {
+                        prog.show();
+                        File file = list_builder.Public.BuildDetailedCategoryListing(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), mainId);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                prog.dismiss();
+                            }
+                        });
+                    } catch(final Exception e) {
 
+                    }
                 }
-            }
-        }.start(); */
+            }.start();
             }
         });
     }
