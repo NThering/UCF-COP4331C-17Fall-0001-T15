@@ -122,22 +122,7 @@ public class MyArticles extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-               new Thread() {
-                    public void run() {
-                        try {
-                        prog.show();
-                        log = Public.logout();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                prog.dismiss();
-                            }
-                        });
-                        } catch(final Exception e) {
-
-                        }
-                    }
-                }.start();
+                log = Public.logout();
 
                 if(log == 0) { // Might remove some of this when Networking is up TBD
                     Intent intent = new Intent(MyArticles.this, TitleScreenLoggedOut.class);
@@ -227,6 +212,7 @@ public class MyArticles extends AppCompatActivity {
                 subcategories.add(info.printName);
                 ls.add(info);
                 adapter.notifyDataSetChanged();
+                window.dismiss();
             }
         });
     }

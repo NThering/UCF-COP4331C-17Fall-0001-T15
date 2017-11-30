@@ -318,6 +318,8 @@ public class ArticlePreview extends AppCompatActivity {
             ArticleInfo info = PublicUsage.categorize(file, GetMainCategoryArray(), GetMainCategoryArraySize(), ArticlePreview.this );
 
             networking.Public.uploadArticle(file, info);
+
+            window.dismiss();
             }
         });
     }
