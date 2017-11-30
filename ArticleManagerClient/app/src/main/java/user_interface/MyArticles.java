@@ -57,6 +57,10 @@ public class MyArticles extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_articles);
 
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        userName = bundle.getString("uName");
+
         // Initialize ProgressDialog
         prog = new ProgressDialog(MyArticles.this);
         prog.setMessage("loading");
@@ -67,28 +71,11 @@ public class MyArticles extends AppCompatActivity {
         username = (TextView) findViewById(R.id.usernameTextView);
         userTitle = (TextView) findViewById(R.id.userTitleTextView);
 
-        username.setText(networking.Public.getUsername());
+        username.setText(userName);
 
         lv = (ListView) findViewById(R.id.list);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, subcategories);
         lv.setAdapter(adapter);
-
-        new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    userName = networking.Public.getUsername();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
-
-                }
-            }
-        }.start();
 
         addCategories();
 
@@ -100,6 +87,7 @@ public class MyArticles extends AppCompatActivity {
                 newActivity.putExtra("messageSub", data);
                 newActivity.putExtra("mainCatId", getMainId());
                 newActivity.putExtra("subCatId", getSubId());
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });
@@ -150,6 +138,8 @@ public class MyArticles extends AppCompatActivity {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     SharedPreferences preference = getSharedPreferences("loggedIn", MODE_PRIVATE);
                     preference.edit().remove("logged").commit();
+                    SharedPreferences preference2 = getSharedPreferences("oname", MODE_PRIVATE);
+                    preference2.edit().remove("onamewa").commit();
                     startActivity(intent);
                 }
 
@@ -189,7 +179,7 @@ public class MyArticles extends AppCompatActivity {
             for (int j = 0; j < mCat[i].size(); j++) {
                 if (mCat[i].children()[j] == null)
                     continue;
-
+                // PUT IN THREAD!!
                 ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(i, j, false);
                 for (ArticleInfo item : ls)
                 {

@@ -61,6 +61,7 @@ public class ArticlePreview extends AppCompatActivity {
         message = bundle.getString("titleMessage");
         mainId = bundle.getInt("mainCatId");
         subId = bundle.getInt("subCatId");
+        userName = bundle.getString("uName");
 
         // Initialize the elements
         title = (TextView) findViewById(R.id.articleTitleTextView);
@@ -79,23 +80,6 @@ public class ArticlePreview extends AppCompatActivity {
         prog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         prog.setCancelable(false);
         prog.setCanceledOnTouchOutside(false);
-
-        new Thread() {
-            public void run() {
-                try {
-                    prog.show();
-                    userName = networking.Public.getUsername();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            prog.dismiss();
-                        }
-                    });
-                } catch(final Exception e) {
-
-                }
-            }
-        }.start();
 
         // Setting stuff
         title.setText(message);

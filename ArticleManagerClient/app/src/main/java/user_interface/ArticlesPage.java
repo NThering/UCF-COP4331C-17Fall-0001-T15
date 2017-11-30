@@ -29,7 +29,7 @@ public class ArticlesPage extends AppCompatActivity {
     TextView title;
     Button downloadAllArticles, downloadUnderCategory;
     Integer mainId, subId;
-    String data, message;
+    String data, message, userName;
     ProgressDialog prog;
 
     @Override
@@ -43,6 +43,7 @@ public class ArticlesPage extends AppCompatActivity {
         message = bundle.getString("messageSub");
         mainId = bundle.getInt("mainCatId");
         subId = bundle.getInt("subCatId");
+        userName = bundle.getString("uName");
 
         // Initialize ProgressDialog
         prog = new ProgressDialog(ArticlesPage.this);
@@ -86,6 +87,7 @@ public class ArticlesPage extends AppCompatActivity {
                 newActivity.putExtra("titleMessage", data);
                 newActivity.putExtra("mainCatId", mainId);
                 newActivity.putExtra("subCatId", subId);
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });

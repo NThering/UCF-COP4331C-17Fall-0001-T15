@@ -47,11 +47,16 @@ public class AllArticles extends AppCompatActivity {
     String data;
     Button downloadAllArticles;
     ProgressDialog prog;
+    String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_articles);
+
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        userName = bundle.getString("uName");
 
         // Initialize ProgressDialog
         prog = new ProgressDialog(AllArticles.this);
@@ -75,6 +80,7 @@ public class AllArticles extends AppCompatActivity {
                 Intent newActivity = new Intent(AllArticles.this, SubCategories.class);
                 newActivity.putExtra("message", data);
                 newActivity.putExtra("final_cat_list", finalCatList);
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });

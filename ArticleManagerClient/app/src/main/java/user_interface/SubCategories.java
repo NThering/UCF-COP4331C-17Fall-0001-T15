@@ -28,7 +28,7 @@ public class SubCategories extends AppCompatActivity {
     ArrayList<CatContainer> finalCatList;
     ArrayAdapter<String> adapter;
     TextView title;
-    String data, message;
+    String data, message, userName;
     Button downloadAllArticles, downloadUnderCategory;
     Integer mainId, subId;
     ProgressDialog prog;
@@ -42,6 +42,7 @@ public class SubCategories extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         message = bundle.getString("message");
+        userName = bundle.getString("uName");
         finalCatList = (ArrayList<CatContainer>) bundle.getSerializable("final_cat_list");
 
         // Initialize ProgressDialog
@@ -70,6 +71,7 @@ public class SubCategories extends AppCompatActivity {
                 newActivity.putExtra("messageSub", data);
                 newActivity.putExtra("mainCatId", mainId);
                 newActivity.putExtra("subCatId", subId);
+                newActivity.putExtra("uName", userName);
                 startActivity(newActivity);
             }
         });

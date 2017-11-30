@@ -25,6 +25,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
     Button loginButton, viewArticlesButton;
     Boolean logged;
     ProgressDialog prog;
+    String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +34,10 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
 
         // Shared variable to determine if previously logged in -- return false if not and do nothing
         logged = getSharedPreferences("loggedIn", MODE_PRIVATE).getBoolean("logged", false);
+        userName = getSharedPreferences("oname", MODE_PRIVATE).getString("onamewa", "");
 
         if(logged) // If true, instant login -- CHANGE LOGIC WHEN WE HAVE MORE THAN ONE USER! THIS IS FOR TESTING
-            loginSuccess();
+            loginSuccess(userName);
 
         // Initialize buttons
         loginButton = (Button) findViewById(R.id.loginButton);
@@ -106,7 +108,7 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            loginSuccess();
+                            loginSuccess(un);
                         }
 
                         runOnUiThread(new Runnable() {
@@ -139,16 +141,18 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Register successful, logging in...", Toast.LENGTH_SHORT).show();
                     logSuccess = Public.login(un, pw);
                     if(logSuccess == 0)
-                        loginSuccess();
+                        loginSuccess(un);
                 }
             }
         });
     }
 
-    public void loginSuccess() {
+    public void loginSuccess(String un) {
         // Remembers that someone is logged in and will take them to the next screen on startup
         getSharedPreferences("loggedIn", MODE_PRIVATE).edit().putBoolean("logged", true).commit();
+        getSharedPreferences("oname", MODE_PRIVATE).edit().putString("onamewa", un).commit();
         Intent intent = new Intent(this, TitleScreenLoggedIn.class);
+        intent.putExtra("uName", un);
         startActivity(intent);
         finish(); // Prevents going back to login page
     }
