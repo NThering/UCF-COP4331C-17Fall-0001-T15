@@ -1,10 +1,8 @@
 package user_interface;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -94,41 +92,16 @@ public class TitleScreenLoggedOut extends AppCompatActivity {
             public void onClick(View v) {
             unLog = username.getText().toString();
             pwLog = password.getText().toString();
-            new Thread() {
-                public void run() {
-                    try {
-                    prog.show();
-                        int logSuccess = -1;
+                int logSuccess = -1;
 
-                        if(unLog != null && !unLog.isEmpty() && pwLog != null && !pwLog.isEmpty())
-                            logSuccess = Public.login(unLog, pwLog);
+                if(unLog != null && !unLog.isEmpty() && pwLog != null && !pwLog.isEmpty())
+                    logSuccess = Public.login(unLog, pwLog);
 
-                        if(logSuccess == 0) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            loginSuccess(unLog);
-                        }
+                if(logSuccess == 0) {
+                    Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                prog.dismiss();
-                            }
-                        });
-                    } catch (final Exception e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "Something happened...", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    loginSuccess(unLog);
                 }
-            }.start();
             }
         });
 
