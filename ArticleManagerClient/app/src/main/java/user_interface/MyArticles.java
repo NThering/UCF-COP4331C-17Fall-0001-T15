@@ -39,6 +39,7 @@ public class MyArticles extends AppCompatActivity {
 
     ListView lv;
     ArrayList<String> subcategories = new ArrayList<>();
+    ArrayList<ArticleInfo> subList = new ArrayList<>();
     ArrayAdapter<String> adapter;
     TextView username, userTitle;
     Button upload, logout;
@@ -49,6 +50,7 @@ public class MyArticles extends AppCompatActivity {
     DefaultCategories defaultCat = new DefaultCategories();
     Uri path;
     ProgressDialog prog;
+    String userName, data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,22 +67,39 @@ public class MyArticles extends AppCompatActivity {
         username = (TextView) findViewById(R.id.usernameTextView);
         userTitle = (TextView) findViewById(R.id.userTitleTextView);
 
-        // Hard code until I can pull from database -- DEAL WITH THIS IAN
-        username.setText("Ian");
+        username.setText(networking.Public.getUsername());
 
         lv = (ListView) findViewById(R.id.list);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, subcategories);
         lv.setAdapter(adapter);
+
+        new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    userName = networking.Public.getUsername();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start();
+
         addCategories();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String data = (String)parent.getItemAtPosition(position);
+                data = (String)parent.getItemAtPosition(position);
                 Intent newActivity = new Intent(MyArticles.this, ArticlePreview.class);
                 newActivity.putExtra("messageSub", data);
-                newActivity.putExtra("mainCatId", 1); // CHANGE 1 WHEN WE TRACK USERNAME
-                newActivity.putExtra("subCatId", 1); // CHANGE 1 WHEN WE TRACK USERNAME
+                newActivity.putExtra("mainCatId", getMainId());
+                newActivity.putExtra("subCatId", getSubId());
                 startActivity(newActivity);
             }
         });
@@ -157,15 +176,32 @@ public class MyArticles extends AppCompatActivity {
         }
     }
 
-    // Hard coded categories -- CHANGE WHEN NETWORKING IS UP
+    // Handles the articles
     public void addCategories() {
-        subcategories.add("The");
-        subcategories.add("memes");
-        subcategories.add("are");
-        subcategories.add("too");
-        subcategories.add("spicy");
-        subcategories.add("for");
-        subcategories.add("this");
+        DefaultCategories dCat = new DefaultCategories();
+        MainCategory mCat[] = dCat.getDefaultCategories();
+
+        for (int i = 0; i < dCat.size(); i++)
+        {
+            if (mCat[i] == null)
+                continue;
+
+            for (int j = 0; j < mCat[i].size(); j++) {
+                if (mCat[i].children()[j] == null)
+                    continue;
+
+                ArrayList<ArticleInfo> ls = networking.Public.getArticlesFromCategory(i, j, false);
+                for (ArticleInfo item : ls)
+                {
+                    if(item.owner.equals(userName)) {
+                        subcategories.add(item.printName);
+                        subList.add(item);
+                    }
+
+                }
+            }
+        }
+
         adapter.notifyDataSetChanged();
     }
 
@@ -242,5 +278,23 @@ public class MyArticles extends AppCompatActivity {
     public int GetMainCategoryArraySize() { return defaultCat.size(); }
 
     public MainCategory[] GetMainCategoryArray() { return defaultCat.getDefaultCategories(); }
+
+    public int getMainId() {
+        for (ArticleInfo item : subList) {
+            if(item.printName.equals(data))
+                return item.mainCategoryID;
+        }
+
+        return -1;
+    }
+
+    public int getSubId() {
+        for (ArticleInfo item : subList) {
+            if(item.printName.equals(data))
+                return item.subCategoryID;
+        }
+
+        return -1;
+    }
 
 }

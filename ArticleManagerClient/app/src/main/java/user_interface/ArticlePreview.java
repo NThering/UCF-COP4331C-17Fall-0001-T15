@@ -48,6 +48,7 @@ public class ArticlePreview extends AppCompatActivity {
     int downloadFlag;
     ProgressDialog prog;
     File file;
+    String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,24 @@ public class ArticlePreview extends AppCompatActivity {
         prog.setCancelable(false);
         prog.setCanceledOnTouchOutside(false);
 
-        // Hard code until I get real code
+        new Thread() {
+            public void run() {
+                try {
+                    prog.show();
+                    userName = networking.Public.getUsername();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            prog.dismiss();
+                        }
+                    });
+                } catch(final Exception e) {
+
+                }
+            }
+        }.start();
+
+        // Setting stuff
         title.setText(message);
         categories.setText(getMainCategoryName(mainId) + ", " + getSubCategoryName(mainId, subId));
         articleInformation = networking.Public.getArticlesFromCategory(mainId, subId, false);
@@ -89,7 +107,7 @@ public class ArticlePreview extends AppCompatActivity {
         abstractInfo.setText(getAbstract());
 
         // If you uploaded the article, get access to these two buttons
-        if(networking.Public.getUsername().equals(uploader.getText())) {
+        if(userName.equals(uploader.getText())) {
             deleteButton.setVisibility(View.VISIBLE);
             reupload.setVisibility(View.VISIBLE);
         }
